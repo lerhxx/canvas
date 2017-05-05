@@ -97,7 +97,7 @@ window.onload = function() {
     // ctx.setLineDotted({dx: 0, dy: 20, style:'fill'});
 
     /*
-     * @method setLineDotted: 绘制五角星
+     * @method drawStar: 绘制五角星
      * @params {CanvasRenderingContext2D} ctx canvas环境
      * @params {Number} x 中心点横坐标
      * @params {Number} y 中心点纵坐标
@@ -210,7 +210,7 @@ window.onload = function() {
         ctx.fill()
 
     }
-    drawSector(ctx);
+    // drawSector(ctx);
 
     // ctx.shadowBlur = 5;
     // ctx.shadowColor = 'rgba(204, 204, 204, 0.5)';
@@ -235,4 +235,212 @@ window.onload = function() {
     // ctx.arc(150, 30, 20, 0, Math.PI * 2, true);
     // ctx.closePath();
     // ctx.fill()
+    let rect = {}
+    function dragRect() {
+        canvas.addEventListener('mousedown', mouseDown, false);
+        canvas.addEventListener('mousemove', mouseMove, false);
+        canvas.addEventListener('mouseup', mouseUp, false);
+    }
+
+    function mouseDown(e) {
+        rect.startX = e.pageX - this.offsetLeft;
+        rect.startY = e.pageY - this.offsetTop;
+        rect.drag = true;
+        // console.log(rect.startX)
+        // console.log(e.pageX)
+    }
+
+    function mouseMove(e) {
+        if(rect.drag) {
+            rect.w = (e.pageX - this.offsetLeft) - rect.startX;
+            rect.h = (e.pageY - this.offsetTop) - rect.startY;
+            // console.log(rect.w)
+            ctx.clearRect(0, 0, this.width, this.height);
+            drawRect('stroke');
+            // console.log('mousemove')
+        }
+    }
+
+    function mouseUp() {
+        rect.drag = false;
+        // console.log('mouseup')
+    }
+
+    function drawRect(style) {
+        ctx[`${style}Rect`](rect.startX, rect.startY, rect.w, rect.h)
+        console.log(rect.startX)
+    }
+    // dragRect()
+
+    function drawCurve() {
+        ctx.strokeStyle = '#f36';
+        ctx.fillStyle = 'red';
+        ctx.lineWidth = 1;
+
+        ctx.fillRect(100 - 4, 50 - 4, 8, 8)
+        ctx.fillRect(300 - 4, 200 - 4, 8, 8)
+        ctx.fillRect(100 - 4, 200 - 4, 8, 8)
+
+        ctx.beginPath();
+        ctx.strokeStyle = 'pink';
+        ctx.moveTo(100, 50);
+        ctx.lineTo(100, 200);
+        ctx.lineTo(300, 200);
+        ctx.stroke()
+
+        ctx.beginPath();
+        ctx.strokeStyle = 'blue';
+        ctx.moveTo(100, 50);
+        ctx.quadraticCurveTo(100, 200, 300, 200);
+        ctx.stroke()
+    }
+    // drawCurve()
+    function drawLang() {
+        let lineWidth = 2,
+            oW = canvas.width,
+            oH = canvas.height,
+            r = (oW / 2),
+            cR = r - 8 * lineWidth,
+            oRange = document.getElementsByName('range')[0];
+        let M = Math;
+            Sin = M.sin;
+            Cos = M.cos;
+            Sqrt = M.sqrt;
+            Pow = M.pow;
+            PI = M.PI;
+            Round = M.round;
+        
+        ctx.beginPath();
+        ctx.lineWidth = lineWidth;
+        let axisLength = 2 * r - 16 * lineWidth,
+            unit = axisLength / 8,
+            range = .2,
+            nowrange = range,
+            xoffset = 8 * lineWidth,
+            data = ~~(oRange.value) / 100,
+            sp = 0,
+            nowdata = 0,
+            waveupsp = 0.002,
+            arcStack = [],
+            bR = r - 8 * lineWidth,
+            soffset = -(PI/2),
+            circleLock = true;
+        
+        for(let i = soffset; i < soffset + 2 * PI; i += 1/(8 * PI)) {
+            arcStack.push([
+                r + bR * Cos(i),
+                r + bR * Sin(i)
+            ])
+        }
+
+        let cStartPoint = arcStack.shift();
+
+        ctx.strokeStyle = '#1c86d1';
+        ctx.moveTo(cStartPoint[0], cStartPoint[1])
+
+        render();
+
+        function render() {
+             ctx.clearRect(0, 0, oW, oH);
+             if(circleLock) {
+                 if(arcStack.length) {
+                     let temp = arcStack.shift();
+                     ctx.lineTo(temp[0], temp[1]);
+                     ctx.stroke();
+                 }else {
+                     circleLock = false;
+                     ctx.lineTo(cStartPoint[0], cStartPoint[1]);
+                     ctx.stroke();
+                     arcStack = null;
+
+                     ctx.globalCompositeOperation = 'destination-over';
+
+                     ctx.beginPath();
+                     ctx.lineWidth = lineWidth;
+                     ctx.arc(r, r, bR, 0, 2 * PI, 1);
+                     
+                     ctx.beginPath();
+                     ctx.save();
+                     ctx.arc(r, r, r - 16 * lineWidth, 0, 2 * PI, 1);
+                     ctx.restore();
+                     ctx.clip();
+                    //  ctx.fillRect(0, 0, oW, oH)
+
+                     ctx.fillStyle = '#1c86d1';
+
+                     oRange.addEventListener('change', () => {
+                         data = ~~(oRange.value) / 100;
+                         console.log(`data = ${data}`);
+                     }, 0);
+                 }
+             }else {
+                let t = range * .01;
+                 if(data >= 0.85) {
+                     if(nowrange > range / 4) {
+                         nowrange -= t;
+                     }
+                 } else if (data <= .1) {
+                     if(nowrange < range * 1.5) {
+                         nowrange += t;
+                     }
+                 } else {
+                     if(nowrange <= range) {
+                         nowrange += t;
+                     }
+                     if(nowrange >= range) {
+                         nowrange -= t;
+                     }
+                 }
+                 if((data - nowdata) > 0) {
+                     nowdata += waveupsp;
+                 }
+                 if((data - nowdata) < 0) {
+                     nowdata -= waveupsp;
+                 }
+                 sp+= .07;
+                 drawSine();
+                 drawText();
+             }
+
+             requestAnimationFrame(render);
+        }
+
+        function drawSine() {
+            ctx.beginPath();
+            ctx.save();
+            let Stack = [];
+            for(let i = xoffset; i <= xoffset + axisLength; i += 20 / axisLength) {
+                let x = sp + (xoffset + i) / unit,
+                    y = Sin(x) * nowrange,
+                    dx = i,
+                    dy = 2 * cR * (1 - nowdata) + (r - cR) - (unit * y);
+                
+                ctx.lineTo(dx, dy);
+                Stack.push([dx, dy]);
+            }
+            let startP = Stack[0];
+            let endP = Stack[Stack.length - 1];
+
+            ctx.lineTo(xoffset + axisLength, oW);
+            ctx.lineTo(xoffset, oW);
+            ctx.lineTo(startP[0], startP[1]);
+            ctx.fillStyle = '#1c86d1';
+            // ctx.fillStyle = 'pink'
+            ctx.fill();
+            ctx.restore();
+        }
+        function drawText() {
+            ctx.globalCompositeOperation = 'source-over';
+            let size = .4 * cR;
+            ctx.font = 'bold ' + size + 'px Microsoft Yahei';
+
+            let txt = (nowdata.toFixed(2) * 100).toFixed(0) + '%';
+
+            let fonty = r + size / 2,
+                fontx = r - size * .8;
+            ctx.fillStyle = 'rgba(6, 85, 128, .8)';
+            ctx.fillText(txt, fontx, fonty);
+        }
+    }
+    drawLang()
 }
