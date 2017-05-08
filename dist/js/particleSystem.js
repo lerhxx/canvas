@@ -11,6 +11,7 @@ window.addEventListener('load', function () {
 
     canvas.width = 500;
     canvas.height = 500;
+    ctx.fillStyle = 'black';
 
     var play = new Play(ctx, canvas);
     run.addEventListener('click', play.start);
@@ -132,14 +133,18 @@ var ParticleSystem = function () {
     }, {
         key: 'aging',
         value: function aging(dt) {
-            var _this = this;
-
-            this.particles.forEach(function (p, i) {
+            var len = this.particles.length,
+                p = void 0;
+            for (var _i = 0; _i < len;) {
+                p = this.particles[_i];
                 p.age += dt;
-                if (p.age >= p.life) {
-                    _this.kill(i);
+                if (p.age > p.life) {
+                    this.kill(_i);
+                    --len;
+                } else {
+                    ++_i;
                 }
-            });
+            }
         }
     }, {
         key: 'kill',
@@ -161,43 +166,54 @@ var ParticleSystem = function () {
     }, {
         key: 'render',
         value: function render(ctx) {
-            this.particles.forEach(function (p) {
+            var len = this.particles.length,
+                i = 0;
+            for (; i < len; ++i) {
+                var p = this.particles[i];
                 var alpha = 1 - p.age / p.life;
                 ctx.fillStyle = 'rgba(' + Math.floor(p.color.r * 255) + ', ' + Math.floor(p.color.g * 255) + ', ' + Math.floor(p.color.b * 255) + ', ' + alpha.toFixed(2) + ')';
                 ctx.beginPath();
                 ctx.arc(p.position.x, p.position.y, p.r, 0, Math.PI * 2, true);
                 ctx.closePath();
                 ctx.fill();
-            });
+            }
         }
     }, {
         key: 'applyGravity',
         value: function applyGravity() {
-            var _this2 = this;
-
-            this.particles.forEach(function (p) {
-                p.acceleration = _this2.gravity;
-            });
+            var len = this.particles.length,
+                i = 0;
+            for (; i < len; ++i) {
+                var p = this.particles[i];
+                p.acceleration = this.gravity;
+            }
         }
     }, {
         key: 'applyEffectors',
         value: function applyEffectors() {
-            var _this3 = this;
-
-            this.effectors.forEach(function (e) {
-                var apply = e.apply;
-                for (var i in _this3.particles) {
-                    apply(_this3.particles[i]);
+            var len = this.effectors.length,
+                l = this.particles.length,
+                i = 0,
+                n = 0,
+                apply = void 0;
+            for (; i < len; ++i) {
+                n = 0;
+                apply = this.effectors[i].apply;
+                for (; n < l; ++n) {
+                    apply(this.particles[n]);
                 }
-            });
+            }
         }
     }, {
         key: 'kinematics',
         value: function kinematics(dt) {
-            this.particles.forEach(function (p) {
+            var len = this.particles.length,
+                i = 0;
+            for (; i < len; ++i) {
+                var p = this.particles[i];
                 p.position = p.position.add(p.velocity.multiply(dt));
                 p.velocity = p.velocity.add(p.acceleration.multiply(dt));
-            });
+            }
         }
     }]);
 
@@ -212,43 +228,76 @@ var Play = function () {
         this.dt = .01;
         this.ctx = ctx;
         this.canvas = canvas;
+        this.oldPosition = Vector2.zero;
+        this.newPosition = Vector2.zero;
 
+        this.particleSystem.effectors.push(new ChamberBox(0, 0, this.canvas.width, this.canvas.height));
         this.step = this.step.bind(this);
         this.start = this.start.bind(this);
         this.sampleDirection = this.sampleDirection.bind(this);
+        this.samplyNumber = this.samplyNumber.bind(this);
         this.clearCanvas = this.clearCanvas.bind(this);
+        this.bindEvent();
     }
 
     _createClass(Play, [{
         key: 'step',
         value: function step() {
-            this.particleSystem.emit(new Particle(new Vector2(200, 200), this.sampleDirection().multiply(100), 5, 1, Color.red));
-            this.particleSystem.simulate(this.dt);
+            if (this.oldPosition == Vector2.zero && this.newPosition == Vector2.zero) {} else {
+                if (this.particleSystem.particles.length === 0) {
+                    this.oldPosition = this.newPosition;
+                }
+                var velocity = this.newPosition.substract(this.oldPosition).multiply(10);
+                velocity = velocity.add(this.sampleDirection(0, Math.PI * 2).multiply(20));
+                var life = this.samplyNumber(1, 2),
+                    size = this.samplyNumber(2, 4);
+                this.particleSystem.emit(new Particle(this.newPosition, velocity, size, life, Color.red));
+                this.oldPosition = this.newPosition;
+                this.particleSystem.simulate(this.dt);
 
-            this.clearCanvas();
-            ++n;
-            if (n < 100) {
+                this.clearCanvas();
+                ++y;
                 this.particleSystem.render(this.ctx);
-                requestAnimationFrame(this.step);
             }
+            requestAnimationFrame(this.step);
+            // }
         }
     }, {
         key: 'start',
         value: function start() {
             // console.log(this)
-            n = 0;
+            y = 0;
             this.particleSystem.particles = [];
             this.position = new Vector2(10, 200);
             this.velocity = new Vector2(50, -50);
             this.acceleration = new Vector2(0, 10);
-            n = 0;
+            y = 0;
             requestAnimationFrame(this.step);
         }
     }, {
         key: 'sampleDirection',
-        value: function sampleDirection() {
-            var theta = Math.random() * 2 * Math.PI;
+        value: function sampleDirection(a1, a2) {
+            // let theta = Math.random() * 2 * Math.PI;
+            // return new Vector2(Math.cos(theta), Math.sin(theta));
+            var t = Math.random();
+            var theta = a1 * t + a2 * (1 - t);
             return new Vector2(Math.cos(theta), Math.sin(theta));
+        }
+    }, {
+        key: 'samplyNumber',
+        value: function samplyNumber(n1, n2) {
+            var t = Math.random();
+            return n1 * t + n2 * (1 - t);
+        }
+    }, {
+        key: 'bindEvent',
+        value: function bindEvent() {
+            var _this = this;
+
+            this.canvas.addEventListener('mousemove', function (e) {
+                _this.newPosition = new Vector2(e.offsetX, e.offsetY);
+                var velocity = _this.newPosition.substract(_this.oldPosition);
+            });
         }
     }, {
         key: 'clearCanvas',
@@ -260,4 +309,52 @@ var Play = function () {
     return Play;
 }();
 
-var n = 0;
+var ChamberBox = function () {
+    function ChamberBox(x1, y1, x2, y2) {
+        _classCallCheck(this, ChamberBox);
+
+        this.x1 = x1;
+        this.y1 = y1;
+        this.x2 = x2;
+        this.y2 = y2;
+        this.apply = this.apply.bind(this);
+    }
+
+    _createClass(ChamberBox, [{
+        key: 'apply',
+        value: function apply(p) {
+            if (p.position.x - p.r < this.x1 || p.position.x + p.r > this.x2) {
+                p.velocity.x = -p.velocity.x;
+            }
+            if (p.position.y - p.r < this.y1 || p.position.y + p.r > this.y2) {
+                p.velocity.y = -p.velocity.y;
+            }
+        }
+    }]);
+
+    return ChamberBox;
+}();
+
+var y = 0;
+var i = 0,
+    a = [];
+for (; i < 1000000; ++i) {
+    a.push(i);
+}
+console.time('forin');
+for (i = 0; i < 1000000; ++i) {
+    ++y;
+}
+console.timeEnd('forin');
+y = 0;
+console.time('forEach');
+a.forEach(function () {
+    ++y;
+});
+console.timeEnd('forEach');
+y = 0;
+console.time('forof');
+for (var x in a) {
+    ++y;
+}
+console.timeEnd('forof');

@@ -5,6 +5,7 @@ window.addEventListener('load', () => {
     
     canvas.width = 500;
     canvas.height = 500;
+    ctx.fillStyle = 'black';
 
     let play = new Play(ctx, canvas);
     run.addEventListener('click', play.start);
@@ -105,12 +106,18 @@ class ParticleSystem {
     }
 
     aging(dt) {
-        this.particles.forEach((p, i) => {
+        let len = this.particles.length,
+            p;
+        for(let i = 0; i < len;) {
+            p = this.particles[i];
             p.age += dt;
-            if(p.age >= p.life) {
+            if(p.age > p.life) {
                 this.kill(i);
+                --len;
+            }else {
+                ++i;
             }
-        })
+        }
     }
 
     kill(i) {
@@ -129,35 +136,51 @@ class ParticleSystem {
     }
 
     render(ctx) {
-        this.particles.forEach(p => {
+        let len = this.particles.length,
+            i = 0;
+        for(; i < len; ++i) {
+            let p = this.particles[i];
             let alpha = 1 - p.age / p.life;
             ctx.fillStyle = `rgba(${Math.floor(p.color.r * 255)}, ${Math.floor(p.color.g * 255)}, ${Math.floor(p.color.b * 255)}, ${alpha.toFixed(2)})`
             ctx.beginPath();
             ctx.arc(p.position.x, p.position.y, p.r, 0, Math.PI * 2, true);
             ctx.closePath();
             ctx.fill();
-        })
+        }
     }
 
     applyGravity() {
-        this.particles.forEach(p => {
+        let len = this.particles.length,
+            i = 0;
+        for(; i < len; ++i) {
+            let p = this.particles[i];
             p.acceleration = this.gravity;
-        })
+        }
     }
 
     applyEffectors() {
-        this.effectors.forEach(e => {
-            var apply = e.apply;
-            for (var i in this.particles)
-                apply(this.particles[i]);    
-        })
+        let len = this.effectors.length,
+            l = this.particles.length,
+            i = 0,
+            n = 0,
+            apply;
+        for(; i < len; ++i) {
+            n = 0;
+            apply = this.effectors[i].apply;
+            for (; n < l; ++n){
+                apply(this.particles[n]); 
+            }   
+        }
     }
 
     kinematics(dt) {
-        this.particles.forEach(p => {
+        let len = this.particles.length,
+            i = 0;
+        for(; i < len; ++i) {
+            let p = this.particles[i];
             p.position = p.position.add(p.velocity.multiply(dt));
             p.velocity = p.velocity.add(p.acceleration.multiply(dt));
-        })
+        }
     }
 }
 
@@ -167,45 +190,114 @@ class Play {
         this.dt = .01;
         this.ctx = ctx;
         this.canvas = canvas;
+        this.oldPosition = Vector2.zero;
+        this.newPosition = Vector2.zero;
 
+        this.particleSystem.effectors.push(new ChamberBox(0, 0, this.canvas.width, this.canvas.height));
         this.step = this.step.bind(this);
         this.start = this.start.bind(this);
         this.sampleDirection = this.sampleDirection.bind(this);
+        this.samplyNumber = this.samplyNumber.bind(this);
         this.clearCanvas = this.clearCanvas.bind(this);
+        this.bindEvent();
     }
 
     step() {
-        this.particleSystem.emit(new Particle(new Vector2(200, 200), this.sampleDirection().multiply(100), 5, 1, Color.red));
-        this.particleSystem.simulate(this.dt);
+        if(this.oldPosition == Vector2.zero && this.newPosition == Vector2.zero) {
+        }else {
+            if(this.particleSystem.particles.length === 0) {
+                this.oldPosition = this.newPosition;
+            }
+            let velocity = this.newPosition.substract(this.oldPosition).multiply(10);
+            velocity = velocity.add(this.sampleDirection(0, Math.PI * 2).multiply(20));
+            let life = this.samplyNumber(1, 2),
+                size = this.samplyNumber(2, 4);
+            this.particleSystem.emit(new Particle(this.newPosition, velocity, size, life, Color.red));
+            this.oldPosition = this.newPosition;
+            this.particleSystem.simulate(this.dt);
 
-        this.clearCanvas();
-        ++n;
-        if(n < 100) {
+            this.clearCanvas();
+            ++y;
             this.particleSystem.render(this.ctx);
-            requestAnimationFrame(this.step);
         }
+        requestAnimationFrame(this.step);
+        // }
     }
 
     start() {
         // console.log(this)
-        n = 0;
+        y = 0;
         this.particleSystem.particles = [];
         this.position = new Vector2(10, 200);
         this.velocity = new Vector2(50, -50);
         this.acceleration = new Vector2(0, 10);
-        n = 0;
+        y = 0;
         requestAnimationFrame(this.step);
     }
 
-    sampleDirection() {
-        let theta = Math.random() * 2 * Math.PI;
+    sampleDirection(a1, a2) {
+        // let theta = Math.random() * 2 * Math.PI;
+        // return new Vector2(Math.cos(theta), Math.sin(theta));
+        let t = Math.random();
+        let theta = a1 * t + a2 * (1 - t);
         return new Vector2(Math.cos(theta), Math.sin(theta));
+    }
+
+    samplyNumber(n1, n2) {
+        let t = Math.random();
+        return n1 * t + n2 * (1 - t);
+    }
+
+    bindEvent() {
+        this.canvas.addEventListener('mousemove', (e) => {
+            this.newPosition = new Vector2(e.offsetX, e.offsetY);
+            let velocity = this.newPosition.substract(this.oldPosition);
+        })
     }
 
     clearCanvas() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
+}
+class ChamberBox {
+    constructor(x1, y1, x2, y2) {
+        this.x1 = x1;
+        this.y1 = y1;
+        this.x2 = x2;
+        this.y2 = y2;
+        this.apply = this.apply.bind(this);
+    }
 
+    apply(p) {
+        if(p.position.x - p.r < this.x1 || p.position.x + p.r > this.x2) {
+            p.velocity.x = -p.velocity.x;
+        }
+        if(p.position.y - p.r < this.y1 || p.position.y + p.r > this.y2) {
+            p.velocity.y = -p.velocity.y;
+        }
+    }
 }
 
-let n = 0;
+let y = 0;
+var i = 0,
+    a = [];
+for(; i < 1000000; ++i) {
+    a.push(i);
+}
+console.time('forin');
+for(i = 0; i < 1000000; ++i) {
+    ++y;
+}
+console.timeEnd('forin');
+y = 0;
+console.time('forEach');
+a.forEach(function() {
+    ++y;
+})
+console.timeEnd('forEach');
+y = 0;
+console.time('forof');
+for(let x in a) {
+    ++y;
+}
+console.timeEnd('forof');
