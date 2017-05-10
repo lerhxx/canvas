@@ -649,4 +649,117 @@ window.onload = function() {
         }
     }
     new Ball('canvas4')
+
+    class Ship {
+        constructor(id) {
+            if(!this.init(id)) {
+                return;
+            }
+
+            this.x = this.canvas.width / 2;
+            this.y = this.canvas.height / 2;
+            this.color = '#000';
+            this.rotation = 0;
+            this.vx = 0;
+            this.vy = 0;
+            this.vr = 0;
+            this.ax = 0;
+            this.ay = 0;
+            this.thrust = 0;
+            this.showFlame = false;
+
+            this.bindEvent();
+
+            this.draw = this.draw.bind(this);
+            this.start = this.start.bind(this);
+
+            this.start();
+        }
+
+        init(id) {
+            if(!id) {
+                console.warn('there is no id')
+                return null;
+            }
+            this.canvas = document.getElementById(id);
+            this.ctx =this. canvas.getContext('2d');
+            return true;
+        }
+
+        draw() {
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.strokeStyle = this.color;
+            this.ctx.translate(this.x, this.y);
+            this.ctx.rotate(this.rotation);
+            this.ctx.moveTo(10, 0);
+            this.ctx.lineTo(-10, 10);
+            this.ctx.lineTo(-5, 0);
+            this.ctx.lineTo(-10, -10);
+            this.ctx.closePath();
+            this.ctx.stroke();
+            if(this.showFlame) {
+                this.ctx.save();
+                this.ctx.beginPath();
+                this.ctx.strokeStyle = "#f69";
+                this.ctx.moveTo(-7.5, -5);
+                this.ctx.lineTo(-15, 0);
+                this.ctx.lineTo(-7.5, 5);
+                this.ctx.stroke();
+                this.ctx.restore();
+            }
+            this.ctx.restore();
+        }
+
+        bindEvent() {
+            window.addEventListener('keydown', (e) => {
+                switch(e.keyCode) {
+                    case 37:
+                        this.vr = -3;
+                        this.vx = 0;
+                        this.vy = 0;
+                        break;
+                    case 39:
+                        this.vr = -3;
+                        this.vx = 0;
+                        this.vy = 0;
+                        break;
+                    case 38:
+                        this.showFlame = true;
+                        this.vx = 0;
+                        this.vy = 0;
+                        this.thrust += .05;
+                        break;
+                    case 40:
+                        this.ax = 0;
+                        this.ay = 0;
+                        this.vx = 0;
+                        this.vy = 0;
+                        break;
+                }
+            })
+            window.addEventListener('keyup', () => {
+                this.vr = 0;
+                this.showFlame = false;
+            })
+        }
+
+        start() {
+            requestAnimationFrame(this.start);
+            this.rotation += this.vr * Math.PI / 180;
+            this.ax = Math.cos(this.rotation) * this.thrust;
+            this.ay = Math.sin(this.rotation) * this.thrust;
+
+            this.vx += this.ax;
+            this.vy += this.ay;
+
+            this.x += this.vx;
+            this.y += this.vy;
+
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+            this.draw();
+        }
+    }
+    new Ship('canvas5');
 }
