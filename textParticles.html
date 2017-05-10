@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+    <head>
+        <title>text particles</title>
+        <meta charset='utf-8' />
+        <style>
+            body {
+                position: relative;
+                padding: 0;
+                margin: 0;
+            }
+            canvas {
+                position: absolute;
+                top: 0;
+                left: 0;
+                border: 1px solid red;
+            }
+            .toolbar {
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id='textParticle'></canvas>
+        <div class='toolbar'>
+            <div class='group'>
+                <label>text:</label>
+                <input id='text' type='text' />
+            </div>
+        </div>
+        <script src='./dist/js/vector2.js'></script>
+        <script src='./dist/js/particle.js'></script>
+        <script src='./dist/js/textParticles.js'></script>
+    </body>
+</html>

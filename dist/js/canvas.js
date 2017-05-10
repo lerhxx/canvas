@@ -1,5 +1,9 @@
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 window.onload = function () {
     var canvas = document.getElementById('canvas'),
         ctx = canvas.getContext('2d');
@@ -20,38 +24,6 @@ window.onload = function () {
         n;
 
     ctx.strokeStyle = '#f36';
-    // for(i = 0.5; i < xWidth; i += xy) {
-    //     ctx.moveTo(i, 0);
-    //     ctx.lineTo(i, yWidth);
-    //     ctx.stroke();
-    // }
-    // for(n = 0.5; n < yWidth; n += xy) {
-    //     ctx.moveTo(0, n);
-    //     ctx.lineTo(xWidth, n);
-    //     ctx.stroke();
-    // }
-
-    // ctx.lineWidth = 10;
-    // ctx.moveTo(10, 10);
-    // ctx.lineTo(100, 10);
-    // ctx.lineTo(100, 100);
-    // ctx.stroke();
-    // ctx.moveTo(150, 100)
-    // ctx.lineTo(150, 50);
-    // ctx.stroke()
-
-    // ctx.lineCap = 'round';
-    // ctx.lineJoin = 'round';
-    // ctx.fillStyle = '#f36';
-    // ctx.lineWidth = 10;
-    // ctx.beginPath();
-    // ctx.moveTo(100.5, 10.5);
-    // ctx.lineTo(300.5, 10.5);
-    // ctx.lineTo(300.5, 210.5);
-    // ctx.lineTo(100.5, 210.5);
-    // ctx.lineTo(100.5, 10.5);
-    // ctx.stroke();
-
 
     var canvasPro = window.CanvasRenderingContext2D && CanvasRenderingContext2D.prototype;
 
@@ -205,31 +177,6 @@ window.onload = function () {
         ctx.restore;
         ctx.fill();
     }
-    // drawSector(ctx);
-
-    // ctx.shadowBlur = 5;
-    // ctx.shadowColor = 'rgba(204, 204, 204, 0.5)';
-    // ctx.shadowOffsetX = 5;
-    // ctx.shadowOffsetY = 5;
-    // ctx.fillStyle = '#FA6900';
-    // ctx.save();
-    // ctx.fillRect(10, 10, 20, 50)
-
-    // ctx.shadowStyle = 'rgba(204, 204, 204, 0.5)';
-    // ctx.fillStyle = '#f36';
-    // ctx.save();
-    // ctx.fillRect(50, 10, 20, 50)
-
-    // ctx.shadowStyle = 'rgba(204, 204, 204, 0.5)';
-    // ctx.fillStyle = '#A7DBD7';
-    // ctx.save();
-    // ctx.fillRect(100, 10, 20, 50)
-
-    // ctx.restore();
-    // ctx.beginPath();
-    // ctx.arc(150, 30, 20, 0, Math.PI * 2, true);
-    // ctx.closePath();
-    // ctx.fill()
     var rect = {};
     function dragRect() {
         canvas.addEventListener('mousedown', mouseDown, false);
@@ -434,5 +381,317 @@ window.onload = function () {
             ctx.fillText(txt, fontx, fonty);
         }
     }
-    drawLang();
+    // drawLang()
+
+    var Loading = function () {
+        function Loading(id) {
+            _classCallCheck(this, Loading);
+
+            this.init(id);
+
+            this.x = this.canvas.width / 2;
+            this.y = this.canvas.height / 2;
+            this.r = Math.min(this.x, this.y) - 10;
+            this.speed = .1;
+            this.rad = Math.PI * 2 / 100;
+            this.initialPoint = -Math.PI / 2;
+
+            this.baseRound = this.baseRound.bind(this);
+            this.progressBar = this.progressBar.bind(this);
+            this.progressText = this.progressText.bind(this);
+            this.start = this.start.bind(this);
+
+            this.start();
+        }
+
+        _createClass(Loading, [{
+            key: 'init',
+            value: function init(id) {
+                if (!id) {
+                    console.warn('there is no id');
+                    return null;
+                }
+                this.canvas = document.getElementById(id);
+                this.ctx = this.canvas.getContext('2d');
+            }
+        }, {
+            key: 'baseRound',
+            value: function baseRound() {
+                this.ctx.save();
+                this.ctx.beginPath();
+                this.ctx.strokeStyle = '#49f';
+                this.ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
+                this.ctx.closePath();
+                this.ctx.stroke();
+                this.ctx.restore();
+            }
+        }, {
+            key: 'progressBar',
+            value: function progressBar(n) {
+                this.ctx.save();
+                this.ctx.beginPath();
+                this.ctx.strokeStyle = '#49f';
+                this.ctx.lineWidth = 5;
+                this.ctx.arc(this.x, this.y, this.r, this.initialPoint, n * this.rad + this.initialPoint, false);
+                this.ctx.stroke();
+                this.ctx.restore();
+            }
+        }, {
+            key: 'progressText',
+            value: function progressText(n) {
+                this.ctx.save();
+                this.ctx.strokeStyle = '#49f';
+                this.ctx.font = '20px Arial';
+                this.ctx.strokeText(n.toFixed(0) + '%', this.x - 15, this.y + 8);
+                this.ctx.stroke();
+                this.ctx.restore();
+            }
+        }, {
+            key: 'start',
+            value: function start() {
+                requestAnimationFrame(this.start);
+                // this.fillStyle = 'black';
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.baseRound();
+                this.progressText(this.speed);
+                this.progressBar(this.speed);
+                if (this.speed <= 100) {
+                    this.speed += .1;
+                } else {
+                    this.speed = 0;
+                }
+            }
+        }]);
+
+        return Loading;
+    }();
+
+    new Loading('canvas1');
+
+    var FallText = function () {
+        function FallText(id) {
+            _classCallCheck(this, FallText);
+
+            this.init(id);
+            var words = "0123456789qwertyuiopasdfghjklzxcvbnm,./;'\[]QWERTYUIOP{}ASDFGHJHJKL:ZXCVBBNM<>?";
+            this.wordColor = '#3f3';
+            this.clearColor = 'rgba(0, 0, 0, .1)';
+            this.wordArr = words.split('');
+            this.fontSize = 16;
+            this.column = this.canvas.width / this.fontSize;
+            this.drops = [];
+            this.n = 0;
+
+            this.initDrops = this.initDrops.bind(this);
+            this.draw = this.draw.bind(this);
+            this.start = this.start.bind(this);
+            this.initDrops();
+            this.start();
+        }
+
+        _createClass(FallText, [{
+            key: 'init',
+            value: function init(id) {
+                if (!id) {
+                    console.warn('there is no id');
+                    return null;
+                }
+                this.canvas = document.getElementById(id);
+                this.ctx = this.canvas.getContext('2d');
+            }
+        }, {
+            key: 'initDrops',
+            value: function initDrops() {
+                for (var _i5 = 0; _i5 < this.column; ++_i5) {
+                    this.drops[_i5] = 1;
+                }
+            }
+        }, {
+            key: 'draw',
+            value: function draw() {
+                this.ctx.save();
+                this.ctx.fillStyle = this.wordColor;
+                for (var _i6 = 0; _i6 < this.column; ++_i6) {
+                    var text = this.wordArr[Math.floor(Math.random() * this.wordArr.length)];
+                    this.ctx.fillText(text, _i6 * this.fontSize, this.drops[_i6] * this.fontSize);
+                    if (this.drops[_i6] * this.fontSize > this.canvas.height && Math.random() > .98) {
+                        this.drops[_i6] = 0;
+                    }
+                    ++this.drops[_i6];
+                }
+                this.ctx.restore();
+            }
+        }, {
+            key: 'start',
+            value: function start() {
+                requestAnimationFrame(this.start);
+                this.ctx.fillStyle = this.clearColor;
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                this.draw();
+            }
+        }]);
+
+        return FallText;
+    }();
+
+    new FallText('canvas2');
+
+    var Arrow = function () {
+        function Arrow(id) {
+            _classCallCheck(this, Arrow);
+
+            if (!this.init(id)) {
+                return;
+            }
+
+            this.x = this.canvas.width / 2;
+            this.y = this.canvas.height / 2;
+            this.rotation = 0;
+            this.color = '#ff0';
+            this.speed = .2;
+
+            this.bindEvent();
+
+            this.draw = this.draw.bind(this);
+            this.start = this.start.bind(this);
+        }
+
+        _createClass(Arrow, [{
+            key: 'init',
+            value: function init(id) {
+                if (!id) {
+                    console.warn('there is no id');
+                    return null;
+                }
+                this.canvas = document.getElementById(id);
+                this.ctx = this.canvas.getContext('2d');
+                return true;
+            }
+        }, {
+            key: 'bindEvent',
+            value: function bindEvent() {
+                var _this = this;
+
+                this.canvas.addEventListener('mousemove', function (e) {
+                    _this.mouseX = e.offsetX;
+                    _this.mouseY = e.offsetY;
+                    _this.start();
+                });
+            }
+        }, {
+            key: 'draw',
+            value: function draw() {
+                this.ctx.save();
+                this.ctx.translate(this.x, this.y);
+                this.ctx.rotate(this.rotation);
+                this.ctx.lineWidth = 5;
+                this.ctx.fillStyle = this.color;
+                this.ctx.beginPath();
+                this.ctx.moveTo(-50, -25);
+                this.ctx.lineTo(0, -25);
+                this.ctx.lineTo(0, -50);
+                this.ctx.lineTo(50, 0);
+                this.ctx.lineTo(0, 50);
+                this.ctx.lineTo(0, 25);
+                this.ctx.lineTo(-50, 25);
+                this.ctx.closePath();
+                this.ctx.stroke();
+                this.ctx.fill();
+                this.ctx.restore();
+            }
+        }, {
+            key: 'start',
+            value: function start() {
+                requestAnimationFrame(this.start);
+                var dx = this.mouseX - this.x + 50,
+                    dy = this.mouseY - this.y + 50,
+                    rotation = Math.atan2(dy, dx);
+                var vx = Math.cos(rotation) * this.speed,
+                    vy = Math.sin(rotation) * this.speed;
+                this.x += vx;
+                this.y += vy;
+                this.rotation = rotation;
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.draw();
+            }
+        }]);
+
+        return Arrow;
+    }();
+
+    new Arrow('canvas3');
+
+    var Ball = function () {
+        function Ball(id) {
+            var radius = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 5;
+            var color = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '#f36';
+            var speedX = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : .1;
+            var speedY = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : .1;
+
+            _classCallCheck(this, Ball);
+
+            if (!this.init(id)) {
+                return;
+            }
+
+            // this.x = this.canvas.width / 2;
+            this.y = this.canvas.height / 2;
+            this.x = radius;
+            // this.y = 0;
+            this.radius = radius;
+            this.color = color;
+            this.speedX = speedX;
+            this.speedY = speedY;
+            this.scaleX = 1;
+            this.scaleY = 1;
+            this.rad = 0;
+
+            this.draw = this.draw.bind(this);
+            this.start = this.start.bind(this);
+
+            this.start();
+        }
+
+        _createClass(Ball, [{
+            key: 'init',
+            value: function init(id) {
+                if (!id) {
+                    console.warn('there is no id');
+                    return null;
+                }
+                this.canvas = document.getElementById(id);
+                this.ctx = this.canvas.getContext('2d');
+                return true;
+            }
+        }, {
+            key: 'draw',
+            value: function draw() {
+                this.ctx.save();
+                this.ctx.beginPath();
+                this.ctx.scale(this.scaleX, this.scaleY);
+                this.ctx.fillStyle = this.color;
+                this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                this.ctx.fill();
+                this.ctx.restore();
+            }
+        }, {
+            key: 'start',
+            value: function start() {
+                requestAnimationFrame(this.start);
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.x += this.speedX * 10;
+                this.y += Math.cos(this.rad) * 10;
+                if (this.x > this.canvas.width - this.radius || this.x < this.radius) {
+                    this.speedX = -this.speedX;
+                }
+                // this.scaleX = this.scaleY = 1 + Math.sin(this.rad) * .5;
+                this.rad += this.speedY;
+                this.draw();
+            }
+        }]);
+
+        return Ball;
+    }();
+
+    new Ball('canvas4');
 };

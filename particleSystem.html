@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
     <head>
+        <title>particleSystem</title>
         <meta charset='utf-8' />
         <style>
             canvas {
@@ -11,6 +12,50 @@
     <body>
         <canvas id='particle'></canvas>
         <button id='run' type='button'>Run</button>
+        <script src='./dist/js/vector2.js'></script>
+        <script src='./dist/js/color.js'></script>
+        <script src='./dist/js/particle.js'></script>
+        <script src='./dist/js/chamberBox.js'></script>
         <script src='./dist/js/particleSystem.js'></script>
+        <script src='./dist/js/play.js'></script>
+        <script>
+            window.addEventListener('load', () => {
+                let canvas = document.getElementById('particle'),
+                    ctx = canvas.getContext('2d'),
+                    run = document.getElementById('run');
+                
+                canvas.width = 500;
+                canvas.height = 500;
+                ctx.fillStyle = 'black';
+
+                let play = new Play(ctx, canvas);
+                run.addEventListener('click', play.start);
+                
+            })
+
+            let y = 0;
+            var i = 0,
+                a = [];
+            for(; i < 1000000; ++i) {
+                a.push(i);
+            }
+            console.time('forin');
+            for(i = 0; i < 1000000; ++i) {
+                ++y;
+            }
+            console.timeEnd('forin');
+            y = 0;
+            console.time('forEach');
+            a.forEach(function() {
+                ++y;
+            })
+            console.timeEnd('forEach');
+            y = 0;
+            console.time('forof');
+            for(let x in a) {
+                ++y;
+            }
+            console.timeEnd('forof');
+        </script>
     </body>
 </html>

@@ -18,38 +18,6 @@ window.onload = function() {
         n;
     
     ctx.strokeStyle = '#f36';
-    // for(i = 0.5; i < xWidth; i += xy) {
-    //     ctx.moveTo(i, 0);
-    //     ctx.lineTo(i, yWidth);
-    //     ctx.stroke();
-    // }
-    // for(n = 0.5; n < yWidth; n += xy) {
-    //     ctx.moveTo(0, n);
-    //     ctx.lineTo(xWidth, n);
-    //     ctx.stroke();
-    // }
-
-    // ctx.lineWidth = 10;
-    // ctx.moveTo(10, 10);
-    // ctx.lineTo(100, 10);
-    // ctx.lineTo(100, 100);
-    // ctx.stroke();
-    // ctx.moveTo(150, 100)
-    // ctx.lineTo(150, 50);
-    // ctx.stroke()
-
-    // ctx.lineCap = 'round';
-    // ctx.lineJoin = 'round';
-    // ctx.fillStyle = '#f36';
-    // ctx.lineWidth = 10;
-    // ctx.beginPath();
-    // ctx.moveTo(100.5, 10.5);
-    // ctx.lineTo(300.5, 10.5);
-    // ctx.lineTo(300.5, 210.5);
-    // ctx.lineTo(100.5, 210.5);
-    // ctx.lineTo(100.5, 10.5);
-    // ctx.stroke();
-
 
     let canvasPro = window.CanvasRenderingContext2D && CanvasRenderingContext2D.prototype;
 
@@ -210,31 +178,6 @@ window.onload = function() {
         ctx.fill()
 
     }
-    // drawSector(ctx);
-
-    // ctx.shadowBlur = 5;
-    // ctx.shadowColor = 'rgba(204, 204, 204, 0.5)';
-    // ctx.shadowOffsetX = 5;
-    // ctx.shadowOffsetY = 5;
-    // ctx.fillStyle = '#FA6900';
-    // ctx.save();
-    // ctx.fillRect(10, 10, 20, 50)
-    
-    // ctx.shadowStyle = 'rgba(204, 204, 204, 0.5)';
-    // ctx.fillStyle = '#f36';
-    // ctx.save();
-    // ctx.fillRect(50, 10, 20, 50)
-
-    // ctx.shadowStyle = 'rgba(204, 204, 204, 0.5)';
-    // ctx.fillStyle = '#A7DBD7';
-    // ctx.save();
-    // ctx.fillRect(100, 10, 20, 50)
-
-    // ctx.restore();
-    // ctx.beginPath();
-    // ctx.arc(150, 30, 20, 0, Math.PI * 2, true);
-    // ctx.closePath();
-    // ctx.fill()
     let rect = {}
     function dragRect() {
         canvas.addEventListener('mousedown', mouseDown, false);
@@ -442,5 +385,268 @@ window.onload = function() {
             ctx.fillText(txt, fontx, fonty);
         }
     }
-    drawLang()
+    // drawLang()
+
+    class Loading{
+        constructor(id) {
+            this.init(id);
+            
+            this.x = this.canvas.width / 2;
+            this.y = this.canvas.height / 2;
+            this.r = Math.min(this.x, this.y) - 10;
+            this.speed = .1;
+            this.rad = Math.PI * 2 / 100;
+            this.initialPoint = -Math.PI / 2;
+
+            this.baseRound = this.baseRound.bind(this);
+            this.progressBar = this.progressBar.bind(this);
+            this.progressText = this.progressText.bind(this);
+            this.start = this.start.bind(this);
+
+            this.start();
+        }
+
+        init(id) {
+            if(!id) {
+                console.warn('there is no id')
+                return null;
+            }
+            this.canvas = document.getElementById(id);
+            this.ctx =this. canvas.getContext('2d');
+        }
+
+        baseRound() {
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.strokeStyle = '#49f';
+            this.ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
+            this.ctx.closePath();
+            this.ctx.stroke();
+            this.ctx.restore();
+        }
+
+        progressBar(n) {
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.strokeStyle = '#49f';
+            this.ctx.lineWidth = 5;
+            this.ctx.arc(this.x, this.y, this.r, this.initialPoint, n * this.rad + this.initialPoint, false);
+            this.ctx.stroke();
+            this.ctx.restore();
+        }
+
+        progressText(n) {
+            this.ctx.save();
+            this.ctx.strokeStyle = '#49f';
+            this.ctx.font = '20px Arial';
+            this.ctx.strokeText(n.toFixed(0) + '%', this.x - 15, this.y + 8);
+            this.ctx.stroke();
+            this.ctx.restore();
+        }
+
+        start() {
+            requestAnimationFrame(this.start);
+            // this.fillStyle = 'black';
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.baseRound();
+            this.progressText(this.speed);
+            this.progressBar(this.speed);
+            if(this.speed <= 100) {
+                this.speed += .1;
+            }else {
+                this.speed = 0;
+            }
+        }
+    }
+    new Loading('canvas1');
+
+    class FallText {
+        constructor(id) {
+            this.init(id);
+            let words = "0123456789qwertyuiopasdfghjklzxcvbnm,./;'\[]QWERTYUIOP{}ASDFGHJHJKL:ZXCVBBNM<>?";
+            this.wordColor = '#3f3';
+            this.clearColor = 'rgba(0, 0, 0, .1)';
+            this.wordArr = words.split('');
+            this.fontSize = 16;
+            this.column = this.canvas.width / this.fontSize;
+            this.drops = [];
+            this.n = 0;
+
+            this.initDrops = this.initDrops.bind(this);
+            this.draw = this.draw.bind(this);
+            this.start = this.start.bind(this);
+            this.initDrops();
+            this.start();
+        }
+
+        init(id) {
+            if(!id) {
+                console.warn('there is no id')
+                return null;
+            }
+            this.canvas = document.getElementById(id);
+            this.ctx =this. canvas.getContext('2d');
+        }
+
+        initDrops() {
+            for(let i = 0; i < this.column; ++i) {
+                this.drops[i] = 1;
+            }
+        }
+
+        draw() {
+            this.ctx.save();
+            this.ctx.fillStyle = this.wordColor;
+            for(let i = 0; i < this.column; ++i) {
+                let text = this.wordArr[Math.floor(Math.random() * this.wordArr.length)];
+                this.ctx.fillText(text, i * this.fontSize, this.drops[i] * this.fontSize);
+                if(this.drops[i] * this.fontSize > this.canvas.height && Math.random() > .98) {
+                    this.drops[i] = 0;
+                }
+                ++this.drops[i];
+            }
+            this.ctx.restore();
+        }
+
+        start() {
+            requestAnimationFrame(this.start);
+            this.ctx.fillStyle = this.clearColor;
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            this.draw();
+        }
+    }
+    new FallText('canvas2');
+
+    class Arrow {
+        constructor(id) {
+            if(!this.init(id)) {
+                return;
+            }
+
+            this.x = this.canvas.width / 2;
+            this.y = this.canvas.height / 2;
+            this.rotation = 0;
+            this.color = '#ff0';
+            this.speed = .2;
+
+            this.bindEvent();
+
+            this.draw = this.draw.bind(this);
+            this.start = this.start.bind(this);
+
+        }
+
+        init(id) {
+            if(!id) {
+                console.warn('there is no id')
+                return null;
+            }
+            this.canvas = document.getElementById(id);
+            this.ctx =this. canvas.getContext('2d');
+            return true;
+        }
+
+        bindEvent() {
+            this.canvas.addEventListener('mousemove', (e) => {
+                this.mouseX = e.offsetX;
+                this.mouseY = e.offsetY;
+                this.start();
+            })
+        }
+
+        draw() {
+            this.ctx.save();
+            this.ctx.translate(this.x, this.y);
+            this.ctx.rotate(this.rotation);
+            this.ctx.lineWidth = 5;
+            this.ctx.fillStyle = this.color;
+            this.ctx.beginPath();
+            this.ctx.moveTo(-50, -25);
+            this.ctx.lineTo(0, -25);
+            this.ctx.lineTo(0, -50);
+            this.ctx.lineTo(50, 0);
+            this.ctx.lineTo(0, 50);
+            this.ctx.lineTo(0, 25);
+            this.ctx.lineTo(-50, 25);
+            this.ctx.closePath();
+            this.ctx.stroke();
+            this.ctx.fill();
+            this.ctx.restore();
+        }
+
+        start() {
+            requestAnimationFrame(this.start);
+            let dx = this.mouseX - this.x + 50,
+                dy = this.mouseY - this.y + 50,
+                rotation = Math.atan2(dy, dx);
+            let vx = Math.cos(rotation) * this.speed,
+                vy = Math.sin(rotation) * this.speed;
+            this.x += vx;
+            this.y += vy;
+            this.rotation = rotation;
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.draw();
+        }
+    }
+
+    new Arrow('canvas3');
+
+    class Ball {
+        constructor(id, radius = 5, color = '#f36', speedX = .1, speedY = .1) {
+            if(!this.init(id)) {
+                return;
+            }
+
+            // this.x = this.canvas.width / 2;
+            this.y = this.canvas.height / 2;
+            this.x = radius;
+            // this.y = 0;
+            this.radius = radius;
+            this.color = color;
+            this.speedX = speedX;
+            this.speedY = speedY;
+            this.scaleX = 1;
+            this.scaleY = 1;
+            this.rad = 0;
+
+            this.draw = this.draw.bind(this);
+            this.start = this.start.bind(this);
+
+            this.start();
+        }
+
+        init(id) {
+            if(!id) {
+                console.warn('there is no id')
+                return null;
+            }
+            this.canvas = document.getElementById(id);
+            this.ctx =this. canvas.getContext('2d');
+            return true;
+        }
+
+        draw() {
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.scale(this.scaleX, this.scaleY);
+            this.ctx.fillStyle = this.color;
+            this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+            this.ctx.fill();
+            this.ctx.restore();
+        }
+
+        start() {
+            requestAnimationFrame(this.start);
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.x += this.speedX * 10;
+            this.y += Math.cos(this.rad) * 10;
+            if(this.x > this.canvas.width - this.radius || this.x < this.radius) {
+                this.speedX = -this.speedX;
+            }
+            // this.scaleX = this.scaleY = 1 + Math.sin(this.rad) * .5;
+            this.rad += this.speedY;
+            this.draw();
+        }
+    }
+    new Ball('canvas4')
 }
