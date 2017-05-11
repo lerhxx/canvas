@@ -773,7 +773,7 @@ window.onload = function () {
                             _this2.vy = 0;
                             break;
                         case 39:
-                            _this2.vr = -3;
+                            _this2.vr = 3;
                             _this2.vx = 0;
                             _this2.vy = 0;
                             break;
@@ -800,6 +800,19 @@ window.onload = function () {
             key: 'start',
             value: function start() {
                 requestAnimationFrame(this.start);
+                if (this.x - 20 > this.canvas.width) {
+                    this.x = -20;
+                }
+                if (this.x + 20 < 0) {
+                    this.x = this.canvas.width - 10;
+                }
+                if (this.y - 20 > this.canvas.height) {
+                    this.y = -20;
+                }
+                if (this.y + 20 < 0) {
+                    this.y = this.canvas.height - 10;
+                }
+
                 this.rotation += this.vr * Math.PI / 180;
                 this.ax = Math.cos(this.rotation) * this.thrust;
                 this.ay = Math.sin(this.rotation) * this.thrust;
@@ -820,4 +833,248 @@ window.onload = function () {
     }();
 
     new Ship('canvas5');
+
+    var Ball2 = function () {
+        function Ball2(id) {
+            _classCallCheck(this, Ball2);
+
+            if (!this.init(id)) {
+                return;
+            }
+            this.x = 10;
+            this.y = 10;
+            this.size = 10;
+            this.rotation = 0;
+            this.f = .05;
+            this.vx = Math.random() * 10 - 5;
+            this.vy = Math.random() * 10 - 5;
+            this.speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy).toFixed(0);
+
+            this.draw = this.draw.bind(this);
+            this.start = this.start.bind(this);
+
+            this.start();
+            // this.draw()
+        }
+
+        _createClass(Ball2, [{
+            key: 'init',
+            value: function init(id) {
+                if (!id) {
+                    console.warn('there is no id');
+                    return null;
+                }
+
+                this.canvas = document.getElementById(id);
+                this.ctx = this.canvas.getContext('2d');
+                return true;
+            }
+        }, {
+            key: 'draw',
+            value: function draw() {
+                this.ctx.save();
+                this.ctx.beginPath();
+                // this.ctx.translate(this.x, this.y);
+                this.ctx.rotate(this.rotation);
+                this.ctx.fillStyle = '#f36';
+                this.ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                this.ctx.fill();
+                this.ctx.closePath();
+                this.ctx.restore();
+            }
+        }, {
+            key: 'start',
+            value: function start() {
+                requestAnimationFrame(this.start);
+                var angle = Math.atan(this.vx, this.vy);
+                // this.speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy).toFixed(0);
+                // this.speed = 1;
+
+                if (this.speed - this.f > 0) {
+                    this.speed -= this.f;
+                } else {
+                    this.speed = 0;
+                }
+
+                if (this.x - this.size > this.canvas.width) {
+                    this.x = 0 + this.size;
+                    // this.vx = -this.vx;
+                }
+                if (this.x + this.size < 0) {
+                    this.x = this.canvas.width - this.size;
+                    // this.vx = -this.vx;
+                }
+                if (this.y - this.size > this.canvas.height) {
+                    this.y = 0 + this.size;
+                    // this.vy = -this.vy;
+                }
+                if (this.y + this.size < 0) {
+                    this.y = this.canvas.height - this.size;
+                    // this.vy = -this.vy;
+                }
+
+                angle = (this.rotation + 8) * Math.PI / 180;
+
+                this.vx = Math.cos(angle) * this.speed;
+                this.vy = Math.sin(angle) * this.speed;
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.draw();
+            }
+        }]);
+
+        return Ball2;
+    }();
+
+    new Ball2('canvas6');
+
+    var dragBall = function () {
+        function dragBall(id) {
+            _classCallCheck(this, dragBall);
+
+            if (!this.init(id)) {
+                return;
+            }
+
+            this.x = this.ctx.canvas.width / 2;
+            this.y = this.ctx.canvas.height / 2;
+            this.vx = 0;
+            this.vy = 0;
+            this.ax = 0;
+            this.ay = 0;
+            this.size = 20;
+            this.isDrag = false;
+            this.speed = 2;
+            this.bound = -0.8;
+            this.gravity = .5;
+
+            this.draw = this.draw.bind(this);
+            this.start = this.start.bind(this);
+            this.mouseDown = this.mouseDown.bind(this);
+            this.mouseMove = this.mouseMove.bind(this);
+            this.mouseUp = this.mouseUp.bind(this);
+            this.getBound = this.getBound.bind(this);
+
+            this.bindEvent();
+
+            this.start();
+        }
+
+        _createClass(dragBall, [{
+            key: 'init',
+            value: function init(id) {
+                if (!id) {
+                    console.warn('there is no id');
+                    return null;
+                }
+
+                this.canvas = document.getElementById(id);
+                this.ctx = this.canvas.getContext('2d');
+                return true;
+            }
+        }, {
+            key: 'bindEvent',
+            value: function bindEvent() {
+                this.canvas.addEventListener('mousedown', this.mouseDown, false);
+            }
+        }, {
+            key: 'mouseDown',
+            value: function mouseDown(e) {
+                console.log('down');
+                if (Math.abs(e.offsetX - this.x) < this.size && Math.abs(e.offsetY - this.y)) {
+                    this.isDrag = true;
+                    this.w = e.offsetX - this.x;
+                    this.h = e.offsetY - this.y;
+                    this.startX = this.x;
+                    this.startY = this.y;
+                    this.startTime = new Date();
+                    this.canvas.addEventListener('mousemove', this.mouseMove, false);
+                    this.canvas.addEventListener('mouseup', this.mouseUp, false);
+                }
+            }
+        }, {
+            key: 'mouseMove',
+            value: function mouseMove(e) {
+                console.log('move');
+                this.x = e.offsetX - this.w;
+                this.y = e.offsetY - this.h;
+            }
+        }, {
+            key: 'mouseUp',
+            value: function mouseUp(e) {
+                console.log('up');
+                this.isDrag = false;
+                this.durX = this.x - this.startX;
+                this.durY = this.y - this.startY;
+                this.durT = new Date() - this.startTime;
+                this.vx = this.durX / this.durT;
+                this.vy = this.durY / this.durT;
+                this.canvas.removeEventListener('mousemove', this.mouseMove, false);
+                this.canvas.removeEventListener('mouseup', this.mouseUp, false);
+            }
+        }, {
+            key: 'draw',
+            value: function draw() {
+                this.ctx.save();
+                this.ctx.beginPath();
+                this.ctx.fillStyle = '#f36';
+                this.ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                this.ctx.fill();
+                this.ctx.restore();
+            }
+        }, {
+            key: 'getBound',
+            value: function getBound() {
+                this.vy += this.gravity;
+                // console.log(this.vy)
+                if (this.x - this.size < 0) {
+                    this.vx *= this.bound;
+                    this.x = this.size;
+                }
+                if (this.x + this.size > this.canvas.width) {
+                    this.vx *= this.bound;
+                    this.x = this.canvas.width - this.size;
+                }
+                if (this.y - this.size < 0) {
+                    this.vy *= this.bound;
+                    this.y = this.size;
+                }
+                if (this.y + this.size > this.canvas.height) {
+                    this.vy *= this.bound;
+                    this.y = this.canvas.height - this.size;
+                }
+                // this.vx = this.vx.toFixed(0);
+                // this.vy = parseInt(this.vy)
+            }
+        }, {
+            key: 'start',
+            value: function start() {
+                requestAnimationFrame(this.start);
+
+                if (this.isDrag) {
+                    this.vx = 0;
+                    this.vy = 0;
+                } else {
+                    // console.log(this.vy)
+                    // console.log(this.y)
+                    console.log(this.vx);
+
+                    this.getBound();
+
+                    this.x += this.vx;
+                    this.y += this.vy;
+                }
+
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.draw();
+            }
+        }]);
+
+        return dragBall;
+    }();
+
+    new dragBall('canvas7');
 };
