@@ -6,11 +6,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var canvas = void 0,
     ctx = void 0,
-    message = void 0,
+    message = 'hello',
     w = void 0,
     h = void 0,
-    gridX = 7,
-    gridY = 7,
+    gridX = 11,
+    gridY = 15,
     color = '#f36',
     shape = void 0;
 window.onload = function () {
@@ -22,6 +22,7 @@ window.onload = function () {
 
     shape = new Shape(w / 2, h / 2);
 
+    shape.draw();
     bindEvent();
 };
 
@@ -34,7 +35,8 @@ function bindEvent() {
     var messageInput = document.getElementById('text');
     messageInput.addEventListener('change', function () {
         message = this.value;
-        shape.draw(message);
+        shape.getParticles(message);
+        shape.draw();
         // console.log(message);
     }, false);
 }
@@ -54,10 +56,15 @@ var Shape = function () {
     _createClass(Shape, [{
         key: 'getParticles',
         value: function getParticles(message) {
-            ctx.clearRect(0, 0, this.x, this.y);
+            ctx.clearRect(0, 0, w, h);
+            shape.particles = [];
+
+            ctx.save();
             ctx.textAlign = 'center';
             ctx.font = '200px arial';
             ctx.fillText(message, w / 2, h / 2);
+            ctx.fill();
+            ctx.restore();
 
             var data = ctx.getImageData(0, 0, w, h),
                 buffer32 = new Uint32Array(data.data.buffer);
@@ -65,19 +72,19 @@ var Shape = function () {
             for (var n = 0; n < h; n += gridY) {
                 for (var i = 0; i < w; i += gridX) {
                     if (buffer32[n * w + i]) {
-                        this.particles.push(new Particle(new Vector2(i, n, 10, 10, color)));
+                        this.particles.push(new Particle(new Vector2(i, n), 0, 5, 10, color));
                     }
                 }
             }
+            console.log(this.particles);
         }
     }, {
         key: 'draw',
         value: function draw() {
             requestAnimationFrame(this.draw);
-            this.getParticles(message);
             ctx.clearRect(0, 0, w, h);
             var len = this.particles.length;
-            ctx.fillStyle = '#f36';
+            ctx.fillStyle = 'balck';
             for (var i = 0; i < len; ++i) {
                 this.particles[i].update(ctx);
             }

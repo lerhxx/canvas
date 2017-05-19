@@ -385,7 +385,7 @@ window.onload = function() {
             ctx.fillText(txt, fontx, fonty);
         }
     }
-    // drawLang()
+    drawLang()
 
     class Loading{
         constructor(id) {
@@ -862,7 +862,7 @@ window.onload = function() {
             this.draw();
         }
     }
-    new Ball2('canvas6');
+    // new Ball2('canvas6');
 
     class dragBall {
         constructor(id) {
@@ -870,8 +870,8 @@ window.onload = function() {
                 return;
             }
 
-            this.x = this.ctx.canvas.width / 2;
-            this.y = this.ctx.canvas.height / 2;
+            this.x = this.canvas.width / 2;
+            this.y = this.canvas.height / 2;
             this.vx = 0;
             this.vy = 0;
             this.ax = 0;
@@ -944,6 +944,7 @@ window.onload = function() {
         draw() {
             this.ctx.save();
             this.ctx.beginPath();
+            // this.ctx.translate(this.x, this.y);
             this.ctx.fillStyle = '#f36';
             this.ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
             this.ctx.fill();
@@ -982,7 +983,7 @@ window.onload = function() {
             }else {
                 // console.log(this.vy)
                 // console.log(this.y)
-                console.log(this.vx)
+                // console.log(this.vx)
 
                 this.getBound();
 
@@ -995,4 +996,335 @@ window.onload = function() {
         }
     }
     new dragBall('canvas7');
+
+    class Vertex {
+        constructor(x, y, baseY) {
+            this.x = x;
+            this.y = y;
+            this.baseY = baseY;
+            this.targetY = 0;
+            this.vy = 0;
+            this.deceleration = .95;
+            this.friction = 0.15;
+
+            this.updateY = this.updateY.bind(this);
+        }
+
+        updateY(diffVal) {
+            this.targetY = diffVal + this.baseY;
+            this.vy += this.targetY - this.y;
+            this.vy *= this.deceleration;
+            this.y += this.vy*this.friction;
+        }
+    }
+
+    class Wave {
+        constructor(id) {
+            if(!this.init(id)) {
+                return;
+            }
+
+            this.x = this.canvas.width / 2;
+            this.y = this.canvas.height / 2;
+            this.w = this.canvas.width;
+            this.h = this.canvas.height;
+            this.baseY = this.canvas.height;
+            this.lineNum = 250;
+            this.vertexs = [];
+            this.diffPt = [];
+            this.vPos = this.lineNum / 2;
+            this.dd = 15;
+            this.autoDiff = 100;
+
+            this.draw = this.draw.bind(this);
+            this.update = this.update.bind(this);
+            this.mouseDown = this.mouseDown.bind(this);
+            this.start = this.start.bind(this);
+
+            this.initVertexs();
+            this.bindEvent();
+            this.start();
+        }
+        init(id) {
+            if(!id) {
+                console.warn('there is no id')
+                return null;
+            }
+
+            this.canvas = document.getElementById(id);
+            this.ctx =this. canvas.getContext('2d');
+            this.canvas.width = window.innerWidth;
+
+            return true;
+        }
+
+        initVertexs() {
+            let dur = this.w / (this.lineNum - 1);
+            console.log(dur)
+            for(let i = 0; i < this.lineNum; ++i) {
+                this.vertexs[i] = new Vertex(dur * i, this.h / 2, this.h / 2);
+                this.diffPt[i] = 0;
+            }
+        }
+
+        bindEvent() {
+            this.canvas.addEventListener('mousedown', this.mouseDown, false);
+        }
+
+        mouseDown(e) {
+            if(e.offsetY < this.h / 2 + 30 || e.offsetY > this.h / 2 - 30) {
+                this.vPos = Math.floor((this.lineNum) * e.offsetX / this.w);
+                this.autoDiff = 100;
+            }
+        }
+ 
+        draw() {
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.fillStyle = '#6ca0f6'
+            this.ctx.moveTo(0, this.h);
+            this.ctx.lineTo(this.vertexs[0].x, this.vertexs[0].y);
+            for(let i = 0; i < this.lineNum; ++i) {
+                this.ctx.lineTo(this.vertexs[i].x, this.vertexs[i].y);
+            }
+            this.ctx.lineTo(this.w, this.h);
+            this.ctx.lineTo(0, this.h);
+            this.ctx.fill();
+            this.ctx.restore();
+
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.fillStyle = '#367aec'
+            this.ctx.moveTo(0, this.h);
+            this.ctx.lineTo(this.vertexs[0].x, this.vertexs[0].y);
+            for(let i = 0; i < this.lineNum; ++i) {
+                this.ctx.lineTo(this.vertexs[i].x, this.vertexs[i].y + 5);
+            }
+            this.ctx.lineTo(this.w, this.h);
+            this.ctx.lineTo(0, this.h);
+            this.ctx.fill();
+            this.ctx.restore();
+
+        }
+
+        update() {
+            this.diffPt[this.vPos] = this.autoDiff;
+            let len = this.vertexs.length
+
+            for(let i = this.vPos - 1; i > 0; --i) {
+                let d = this.vPos - i;
+                if(d > this.dd) {
+                    d = this.dd;
+                }
+                this.diffPt[i] -= (this.diffPt[i] - this.diffPt[i + 1]) * (1 - .01 * d); 
+            }
+            for(let i = this.vPos + 1; i < len; ++i) {
+                let d = i - this.vPos;
+                if(d > this.dd) {
+                    d = this.dd;
+                }
+                this.diffPt[i] -= (this.diffPt[i] - this.diffPt[i - 1]) * (1 - .01 * d); 
+            }
+
+            for(let i = 0; i < len; ++i) {
+                this.vertexs[i].updateY(this.diffPt[i]);
+            }
+
+            this.autoDiff -= this.autoDiff * .9;
+        }
+
+        start() {
+            requestAnimationFrame(this.start);
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.update();
+            this.draw();
+        }
+    }
+    new Wave('canvas8');
+
+    class Balls {
+        constructor(ctx, canvas, x = 0, y = 0, r = 10, handle = false, color = '#f36') {
+            if(!ctx) {
+                console.error('there is no ctx');
+                return;
+            }
+            this.x = x;
+            this.y = y;
+            this.r = r;
+            this.ctx = ctx;
+            this.color = color;
+            this.handle = handle;
+
+            this.draw = this.draw.bind(this);
+        }
+
+        draw() {
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.fillStyle = this.color;
+            this.ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
+            this.ctx.fill();
+            this.ctx.closePath();
+            this.ctx.restore();
+        }
+    }
+
+    class Easing {
+        constructor(id) {
+            if(!this.init(id)) {
+                return;
+            }
+
+            this.x = this.canvas.width / 2;
+            this.y = this.canvas.height / 2;
+            this.r = 20;
+            this.vx = 0;
+            this.vy = 0;
+            this.ax = 0;
+            this.ay = 0;
+            this.color = '#f36';
+            this.lineColor = 'blake';
+            this.dx = 0;
+            this.dy = 0;
+
+            this.s1X
+            this.targetX = 0;
+            this.targetY = 0;
+            this.easing = .9;
+            this.spring = .03;
+            this.springLength = 100;
+
+            this.draw = this.draw.bind(this);
+            this.drawLine = this.drawLine.bind(this);
+            this.changeStatus = this.changeStatus.bind(this);
+            this.containPoint = this.containPoint.bind(this);
+            this.mouseDown = this.mouseDown.bind(this);
+            this.mouseMove = this.mouseMove.bind(this);
+            this.mouseUp = this.mouseUp.bind(this);
+            this.start = this.start.bind(this);
+
+            this.bindEvent();
+            this.start();
+        }
+
+        init(id) {
+            if(!id) {
+                console.warn('there is no id')
+                return null;
+            }
+
+            this.canvas = document.getElementById(id);
+            this.ctx =this. canvas.getContext('2d');
+            this.canvas.width = window.innerWidth;
+
+            this.w = this.canvas.width;
+            this.h = this.canvas.height;
+            this.sBall = []; 
+
+            for(let i = 0; i < 3; ++i) {
+                this.sBall.push(new Balls(this.ctx, this.canvas, Math.random() * 450 + 20, Math.random() * 450 + 20, Math.random() * 10 + 5));  
+        }
+
+            return true;
+        }
+
+        draw() {
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.fillStyle = this.color;
+            this.ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
+            this.ctx.fill();
+            this.ctx.restore();
+        }
+
+        drawLine(ball) {
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.strokeStyle = this.lineColor;
+            this.ctx.moveTo(this.x, this.y);
+            this.ctx.lineTo(ball.x, ball.y);
+            this.ctx.stroke();
+            this.ctx.restore();
+        }
+
+        containPoint(ball, x, y) {
+            if(Math.abs(x - ball.x) < ball.r && Math.abs(y - ball.y) < ball.r) {
+                return true;
+            }
+            return false;
+        }
+
+        bindEvent() {
+            console.log(this.sBall)
+            this.canvas.addEventListener('mousedown', this.mouseDown, false);
+        }
+
+        mouseDown(e) {
+            console.log(e.offsetX)
+            for(let i  = 0; i < this.sBall.length; ++i) {
+                // console.log(this.containPoint(this.sBall[i]))
+                if(this.containPoint(this.sBall[i], e.offsetX, e.offsetY)) {
+                    this.sBall[i].handle = true;
+                    this.handleBall = this.sBall[i];
+                    this.dx = this.handleBall.x - e.offsetX;
+                    this.dy = this.handleBall.y - e.offsetY;
+                    this.canvas.addEventListener('mousemove', this.mouseMove, false);
+                    this.canvas.addEventListener('mouseup', this.mouseUp, false);
+                    break;
+                }
+            }
+        }
+
+        mouseMove(e) {
+            if(this.handleBall.handle) {
+                this.handleBall.x = e.offsetX + this.dx;
+                this.handleBall.y = e.offsetY + this.dy;
+            }
+             
+        }
+
+        mouseUp() {
+             this.handleBall.handle = false;
+             this.canvas.addEventListener('mousemove', this.mouseMove);
+             this.canvas.addEventListener('mouseup', this.mouseUp);
+        }
+
+        changeStatus() {
+            let dx = 0,
+                dy = 0,
+                angle = 0;
+            if(this.handleBall) {
+                dx = this.handleBall.x - this.x,
+                dy = this.handleBall.y - this.y;
+                angle = Math.atan2(dy, dx);
+                this.targetX = this.handleBall.x + Math.cos(angle) * this.springLength;
+                this.targetY = this.handleBall.y + Math.sin(angle) * this.springLength;
+                this.vx += (this.targetX - this.x) * this.spring;
+                this.vy += (this.targetY - this.y) * this.spring;
+            }else {
+                dx = 0;
+                dy = 0;
+                this.vx = dx;
+                this.vy = dy;
+            }
+            
+            this.x += this.vx * this.easing;
+            this.y += this.vy * this.easing;
+        }
+
+        start() {
+            requestAnimationFrame(this.start);
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.changeStatus();
+            for(let i  = 0; i < this.sBall.length; ++i) {
+                this.drawLine(this.sBall[i]);
+                this.sBall[i].draw()
+            }
+            this.draw();
+        }
+    }
+    new Easing('canvas9');
+
+    
+    
 }

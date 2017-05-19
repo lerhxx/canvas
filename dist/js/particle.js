@@ -24,7 +24,16 @@ var Particle = function () {
     _createClass(Particle, [{
         key: "update",
         value: function update(ctx) {
+            if (Math.random() > .9) {
+                this.r = this.r * Math.random() + 2;
+            }
+            ctx.save();
+            ctx.beginPath();
+            ctx.fillStyle = this.color;
             ctx.arc(this.position.x, this.position.y, this.r, 0, Math.PI * 2, false);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
         }
     }]);
 
