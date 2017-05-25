@@ -1454,4 +1454,68 @@ window.onload = function () {
     }();
 
     new Easing('canvas9');
+
+    var Magnifier = function () {
+        function Magnifier(id) {
+            _classCallCheck(this, Magnifier);
+
+            if (!this.init(id)) {
+                return;
+            }
+
+            this.img = document.getElementById('img');
+            this.r = 50;
+
+            this.bindEvent = this.bindEvent.bind(this);
+            this.draw = this.draw.bind(this);
+
+            this.bindEvent();
+        }
+
+        _createClass(Magnifier, [{
+            key: 'init',
+            value: function init(id) {
+                if (!id) {
+                    console.warn('there is no id');
+                    return null;
+                }
+
+                this.canvas = document.getElementById(id);
+                this.ctx = this.canvas.getContext('2d');
+                // this.canvas.width = window.innerWidth;
+
+                this.w = this.canvas.width;
+                this.h = this.canvas.height;
+
+                return true;
+            }
+        }, {
+            key: 'bindEvent',
+            value: function bindEvent() {
+                var _this3 = this;
+
+                this.img.addEventListener('click', function (e) {
+                    _this3.mX = e.offsetX;
+                    _this3.mY = e.offsetY;
+                    _this3.draw();
+                });
+            }
+        }, {
+            key: 'draw',
+            value: function draw() {
+                console.log(this.mX);
+                console.log(this.mY);
+                // this.ctx.save();
+                this.ctx.arc(250, 250, 100, 0, Math.PI * 2, false);
+                this.ctx.clip();
+                this.ctx.drawImage(this.img, this.mX - this.r, this.mY - this.r, this.r * 2, this.r * 2, this.w / 2 - this.r * 2, this.h / 2 - this.r * 2, this.r * 4, this.r * 4);
+                // this.ctx.drawImage(this.img, 0, 0)
+                // this.ctx.restore();
+            }
+        }]);
+
+        return Magnifier;
+    }();
+
+    new Magnifier('canvas10');
 };

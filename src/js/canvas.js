@@ -1324,7 +1324,56 @@ window.onload = function() {
         }
     }
     new Easing('canvas9');
+    
+    class Magnifier {
+        constructor(id) {
+            if(!this.init(id)) {
+                return;
+            }
 
-    
-    
+            this.img = document.getElementById('img');
+            this.r = 50;
+
+            this.bindEvent = this.bindEvent.bind(this);
+            this.draw = this.draw.bind(this);
+
+            this.bindEvent();
+        }
+
+        init(id) {
+            if(!id) {
+                console.warn('there is no id')
+                return null;
+            }
+
+            this.canvas = document.getElementById(id);
+            this.ctx =this. canvas.getContext('2d');
+            // this.canvas.width = window.innerWidth;
+
+            this.w = this.canvas.width;
+            this.h = this.canvas.height;
+
+            return true;
+        }
+
+        bindEvent() {
+            this.img.addEventListener('click', (e) => {
+                this.mX = e.offsetX;
+                this.mY = e.offsetY;
+                this.draw();
+            })
+        }
+
+        draw() {
+            console.log(this.mX)
+console.log(this.mY)
+            // this.ctx.save();
+            this.ctx.arc(250, 250 , 100, 0, Math.PI * 2, false);
+            this.ctx.clip();
+            this.ctx.drawImage(this.img, this.mX - this.r, this.mY - this.r,this.r * 2, this.r * 2, this.w / 2 - this.r * 2, this.h / 2 - this.r * 2, this.r * 4, this.r * 4);
+            // this.ctx.drawImage(this.img, 0, 0)
+            // this.ctx.restore();
+        }
+    }
+    new Magnifier('canvas10')
 }
