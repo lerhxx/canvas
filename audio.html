@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset='utf-8' />
+        <style>
+            .control-box {
+                padding: 5px 0;
+            }
+            .progress-box {
+                padding: 20px 10px;
+                position: relative;
+                border: 1px solid red;
+            }
+            .progress-thumb {
+                height: 1px;
+                background: #ccc;
+            }
+            .progress {
+                height: 100%;
+                background: pink;
+            }
+            .icon {
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                width: 20px;
+                height: 20px;
+                background: yellow;
+                border-radius: 20px;
+            }
+            #add {
+                width: 30px;
+                height: 30px;
+                text-align: center;
+                line-height: 30px;
+                border: 1px solid lawngreen
+            }
+        </style>
+    </head>
+    <body>
+        <div class='control-box'>
+            <div class='progress-box'>
+                <div class='progress-thumb'>
+                    <div class='progress'></div>
+                </div>
+                <i class='icon'></i>
+            </div>
+            <div class='control'>
+                <button id='pause' type='button'>pause</button>
+                <button id='prev' type='button'>prev</button>
+                <button id='play' type='button'>play</button>
+                <button id='next' type='button'>next</button>
+            </div>
+        </div>
+        <div class='file-box'>
+            <div id='add'>+</div>
+            <input id='file' type='file' multiple webkitdirectory directory />
+        </div>
+        <script src='./src/js/audio.js'></script>
+    </body>
+</html>

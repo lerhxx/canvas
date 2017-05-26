@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset='utf-8' />
+        <style>
+            canvas {
+                border: 1px solid pink;
+            }
+            .color {
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                margin: 0 5px;
+            }
+            .pan {
+                display: inline-block;
+                margin: 0 5px;
+                background: url(./src/imgs/pan.png) center no-repeat;
+                background-size: contain;
+            }
+            .pan-1 {
+                width: 15px;
+                height: 15px;
+            }
+            .pan-2 {
+                width: 20px;
+                height: 20px;
+            }
+            .pan-3 {
+                width: 25px;
+                height:25px;
+            }
+            .pan-4 {
+                width: 30px;
+                height: 30px;
+            }
+            .pan-5 {
+                width: 35px;
+                height: 35px;
+            }
+            #eraser-box {
+                display: inline-block;
+                cursor: url(./src/imgs/eraser.ico), auto;
+            }
+            .eraser {
+                display: inline-block;
+                margin: 0 5px;
+                background: url(./src/imgs/eraser.png) center no-repeat;
+                background-size: contain;
+            }
+            .eraser:hover {
+                background-color: #ddd;
+            }
+            .eraser-1 {
+                width: 25px;
+                height: 25px;
+            }
+            .eraser-2 {
+                width: 30px;
+                height: 30px;
+            }
+            .eraser-3 {
+                width: 35px;
+                height:35px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id='color-box'>
+        </div>
+        <div id='pan-box'>
+        </div>
+        <div id='eraser-box'>
+        </div>
+        <canvas id='canvas' width=500 height=500></canvas>
+        <script src='./src/js/drawSth.js'></script>
+    </body>
+</html>
