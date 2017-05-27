@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<style type="text/css">
+  body{text-align:center;}
+  #c1{border:1px dotted black;}
+</style>
+<body>
+   <h2>像素操作</h2>
+  <img id="img1" src="img/earth.jpg" />
+  <input id="btnGO" type="button" value="转成灰度图" />
+  <canvas id="c1" width="320" height="200"  ></canvas><br>  
+</body>
+<script>
+   function $(id)
+   {
+     return document.getElementById(id);
+   }
+   //开始
+   function init()
+   {
+      //注册GO按钮事件
+      $("btnGO").onclick=function()
+	  {
+	     c1.width = img1.width;
+		 c1.height = img1.height;
+	     //先把image绘制到canvas上
+		 var ctx = c1.getContext("2d");
+		 ctx.drawImage(img1,0,0,c1.width,c1.height);
+		 //获取像素数据
+		 var imgData = ctx.getImageData(0,0,c1.width,c1.height);
+		 for(var i = 0;i<imgData.data.length;i+=4)
+		 {
+		    //获取RGB像素值
+			var r = imgData.data[i],
+			    g = imgData.data[i+1],
+				b = imgData.data[i+2];
+            //计算灰度值,常用公式 Gray = (R*30 + G*59 + B*11 + 50) / 100
+			var gray = (r*30+g*59+b*11+50)*0.01;
+            imgData.data[i] = gray;
+            imgData.data[i+1] = gray;
+			imgData.data[i+2] = gray;
+		 }
+		 //最后把imgdata数据绘制到canvas中
+		 ctx.putImageData(imgData,0,0);
+	  }
+   }
+   init();
+</script>
+</html>

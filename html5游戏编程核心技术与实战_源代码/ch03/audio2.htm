@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="css/song.css"/>
+<body>
+   <h2>简单的音乐播放器</h2>
+    <input id="selFile" type="file" style="display:none"  webkitdirectory directory mozdirectory >
+	<div id="container">
+	   <!--控制面板-->
+	   <div id="control">	     
+	     <div id="title">&nbsp</div>
+	     <div id="ctrlContainer">
+		   <div id="pri"></div>
+		   <div id="play"></div>
+		   <div id="next"></div>	
+		   <div id="vol"></div>
+		 </div>
+	     <div id="progress">
+		   <div id="pgBar"></div>  
+		   <div id="pBar"></div>
+		 </div>		
+	   </div>
+	   <!--工具栏-->
+	   <div id="toolbar">
+	     <div id="addFolder">+</div>
+	   </div>
+	   <!--音频文件列表-->
+       <div id="fileList">
+	      <ul id="fList"></ul>
+	   </div>	
+	</div>
+	<!--定义消息层-->
+	<div id="msg"></div>
+</body>
+<script src="js/jquery.js"></script>
+<script src="js/player.js" charset="utf-8"></script>
+<script charset="utf-8">
+   $(document).ready(function(){
+      //绑定文件按钮
+	  $("#selFile").bind("change",selFile);
+	  $("#addFolder").bind("click",function(){
+	     $("#selFile").click();
+	  })	
+      //初始化player,绑定播放控制按钮
+	  bindPlayer();
+	  //绑定播放错误处理
+      bindPlayError();
+	  //绑定播放进度条
+      bindProgress();
+   })
+   //创建对象的URL地址
+   function createURL(obj)
+   {
+     var url = null;
+     if(window.createObjectURL){	
+	  url = window.createObjectURL(obj)
+	 }else if(window.createBlobURL){
+	  url = window.createBlobURL(obj)
+	 }else if(window.URL && window.URL.createObjectURL){
+	  url = window.URL.createObjectURL(obj)
+	 }else if(window.webkitURL && window.webkitURL.createObjectURL){
+	  url = window.webkitURL.createObjectURL(obj)
+	 }
+	 return url;
+   }
+   //显示提示消息
+   function showMsg(msg)
+   {
+     var ww = $(document).width(),
+	     wh = $(document).height();
+     var dmsg = $("#msg");
+	 dmsg.text(msg);
+	 dmsg.css("left",(ww-170)*0.5);
+	 dmsg.css("top",(wh-170)*0.5)
+	 $("#msg").fadeIn(500,function(){
+	    $(this).fadeOut(3000);    
+	 });
+   }        
+   //读取目录中文件
+   function selFile()
+   {
+      var fs = $("#selFile")[0].files;
+	  if(fs.length>0)
+	  {	     
+		  $("#fList").empty();
+		  //清空播放对象列表
+		  Player.clearList();
+		  //记录当前可播放文件编号
+		  var idxs=0;
+		  //循环数组中所有文件，把文件添加到播放列表中
+		  for(var i=0;i<fs.length;i++)
+		  {
+			 var f = fs[i];			 
+			 //检测是否是音乐文件
+			 if(f.name.match(/(.mp3|.ogg|.wma|.ape)$/))
+			 {
+			   var li = $("<li id='"+(idxs++)+"'>"+f.name+"</li>");	
+			   //双击播放
+			   li.bind("dblclick",function(){		
+			      playMusic($(this).attr("id"));				  
+			   });              
+			   //创建文件播放url
+			   var fURL = createURL(f);			 
+			   //放到播放文件集合中
+               Player.add(f.name,fURL);
+			   $("#fList").append(li);
+			 } 
+		  }
+		  //如果歌曲列表不为空，则设定第一首歌是当前播放歌曲
+		  if(!Player.isEmptyPlayList())
+		  {
+		     Player.currentId = 0;
+		  }
+	  }
+   }
+   //播放文件
+   function playMusic(index)
+   {    
+     var song = Player.play(index); 	
+	 setMusicClass(song);
+   }  
+   //设置当前播放歌曲选中的样式
+   function setMusicClass(song)
+   {
+     if(song!=null)
+	 {	  
+	   //设置标题
+	   $("#title").text(song.name);    
+	   //设置播放按钮变暂停图标
+	   $("#play").css("background-image","url(img/pause.png)");
+	    //还原上次被选中的样式
+	   $("#fList li").removeClass("selSong");
+       //设置选中歌曲文字样式
+	   $("#fList li[id="+Player.currentId+"]").addClass("selSong");
+	 }     
+   }
+   //停止播放
+   function stop()
+   {
+     Player.stop();
+	 //设置播放按钮变播放图标
+	 $("#play").css("background-image","url(img/play.png)");
+   }      
+   //绑定播放处理错误事件
+   function bindPlayError()
+   {		     
+         var audio = $(Player.audioObj);
+		 //处理错误事件
+		 var errMsg = ["数据读取失败!","网络故障!","解码失败!","不支持的格式!"];
+		 audio.bind("error",function(){		   
+			   showMsg(errMsg[this.error.code-1]);
+		 })
+   } 
+   //绑定进度条事件
+   function bindProgress()
+   {
+       var audio = $(Player.audioObj);
+	   //绑定进度条拖动
+	   $(document).bind("mousedown",function(e){
+           var srcEle = e.srcElement;
+		    e.preventDefault();
+		   //如果是进度条控制按钮
+		   if(srcEle.id == "pBar")
+		   {
+		       var x = e.pageX;
+			   //获取相对父坐标的X
+			   var pX = $("#pBar").position().left;
+			   //获取进度条宽度
+			   var pWidth = $("#progress").width();
+			   //绑定mousemove移动事件
+               $(document).bind("mousemove",function(e){
+			      if(!audio[0].paused)
+				  {
+					   e.preventDefault();
+					   //获取鼠标偏移大小
+					   var xOff = e.pageX-x;	
+					   var nX = (pX+xOff);
+					   nX = (nX<=0)?0:nX;
+					   nX = (nX>pWidth)?pWidth:nX;
+					   //设置控制条长度
+					   $("#pBar").css("left",nX); 
+					   //设置音乐播放时间				   				   
+					   audio[0].currentTime = audio[0].duration*(nX/pWidth);
+                  }
+			   });
+               //绑定鼠标按起事件
+               $(document).bind("mouseup",function(e){
+			      $(document).unbind("mousemove");
+			   }) 
+		   }
+	   })
+	   //绑定timeupdate事件，音频播放时间改变时触发
+	   audio.bind("timeupdate",function(){
+		var cTime = this.currentTime,
+			tTime = this.duration;
+		//设置内部滚动条长度
+		setCurrTime(cTime,tTime); 
+	   })
+   }
+   //设置播放进度条,cTime表示当前音乐时间，tTime表示音乐总时间
+   function setCurrTime(cTime,tTime)
+   {
+      var per = (tTime<=0)?0:cTime/tTime;
+      var pPos = $("#progress").width()*per;     
+	  $("#pBar").css("left",pPos);
+      $("#pgBar").width(pPos);
+   }
+   //初始化player,绑定播放控制按钮
+   function bindPlayer()
+   {
+     Player.init(); 
+     //绑定播放按钮
+	 $("#play").click(function(){
+	   //如果歌曲列表为空
+	   if(Player.isEmptyPlayList())
+	   {
+	     showMsg("请添加歌曲！");
+		 return;
+	   }
+	   //歌曲处于暂停状态
+	   if(Player.audioObj.paused)
+	   { 
+	     playMusic(Player.currentId);
+	   }	
+	   else //歌曲处于播放状态
+	   {
+	     stop();
+	   }
+	 });
+	 //绑定播放下一首按钮
+     $("#next").click(function(){
+	   var song = Player.playNext();
+	   setMusicClass(song);
+	 });
+	 //绑定播放上一首按钮
+     $("#pri").click(function(){
+	   var song = Player.playPri();
+       setMusicClass(song);
+	 })
+   }    
+</script>
+</html>

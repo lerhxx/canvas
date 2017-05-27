@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+</head>
+<style type="text/css">
+ body,div{margin:0px;padding:0px;}
+</style>
+<body>
+<input type="button" id="lbtn" value="播放"/>
+<input type="range" id="rge" min="1" max="100" />
+</div>
+</body>
+<script charset="utf-8" src="../js/jquery.js"></script>
+<script charset="utf-8">
+  var aCtx,srcNode,gainNode;
+  $(document).ready(function(){
+    //初始化
+    init();
+    //绑定播放按钮
+	$("#lbtn").click(function(){
+	  play(aCtx,"cat.mp3");
+	});
+    //绑定range
+	$("#rge").change(function(){
+	   gainNode.gain.value = this.value*0.01;
+	});
+  });
+  //初始化
+  function init()
+  {
+    try{
+	  aCtx = new webkitAudioContext();
+	  //创建srcNode
+	  srcNode = aCtx.createBufferSource();
+	  //创建gainNode
+	  gainNode = aCtx.createGainNode();
+	}
+	catch(e)
+	{
+	  alert("不支持音频API!");
+	}
+  }
+  //加载音乐
+  function load(ctx,fUrl,succFN,failFN)
+  {   
+	var req = new XMLHttpRequest();
+    req.open('GET', fUrl, true);
+	//指定响应类型为arraybuffer
+    req.responseType = 'arraybuffer';
+    // 异步解码
+    req.onload = function() {    	
+    ctx.decodeAudioData(
+	    this.response,
+		function(buf){succFN&&succFN(buf)},
+		function(){failFN&&failFN()}
+	  );
+	}
+    req.send();
+  }
+  //播放音频
+  function play(ctx,fUrl)
+  {
+    load(ctx,fUrl,function(buf){
+	  srcNode.loop = true;
+	  srcNode.buffer = buf;	  
+	  //src节点连接到gainNode
+	  srcNode.connect(gainNode);
+	  //gainNode节点连接到最终节点
+	  gainNode.connect(ctx.destination);
+	  srcNode.start(0);
+	});
+  } 
+  </script>
+</html>

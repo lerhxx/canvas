@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<style type="text.css">
+  body{text-align:center;}
+</style>
+</head>
+<body>
+  服务器地址:<input id="host" value="localhost">
+  <input type="button" id="btnConn" value="连接服务器" /><br>  
+  收到的消息:<br>
+  <textarea id="rmsg" rows="10" cols="60">    
+  </textarea><br>
+  <input id="smsg" size="60"><input type="button" id="btnSend" value="发送消息" /><br>  
+</body>
+<script src="../js/jquery.js"></script>
+<script src="socket.io.js"></script>
+<script>
+//初始化
+$(document).ready(function(){
+    //绑定建立连接
+    $("#btnConn").click(function(){
+       connect();
+    });
+    //绑定发送消息
+    $("#btnSend").click(function(){
+       sendMsg();
+    });
+})
+//定义全局客户端socket
+var socket = null,
+    isFirstConnect = true;
+//连接服务器
+function connect()
+{
+   socket = io.connect("http://"+$("#host").val()+":9000",{'reconnect':false});	
+   //注册连接事件
+   socket.on("connect",function(){
+     alert("连接服务器成功!");
+	 //如果是第一次连接，注册事件
+	 if(isFirstConnect)
+	 {
+	    isFirstConnect = false;
+		regEvent();
+	 }
+	 else
+	 {
+	    //重新连接
+	    socket.socket.reconnect();
+	 }
+   });   
+}
+//注册收到消息事件
+function regEvent()
+{
+  socket.on("message",function(msg){
+     $("#rmsg").text($("#rmsg").text()+msg+"\r\n");
+  })
+}
+//发送消息事件
+function sendMsg()
+{
+  if(socket!=null)
+  {
+    socket.send($("#smsg").val());
+  }
+}
+</script>
+</html>

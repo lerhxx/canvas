@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+</head>
+<body>  
+<!--马力动作序列帧-->
+<img src="images/mr.png" id="mr" style="display:none" /><br>    
+</body>
+<script src="js/jquery.js"></script>
+<!--导入引擎js部分-->
+<script charset='utf-8' src="xengine/xcore.js"></script>
+<script charset='utf-8' src="xengine/xutil.js"></script>
+<script charset='utf-8' src="xengine/xevent.js"></script>
+<script charset='utf-8' src="xengine/xsys.js"></script>
+<script charset='utf-8' src="xengine/xrenderobj.js"></script>
+<script charset='utf-8' src="xengine/xscene.js"></script>
+<script charset='utf-8' src="xengine/xscenemanager.js"></script>
+<script charset='utf-8' src="xengine/xframes.js"></script>
+<script charset='utf-8' src="xengine/xsprite.js"></script>
+<script charset='utf-8' src="xengine/xresource.js"></script>
+<script charset='utf-8' src="xengine/xapp.js"></script>
+<!--导入游戏js部分-->
+<script charset='utf-8' src="js/mario.js"></script>
+<script>  
+   var g = new Game();
+   //初始化游戏
+   function initGame()
+	 {
+	   //获取场景管理器
+	   var scm = g.sceneManager; 
+	   //创建场景
+	   var sc = scm.createScene([{"w":640,"h":400}]);
+	   //加载资源
+	   loadRes(sc);	  
+	 }
+   //加载资源
+   function loadRes(scene)
+   {
+      ResManager.loadRes("data/res.json",function(){
+        //创建精灵
+		initRenderObj(scene);
+        //开始飞奔
+        g.run(-1); 
+	  });      
+   }      
+   //初始化创建精灵
+   function initRenderObj(sc)
+   {      
+	  //创建30个mario
+      for(var i=0;i<30;i++)
+	  {
+	   var mr = sc.createRObj(Mario.ClassName,["mr"]);
+	   //设置随机位置
+	   mr.moveTo(MathUtil.randInt(20,620),MathUtil.randInt(20,380));
+	   //设置随机速度0~3
+	   mr.dx = MathUtil.randInt(1,3);
+	   mr.setAnimSpeed(2*Math.random());
+	   mr.w = mr.h = 64;
+	   //获取马力动画序列资源
+	   var anims = ResManager.getAnimationsByName("sprite","mario");
+       mr.setAnims(anims,"run");
+	  }	 
+   } 
+   //初始化游戏
+   initGame();        
+</script>
+</html>

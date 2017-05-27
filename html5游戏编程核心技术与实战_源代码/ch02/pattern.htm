@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8" />
+<style type="text/css">
+  body{text-align:center;}
+  #can{border:1px solid black}
+</style>
+<body>
+   <h2>Pattern</h2>   
+   <canvas id="can" width="600" height="300"></canvas>   
+</body>
+<script>   
+   var ctx = can.getContext('2d');
+   var imgSrc =["img/t1.png","img/f1.png"];
+   var ctx = can.getContext("2d");   
+   //创建Image对象和pattern对象
+   for(var i=0;i<imgSrc.length;i++)
+   {
+     var img = new Image();
+	 img.src = imgSrc[i];
+	 img.onload = (function(im,i){
+	   var self = im;
+	   return function(){
+	     var p = ctx.createPattern(self,"repeat");
+		 if(i==0)
+		 {
+		   ctx.beginPath();
+		   ctx.fillStyle = p;
+           ctx.fillRect(38,38,520,232); 
+		 }	
+		 else
+		 {
+		   ctx.beginPath();
+		   ctx.strokeStyle = p;
+		   ctx.lineWidth = 18; 
+           ctx.strokeRect(28,28,540,250); 
+		 }
+	   }
+	 }(img,i)); 
+   }
+</script>
+</html>

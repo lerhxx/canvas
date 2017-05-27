@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+  <head>
+   <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+  </head>
+  <body>
+    <canvas id="view" width="600" height="400" style="background-color:gray"></canvas>
+	<div id="sx"></div>
+  </body>
+  <script src="js/box2d.js"></script>
+  <script>
+
+    var world,ctx;
+	function init()
+	{
+       b2Vec2 = Box2D.Common.Math.b2Vec2;
+       b2AABB = Box2D.Collision.b2AABB;
+       b2BodyDef = Box2D.Dynamics.b2BodyDef;
+       b2Body = Box2D.Dynamics.b2Body;
+       b2FixtureDef = Box2D.Dynamics.b2FixtureDef;
+       b2Fixture = Box2D.Dynamics.b2Fixture;
+       b2World = Box2D.Dynamics.b2World;
+       b2MassData = Box2D.Collision.Shapes.b2MassData;
+       b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
+       b2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
+       b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
+       b2MouseJointDef =  Box2D.Dynamics.Joints.b2MouseJointDef;
+	}
+
+    function createWorld()
+	{
+	   var gravity = new Box2D.Common.Math.b2Vec2(0,10);
+	   var sleep = true;
+       world = new Box2D.Dynamics.b2World(gravity,sleep);
+	}
+	//创建地板
+	function createFloor()
+	{
+	  //定义floor类型
+	  var bodyDef = new b2BodyDef();
+	  bodyDef.type = b2Body.b2_staticBody;
+	  bodyDef.position.Set(300/30,300/30);
+	   //创建形状
+      var box = new b2PolygonShape();
+      box.SetAsBox(200/30,5/30);  
+      //设置用户数据
+	  bodyDef.userData ={w:200/30,h:5/30};
+	  //创建floor;
+	  var floor = world.CreateBody(bodyDef);  
+	  //创建材质
+	  floor.CreateFixture2(box);
+	}
+	//创建球
+	function createBall()
+	{
+	   //定义ball类型
+       var bodyDef = new b2BodyDef();
+	   bodyDef.type = b2Body.b2_dynamicBody;	   
+	   //创建形状
+	   var ba = new b2CircleShape(20/30);
+	   //创建材质
+	   var fix =  new b2FixtureDef();
+	   fix.shape = ba;
+	   fix.density = 0.6;
+       fix.friction = 0.3;
+	   fix.restitution = 0.6;
+	   //设置用户数据
+	   bodyDef.userData =20/30;
+	   for(var i=0;i<10;i++)
+	   {
+	   bodyDef.position.Set((300+Math.random()*50)/30,(Math.random()*50)/30);
+	   var ball = world.CreateBody(bodyDef);
+	   ball.CreateFixture(fix);	   
+	   }       
+	}
+	//绘制
+	function initDebugDraw()
+	{
+	  ctx = document.getElementById("view").getContext("2d");
+      var debugDraw = new b2DebugDraw();
+	 	  debugDraw.SetSprite(ctx);
+		  debugDraw.SetDrawScale(30.0);
+	      debugDraw.SetFillAlpha(0);
+		  debugDraw.SetAlpha(0);
+		  debugDraw.SetLineThickness(1.0);
+		  debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
+	      world.SetDebugDraw(debugDraw);
+          window.setInterval("update()",1000/60);
+	}
+	//更新
+	function update()
+	{
+	    world.Step(1/60, 8, 1);
+        world.DrawDebugData();
+        //world.ClearForces();
+		//绘制物体		
+	    ctx.strokeStyle = "yellow";
+		ctx.lineWidth = 4;
+		for (var b = world.GetBodyList() ; b; b = b.GetNext())
+		{	
+		  //获取物体当前位置
+		  var pos = b.GetPosition();
+		  //获取物体附加数据
+		  var uData = b.GetUserData();
+		  var ang = b.GetAngle();
+		  if(b.GetType() == b2Body.b2_dynamicBody&&uData!=null)
+		    {		       
+		       ctx.save();		    
+			   ctx.beginPath();
+			   ctx.translate(pos.x*30,pos.y*30);
+			   ctx.rotate(ang);
+			   ctx.moveTo(0,0);
+               ctx.arc(0,0,uData*30,0,Math.PI*2);			 
+			   ctx.stroke();		
+               ctx.restore();
+		  }
+		  //绘制地板 
+          if(b.GetType() == b2Body.b2_staticBody&&uData!=null)
+		    {
+			   ctx.save();		    
+			   ctx.beginPath();			   
+               ctx.strokeRect((pos.x-uData.w)*30,(pos.y-uData.h)*30,uData.w*60,uData.h*60);
+               ctx.restore();
+		    }
+		}		        
+	}
+	init();
+	createWorld();
+	createFloor();
+	createBall();
+	initDebugDraw();
+  </script>
+</html>
+

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style type="text/css">
+    ul{margin:0px;padding:0px;}
+    #menu{
+	  list-style:none;
+	  width:auto;
+	}
+    #menu li{
+	  float:left;
+	  border:1px solid gray;  
+	  background-color:#bfcbd6; 
+	  padding:10px;
+	}
+	#menu li:hover{
+	  transform:scale(1.2);
+	  -webkit-transform:scaleY(1.2);
+	  -webkit-transform-origin:bottom;
+	}
+	#menu li:hover{
+      transform:translateZ(-10px); 
+	  -webkit-transform:translateZ(-10px);
+	}
+    #cm1 {
+      transform:rotateZ(81deg); 
+	  -webkit-transform:rotateZ(81deg);
+	  -webkit-transform-origin:center;
+	}
+	.fs{
+	  transition:all .5s;
+      -webkit-transition:all .5s;
+	}
+	.rot{
+	  transform:rotateZ(90deg); 
+	  -webkit-transform:rotateZ(90deg);
+	  -webkit-transform-origin:5px 5px;
+	}
+</style>
+<!--
+#menu li:hover{
+	  transform:scale(1.2);
+	  -webkit-transform:scaleY(1.2);
+	  -webkit-transform-origin:bottom;
+	}
+-->
+<!--#menu li:hover{
+      transform:translateY(-10px); 
+	  -webkit-transform:translateY(-10px);
+	} -->
+<html>  
+ <body>
+  <input type="button" id="cm" value="100" class="fs"/>
+
+ </body>
+ <script src="../js/jquery.js"></script>
+ <script>
+  $(document.body).ready(function(){
+     $("#cm").on("click",function(){
+	   $(this).toggleClass("rot");
+	 });
+   })
+ </script>
+</html>

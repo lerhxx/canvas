@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8" />
+<style type="text/css">
+  body{text-align:center;}
+  #can{border:1px dotted black}
+</style>
+<body>
+   <h2>图片显示</h2>
+   <img src="img/t1.png" id="img1" /><br>
+   <canvas id="can" width="300" height="200"></canvas>
+</body>
+<script>
+   function $(id)
+   {
+     return document.getElementById(id);
+   }
+   document.body.onload = function()
+   {
+     //获取canvas的上下文
+     var ctx = $("can").getContext("2d");
+     //获取canvas中心
+     var cx = $("can").width*0.5,
+         cy = $("can").height*0.5;
+     //获取图片的宽高度
+	 var iw = $("img1").width,
+	     ih = $("img1").height;
+     //平移到中心	
+     ctx.translate(cx,cy);		  
+	 ctx.drawImage($("img1"),-iw*0.5,-ih*0.5);	      
+   }   
+</script>
+</html>

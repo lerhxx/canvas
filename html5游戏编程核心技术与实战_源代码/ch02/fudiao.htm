@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<style type="text/css">
+  body{text-align:center;}
+  #c1{border:1px dotted black;}
+</style>
+<body>
+   <h2>像素操作</h2>
+  <img id="img1" src="img/earth.jpg" />
+  <input id="btnGO" type="button" value="转成浮雕图" />
+  <canvas id="c1" width="320" height="200"  ></canvas><br>  
+</body>
+<script>
+   function $(id)
+   {
+     return document.getElementById(id);
+   }
+   //开始
+   function init()
+   {
+      //注册GO按钮事件
+      $("btnGO").onclick=function()
+	  {
+	     c1.width = img1.width;
+		 c1.height = img1.height;
+	     //先把image绘制到canvas上
+		 var ctx = c1.getContext("2d");
+		 ctx.drawImage(img1,0,0,c1.width,c1.height);
+		 //获取像素数据
+		 var imgData = ctx.getImageData(0,0,c1.width,c1.height);
+		 var iData = imgData.data;
+		 for(var i = 0;i<img1.height-1;i++)
+		 {
+		    for(var j = 0;j<img1.width;j++)
+			{
+			   //获取像素在dataImage起始位置
+			   var start = (i*img1.width+j)<<2;			   
+               var r = iData[start]-iData[start+4]+128,
+			       g = iData[start+1]-iData[start+5]+128,
+			       b = iData[start+2]-iData[start+6]+128;
+               //越界处理
+               r = (r<0)?0:(r>255)?255:r;
+			   g = (g<0)?0:(g>255)?255:g;
+			   b = (b<0)?0:(b>255)?255:b;
+			   //转灰度图
+			   var g=(r*30+g*59+b*11+50)*0.01;
+               iData[start] = g;
+               iData[start+1] = g;
+			   iData[start+2] = g;
+			}
+		 }		
+		 //最后把imgdata数据绘制到canvas中
+		 ctx.putImageData(imgData,0,0);
+	  }
+   }
+   init();
+</script>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+</head>
+<body style="text-align:center">
+ 最大帧数:<span id="maxf"></span><br>
+ 最小帧数:<span id="minf"></span><br>
+ 当前帧数:<span id="currf"></span><br>
+</body>
+<script src="js/jquery.js"></script>
+<script charset='utf-8' src="xengine/xcore.js"></script>
+<script charset='utf-8' src="xengine/xutil.js"></script>
+<script charset='utf-8' src="xengine/xevent.js"></script>
+<script charset='utf-8' src="xengine/xsys.js"></script>
+<script charset='utf-8' src="xengine/xrenderobj.js"></script>
+<script charset='utf-8' src="xengine/xscene.js"></script>
+<script charset='utf-8' src="xengine/xscenemanager.js"></script>
+<script charset='utf-8' src="xengine/xapp.js"></script>
+<script>
+ var mx = $("#maxf"),
+     mi = $("#minf"),
+	 cr = $("#currf");
+ var g = new Game();
+ //添加监听器
+ g.addListener(new AppEventListener({
+  "afterRender":function(){
+    //显示帧信息
+	mx.text(FrameState.maxFrame);
+	mi.text(FrameState.minFrame);
+	cr.text(FrameState.currFrame);
+  }
+ }));
+ //开始飞奔
+ g.run(-1);
+</script>
+</html>

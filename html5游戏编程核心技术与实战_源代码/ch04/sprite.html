@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+</head>
+<body>  
+<!--马力动作序列帧-->
+<img src="images/mr.png" id="mr" style="display:none" /><br>    
+</body>
+<script src="js/jquery.js"></script>
+<!--导入引擎js部分-->
+<script charset='utf-8' src="xengine/xcore.js"></script>
+<script charset='utf-8' src="xengine/xutil.js"></script>
+<script charset='utf-8' src="xengine/xevent.js"></script>
+<script charset='utf-8' src="xengine/xsys.js"></script>
+<script charset='utf-8' src="xengine/xrenderobj.js"></script>
+<script charset='utf-8' src="xengine/xscene.js"></script>
+<script charset='utf-8' src="xengine/xscenemanager.js"></script>
+<script charset='utf-8' src="xengine/xframes.js"></script>
+<script charset='utf-8' src="xengine/xsprite.js"></script>
+<script charset='utf-8' src="xengine/xapp.js"></script>
+<!--导入游戏js部分-->
+<script charset='utf-8' src="js/mario.js"></script>
+<script>  
+   var g = new Game();
+   //初始化游戏
+   function initGame()
+	 {
+	   //获取场景管理器
+	   var scm = g.sceneManager; 
+	   //创建场景
+	   var sc = scm.createScene([{"w":640,"h":400}]);
+	   initRenderObj(sc);
+	 }
+   //初始化创建精灵
+   function initRenderObj(sc)
+   {
+      //设置跑步动画
+      var runFrames = new Frames("m_run",document.getElementById("mr"));
+	  var jumpFrames = new Frames("m_jump",document.getElementById("mr"));
+      var crouchFrames = new Frames("m_crouch",document.getElementById("mr"));
+	  //取前三幅跑步图片
+	  for(var i=0;i<3;i++)
+	  {
+	    runFrames.add(32*i,0,32,32);
+	  }
+	  //添加跳跃帧
+	  jumpFrames.add(0,0,32,32);
+      jumpFrames.add(32*6,0,32,32);
+      //添加蹲下帧
+	  crouchFrames.add(0,0,32,32);
+      crouchFrames.add(32*14,0,32,32);
+	  //创建动画集合
+	  var anims = new Animations();
+	  anims.add("run",runFrames,true);
+	  anims.add("jump",jumpFrames);
+	  anims.add("crouch",crouchFrames);
+	  //创建30个mario
+      for(var i=0;i<30;i++)
+	  {
+	   var mr = sc.createRObj(Mario.ClassName,["mr"]);
+	   //设置随机位置
+	   mr.moveTo(MathUtil.randInt(20,620),MathUtil.randInt(20,380));
+	   //设置随机速度0~3
+	   mr.dx = MathUtil.randInt(1,3);
+	   mr.setAnimSpeed(2*Math.random());
+	   mr.w = mr.h = 64;
+	   mr.setAnims(anims,"run");
+	  }	 
+   } 
+   //初始化游戏
+   initGame();  
+   //开始飞奔
+   g.run(-1);
+</script>
+</html>

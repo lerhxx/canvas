@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<style type="text/css">
+  body{text-align:center;}
+  #can{border:1px solid black}
+</style>
+<body>
+   <h2>画线例子</h2>
+   <canvas id="can" ></canvas>
+</body>
+<script>
+   //获取2d上下文
+   var ctx = can.getContext("2d");
+   var width = can.width,
+       height = can.height;
+   ctx.moveTo(0,0);
+   ctx.lineTo(width,height);
+   ctx.lineWidth = 6;
+   ctx.strokeStyle = "red";   
+   //开始画线
+   ctx.stroke();
+</script>
+</html>

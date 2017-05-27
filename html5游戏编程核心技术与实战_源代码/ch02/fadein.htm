@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8" />
+<style type="text/css">
+  body{text-align:center;}
+  #can{border:1px dotted black}
+</style>
+<body>
+   <h2>淡入</h2>
+   <img src="img/t1.jpg" id="img1" style="display:none" /><br>
+   <canvas id="can" width="300" height="200"></canvas>
+</body>
+<script>
+   function $(id)
+   {
+     return document.getElementById(id);
+   }  
+   function draw()
+   {
+    //清除屏幕	
+	 ctx.drawImage($("img1"),0,0);	 
+   } 
+   document.body.onload = function()
+   {
+    //获取canvas的上下文
+    ctx = $("can").getContext("2d");
+   //获取图片的宽高度
+    $("can").width = $("img1").width,
+	$("can").height = $("img1").height;
+	ctx.globalAlpha = 0;
+    var tHandle = window.setInterval(function(){
+        ctx.globalAlpha+=0.05;
+		draw();
+		if(ctx.globalAlpha>=0.95)
+		{
+		  window.clearInterval(tHandle);
+		}
+	},100);
+   }   
+</script>
+</html>

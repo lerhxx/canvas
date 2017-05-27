@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<style type="text/css">
+  body,div{margin:0px;padding:0px;}  
+  #ball{
+    position:absolute;
+	width:60px;
+	height:60px;
+	border-radius:30px;
+	background: -webkit-radial-gradient(25px 20px, circle farthest-corner, white 4%, black 75%);
+	-webkit-animation:move 5s linear both;
+  }
+  @-webkit-keyframes move{
+   from {
+     left:100px;
+	 top:100px;
+    }
+   25% {
+     left:400px;
+	 top:100px;
+   }
+   50%{
+     left:400px;
+	 top:400px;
+   }
+   75%{
+     left:100px;
+	 top:400px;
+   }
+   to {
+     left:100px;
+	 top:100px;
+   }
+  }
+</style>
+<html>  
+ <body>  
+   <div id="ball"></div>   
+ </body>
+</html>
+ 

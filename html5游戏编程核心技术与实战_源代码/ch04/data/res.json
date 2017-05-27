@@ -1,0 +1,11 @@
+{
+  "image":
+	[		  
+	   {"name":"mario","src":"images/mr.png"},
+	   {"name":"title","src":"images/bg.png"}       
+	], 
+  "frame":         
+	[
+	  {"name":"sprite","src":"data/sprite_frames.json"}
+	]
+}

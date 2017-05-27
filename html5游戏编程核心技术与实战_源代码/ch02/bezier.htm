@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<style type="text/css">
+  body{text-align:center;}
+  #can{border:1px solid black}
+</style>
+<body>
+   <h2>贝塞尔曲线</h2>   
+   <canvas id="can" width="400" height="300"></canvas>
+</body>
+<script>
+  var ctx = can.getContext("2d");
+  //定义vector2
+  var Point = function(x,y){
+    this.x = x;
+	this.y = y;
+  }   
+  //定义控制点,前面两个是开始和结束点，最后两个是控制点
+  var cPt =[];
+  //产生控制点
+  function createControlPt(x,y)
+  {
+    if(cPt.length<4)
+	{
+	  cPt.push(new Point(x,y));
+	}
+  }
+  //绘制控制点
+  function drawPt()
+  {                
+    for(var i=0;i<cPt.length;i++)
+	{
+	   var c = "red";
+	   if(i<2)
+	   {
+         c = "green";
+	   }
+	   ctx.strokeStyle = c;
+	   ctx.strokeRect(cPt[i].x-5,cPt[i].y-5,10,10);
+	}
+  }
+  //判断一个点是否在一个以p2为中心的矩形中
+  function isInRect(p1,p2,w,h)
+  {
+     return p1.x>=p2.x-w&&p1.x<=p2.x+w&&p1.y>=p2.y-h&&p1.y<=p2.y+h;
+  }
+  //判断一个点在那一个控制区域中
+  function getIdxCpt(p)
+  {
+    var idx = -1;
+	for(var i=0;i<cPt.length;i++)
+	{
+	   if(isInRect(p,cPt[i],5,5))
+	   {
+	     return i;
+	   }
+	}
+	return idx;
+  }
+  //绘制控制点和起始点连线
+  function drawBLine()
+  {
+     ctx.strokeStyle = "gray";
+     ctx.beginPath();     
+     ctx.moveTo(cPt[0].x,cPt[0].y);
+     ctx.lineTo(cPt[2].x,cPt[2].y);
+	 ctx.stroke();
+     ctx.moveTo(cPt[1].x,cPt[1].y);
+     ctx.lineTo(cPt[3].x,cPt[3].y);
+	 ctx.stroke(); 
+  }
+  //绘制贝塞尔曲线
+  function drawBei()
+  {
+     ctx.beginPath();
+     ctx.strokeStyle = "red";
+	 ctx.moveTo(cPt[0].x,cPt[0].y);
+     ctx.bezierCurveTo(cPt[2].x,cPt[2].y,cPt[3].x,cPt[3].y,cPt[1].x,cPt[1].y);
+	 ctx.stroke();
+  }
+  //绘制所有的图形
+  function draw()
+  {
+    drawPt();
+    if(cPt.length>3)
+	{
+	  drawBLine();
+      drawBei();
+	}	
+  }
+  //设置鼠标点下和移动事件 
+  var selPt = new Point(-1,-1),sIdx;
+  can.onmousedown = function(e){     
+      var x = e.offsetX,y = e.offsetY;
+	  selPt.x = x;selPt.y = y;
+      createControlPt(x,y);
+      draw(); 
+	  //判断是否点在控制点中
+      if(cPt.length>3)
+	  {
+	    sIdx = getIdxCpt(selPt);
+	    if(sIdx>=0)
+	    {
+	      can.onmousemove = function(e){
+             cPt[sIdx].x = e.offsetX;
+		     cPt[sIdx].y = e.offsetY;	
+			 ctx.clearRect(0,0,400,300);
+	         draw();
+          }         
+	    }
+	  }      
+  }
+  can.onmouseup = function(){
+     this.onmousemove = null;
+  } 
+</script>
+</html>

@@ -1,0 +1,10 @@
+{
+  "image":
+	[		  
+	   {"name":"pig","src":"imgs/pig.png"}      	 
+	], 
+  "frame":         
+	[
+	  {"name":"sprite","src":"data/sprite_frames.json"}
+	]
+}

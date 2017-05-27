@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<style type="text/css">
+  body{text-align:center;}
+  #can{border:1px dotted black}
+</style>
+<body>
+   <canvas id="can" width="400" height="300" ></canvas>
+</body>
+<script>
+   //获取2d上下文
+   var ctx = can.getContext("2d");
+   var width = can.width,
+       height = can.height;
+   ctx.lineWidth = 2;
+   ctx.strokeStyle = "green";
+   ctx.rect(10,10,30,30);
+   ctx.closePath();
+   ctx.moveTo(8,18);
+   ctx.lineTo(100,100);
+   
+   ctx.stroke();
+</script>
+</html>

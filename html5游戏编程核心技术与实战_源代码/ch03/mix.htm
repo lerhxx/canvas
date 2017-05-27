@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+</head>
+<style type="text/css">
+ body,div{margin:0px;padding:0px;}
+</style>
+<body>
+<input type="button" id="lbtn" value="播放"/>
+青蛙<input type="range" id="rge" min="1" max="10" />猫
+</div>
+</body>
+<script charset="utf-8" src="../js/jquery.js"></script>
+<script charset="utf-8" src="aud.js"></script>
+<script charset="utf-8">    
+  $(document).ready(function(){
+    AudManager.urls=["cat.mp3","frog.mp3"];
+    AudManager.init();
+	AudManager.load(function(){	 
+	  var pNod1 = AudManager.createNode();
+	  var pNod2 = AudManager.createNode();
+	  var sound1 = AudManager.items[0];
+      var sound2 = AudManager.items[1];
+	  sound1.addNode(pNod1);
+	  sound2.addNode(pNod2);
+      sound1.play(true);
+      sound2.play(true);
+	  //绑定range
+	  $("#rge").change(function(){
+		AudManager.items[0].pNode[0][0].gain.value =  1-this.value*0.1;
+		AudManager.items[1].pNode[0][0].gain.value =  this.value*0.1;
+	  });
+	});
+  }); 
+  </script>
+</html>

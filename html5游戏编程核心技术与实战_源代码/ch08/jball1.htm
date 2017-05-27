@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<style>
+body,div{margin:0px;padding:0px;}
+body{
+background-color:gray;
+}
+.con {
+	width:100%;
+	height:80%;	
+	position:absolute;
+	bottom:0px;
+	-webkit-perspective: 1000px;
+}
+.floor{
+    height:100%;
+    width:100%;
+	background-image:url(../imgs/f2.jpg);
+	-webkit-transform:rotateX(45deg);
+	-webkit-transform-origin:bottom;
+}
+.ball{
+    position:absolute;
+	width:40px;
+	height:40px;
+	left:49%;
+	top:60px;
+	border-radius:20px;
+	background: -webkit-radial-gradient(20px 12px, circle farthest-corner, white 4%, black 70%);
+	-webkit-animation:jump 1.6s both; 	
+  }
+@-webkit-keyframes jump {
+	from 
+	{
+	  -webkit-animation-timing-function: ease-in;
+	}	
+	10% 
+	{
+	  top:260px;		      	 
+	  -webkit-animation-timing-function: ease-out;
+	}
+	20%
+	{
+	   top:100px;		
+       -webkit-animation-timing-function: ease-in;
+	}
+	30% 
+	{
+	  top:260px;		
+      -webkit-animation-timing-function: ease-out;
+	}
+	40%
+	{
+	   top:140px;		
+       -webkit-animation-timing-function: ease-in;
+	}
+	50% 
+	{
+	  top:260px;		
+      -webkit-animation-timing-function: ease-out;
+	}
+	60%
+	{
+	   top:180px;		
+       -webkit-animation-timing-function: ease-in;
+	}
+	70% 
+	{
+	  top:260px;		
+      -webkit-animation-timing-function: ease-out;
+	}
+	80%
+	{
+	   top:220px;		
+       -webkit-animation-timing-function: ease-in;
+	}	
+	90%
+	{
+	   top:260px;		
+       -webkit-animation-timing-function: ease-in;
+	}
+	to{
+	   top:260px;
+	   -webkit-animation-timing-function: ease-in;
+	}
+}
+</style>
+<html>  
+ <div class="con">
+    <div class="floor"/>	
+</div>
+<div class="ball" />
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+</head>
+<style type="text/css">
+ body,div{margin:0px;padding:0px;text-align:center}
+</style>
+<body>
+  <input type="button" id="btn_calc" value="计算圆周率" />
+  <input id="txt_rt" />
+</body>
+<script src="../js/jquery.js"></script>
+<script charset="utf-8">     
+  $(document).ready(function(){
+    $("#btn_calc").on("click",function(){
+      var wk = new Worker("worker.js");
+	  //注册返回结果，当woker发送postmessage时，该回调函数响应 
+	  wk.onmessage = function(e)
+	  {
+	    $("#txt_rt").val(e.data);
+	  }
+	  //发送计算请求
+	  wk.postMessage(80000000);
+	}) 
+  }) 
+</script>
+</html>

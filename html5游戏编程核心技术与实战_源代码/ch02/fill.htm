@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<style type="text/css">
+  body{text-align:center;}
+  #can{border:1px dotted black}
+</style>
+<body>
+   <h2>填充圆形例子</h2>
+   <canvas id="can" width="400" height="300" >
+   </canvas>
+</body>
+<script>
+   //获取2d上下文
+   var ctx = can.getContext("2d");
+   var width = can.width,
+       height = can.height;
+   //计算圆心
+   var xOff = width*0.5,
+       yOff = height*0.5;
+   for(var i=1;i<=8;i++)
+     {	 
+	   //以最里面矩形为中心，画同心圆，半径依次减少15
+	   ctx.beginPath();
+	   ctx.fillStyle = "rgba(255,0,0,"+(30*i)/500+")";
+	   ctx.arc(xOff,yOff,120-i*15,0,Math.PI*2,true);
+	   ctx.closePath();
+	   ctx.fill();
+	 }
+</script>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+</head>
+<style type="text/css">
+ body,div{margin:0px;padding:0px;text-align:center}
+ #cav{
+   border:1px solid black;
+   border-radius:4px;
+   margin:10px auto;
+ }
+</style>
+<body>
+<canvas id="cav" width="320" height="200"></canvas>
+</body>
+<script charset="utf-8" src="../js/jquery.js"></script>
+<script charset="utf-8" src="aud.js"></script>
+<script charset="utf-8">    
+  var ctx = document.getElementById("cav").getContext("2d");
+  //定义移动点坐标
+  var cX=190,cY=100,deg=0;
+  $(document).ready(function(){
+	init();
+  }); 
+  //画圆函数
+  function renderCir(x,y,r,col)
+  {
+    ctx.save();
+	ctx.beginPath();
+	ctx.arc(x,y,r,0,Math.PI*2);
+	ctx.closePath();
+	ctx.fillStyle=col;
+    ctx.fill();
+	ctx.restore();
+  }
+  //绘制中心点
+  function renderCenter()
+  {
+    renderCir(160,100,8,"red");
+  }
+  //绘制蚊子,以圆代替，围绕中心点旋转
+  function renderCat()
+  {
+    renderCir(cX,cY,8,"blue");
+  }
+  function init()
+  {    
+	AudManager.urls=["skeeter.mp3"];
+    AudManager.init();
+	AudManager.load(function(){
+	 //创建PannerNode
+	 var pNod1 = AudManager.createNode(1);
+	 var sound1 = AudManager.items[0];     
+	 sound1.addNode(pNod1);
+	 sound1.play(true);
+     timeHandle();
+	});		
+  }
+  //设置时钟动画
+  function timeHandle()
+  {
+    window.setInterval(function(){
+	 ctx.clearRect(0,0,320,200);
+	 var rad = Math.PI*deg/180;
+	 var sx = 90*Math.cos(rad),sy = 90*Math.sin(rad);
+	 cX = 160+sx,cY = 100+sy;
+	 //设置音频位置
+     AudManager.items[0].pNode[0][0].setPosition(sx*0.1,-sy*0.1,0);
+	 renderCenter();
+	 renderCat();
+	 deg++;
+	},30);
+  }
+  </script>
+</html>

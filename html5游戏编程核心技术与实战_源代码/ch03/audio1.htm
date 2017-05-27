@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<style type="text/css">
+  body{text-align:center;}
+  #can{border:1px solid black}
+</style>
+<body>
+   <h2>简单的音视频</h2>
+   <audio id="a1" src="media/scg.mp3" autoplay mediagroup="gp" oncanplaythrough="showDuration(this)" controls>
+      您的浏览器不支持audio元素
+   </audio><br>
+   调节音量：<input type="range" min="0" max="100" onchange="setVolume(this)" />
+   <br>
+   <video id="v1" poster="media/v.png" src="http://www.w3school.com.cn/i/movie.mp4" type="video/mp4" autoplay controls>
+      您的浏览器不支持video元素
+   </video>
+</body>
+<script>
+  //显示音频时间
+ function showDuration(audio)
+{
+    alert(audio.duration);
+}
+//调节音量
+function setVolume(obj)
+{
+  a1.volume = obj.value*0.01;
+}
+</script>
+</html>

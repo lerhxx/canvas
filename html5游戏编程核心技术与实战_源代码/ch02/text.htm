@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<style type="text/css">
+  body{text-align:center;}
+  #can{border:1px dotted black}
+</style>
+<body>
+   <h2>显示文字</h2>
+   <canvas id="can" width="400" height="300" >
+   </canvas>
+</body>
+<script>
+  function $(id)
+  {
+    return document.getElementById(id);
+  }
+  //获取canvas的上下文
+  var ctx = $("can").getContext("2d");
+  ctx.strokeStyle = "red";
+  ctx.font = "bold 40px sans-serif";
+  ctx.strokeText("Welcome To HTML5",10,50);
+</script>
+</html>

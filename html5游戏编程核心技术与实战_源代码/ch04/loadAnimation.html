@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+</head>
+<body>
+  选取带有序列图的图片<input type="file" id="fBtn" onchange="loadImg(this)" /><br>
+  <img src="" id="fImg" />
+  每帧图片宽度:<input id="fWid" value="64"/><br>
+  每帧图片高度:<input id="fHei" value="64"/><br>
+  行数<input id="fRow" value="1" /><br>
+  列数<input id="fCol" value="10" /><br>
+  <input type="button" id="cBtn" onclick="createAnimation()" value="生成动画序列图"/>  
+  查看动画帧<select id="selFrame" onchange="selFrame(this.value)"></select> 
+  <input type="button" value="运行动画" onclick="run(this)" />
+  <br>
+  <canvas id="cv"></canvas>
+</body>
+<script src="js/jquery.js"></script>
+<script>
+ //定义动画集合
+ var frames =[];
+ var timeHandler = null;
+ //加载本地图片
+ function loadImg(fObj)
+ {
+   var f = fObj.files[0];
+   if(!/image\/\w+/.test(f.type))
+   {
+      alert("请选择图片文件!");
+   }
+   else
+   {
+      //创建文件读取对象
+      var r = new FileReader();
+	  //以DataURL方式读取	 
+	  r.onload = function()
+	  {
+	    $("#fImg").attr("src",this.result);
+		delete r;
+	  }
+	  r.readAsDataURL(f);
+   }
+   //停止动画
+   if(timeHandler!=null)
+   {
+     clearInterval(timeHandler);
+   }
+   frames = [];
+ }
+ //生成动画
+ function createAnimation()
+ {
+    if($("#fImg").attr("src")=="")
+	{
+	  alert("清先选择图片文件");
+	}
+	else
+	{
+	   //获取每帧宽度和高度
+	   var w = Number($("#fWid").val())||32,
+	       h = Number($("#fHei").val())||32,
+           r = Number($("#fRow").val())||1,
+           c = Number($("#fCol").val())||1; 
+	   frames = [];
+	   cv.width = w;
+	   cv.height = h;
+	   //清空帧选择
+       $("#selFrame").empty();
+       //生成每帧图片在图中的坐标
+	   var fCount = 0;
+	   for(var i = 0;i<r;i++)
+	   {
+	     for (var j=0;j<c;j++)
+	     {
+		    //计算每帧图片的起始坐标,x,y
+			var x = j*w,
+			    y = i*h;
+            //保存每帧图片的起始坐标,x,y和宽度高度
+		    frames.push([x,y,w,h]);
+            $("#selFrame").append("<option value='"+fCount+"'>第"+fCount+"帧</option>");
+	        fCount++;
+	     }
+	   }	  
+	}
+ }
+ //选择动画帧,把当前帧画到画布上面
+ function selFrame(idx)
+ {
+    if(frames.length==0)return;
+	var f = frames[idx],
+        ctx = cv.getContext("2d");
+	//绘制图片到canvas上
+	ctx.clearRect(0,0,cv.width,cv.height);
+	ctx.drawImage(fImg,f[0],f[1],f[2],f[3],0,0,cv.width,cv.height);
+ } 
+ //运行动画
+ function run(btn)
+ {
+   if(frames.length==0)return;
+   var ctx = cv.getContext("2d");
+   if(btn.value=="运行动画")
+   {
+      //设置动画,每100毫秒运行一帧
+	  var fCount = frames.length,
+	      fIdx = 0;
+      timeHandler = setInterval(function(){
+	      var f = frames[fIdx];		
+          ctx.clearRect(0,0,cv.width,cv.height);
+	      ctx.drawImage(fImg,f[0],f[1],f[2],f[3],0,0,cv.width,cv.height);
+		  fIdx=(++fIdx)%fCount;
+      },100);      
+	  btn.value="停止动画";
+   }
+   else
+   {     
+      clearInterval(timeHandler);
+      btn.value="运行动画";
+   }   
+ }
+</script>
+</html>

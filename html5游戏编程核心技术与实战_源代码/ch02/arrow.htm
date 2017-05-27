@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<style type="text/css">
+  body{text-align:center;}
+  #can{border:1px dotted black}
+</style>
+<body>
+   <canvas id="can" width="400" height="300" ></canvas>
+</body>
+<script>
+   //获取2d上下文
+   var ctx = can.getContext("2d");
+   var width = can.width,
+       height = can.height;
+   var pts=[[30,100],[300,100],[300,50],[350,130],[300,210],[300,160],[30,160]]
+   ctx.strokeStyle="red";
+   ctx.lineWidth = 2;
+   ctx.moveTo(pts[0][0],pts[0][1]);
+   for(var i=1;i<pts.length;i++)
+   {
+      ctx.lineTo(pts[i][0],pts[i][1]);
+   }
+   ctx.closePath();
+   ctx.stroke();
+</script>
+</html>

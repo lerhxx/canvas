@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<style type="text/css">
+  body{text-align:center;}
+  #can{border:1px solid black}
+</style>
+<body>
+   <h2>渐变</h2>   
+   <canvas id="can" width=600 height=300></canvas>
+</body>
+<script>   
+   var ctx = can.getContext("2d");
+   var w = 480,h=60;
+   ctx.beginPath();   
+   //创建线性渐变
+   var g = ctx.createLinearGradient(0,0,480,0);
+   //创建径向渐变
+   var g1 = ctx.createRadialGradient(300,160,10,300,160,240);   
+   //设置颜色
+   g.addColorStop(0,"black");
+   g.addColorStop(1,"white");   
+   ctx.fillStyle = g;
+   //绘制矩形
+   ctx.rect((600-w)*0.5,30,w,80);
+   ctx.fill();
+   ctx.beginPath();
+   //定义基本色
+   var colors=["aqua","black","blue","fuchsia","gray","green","lime","maroon","navy","olive","purple","red","silver","teal","white","yellow"];
+   var step = 1/colors.length;
+   for(var i=0;i<colors.length;i++)
+   {
+    g1.addColorStop(i*step,colors[i]);
+   }   
+   //ctx.arc(300,200,100,0,Math.PI*2,true);
+   //绘制矩形
+   ctx.rect((600-w)*0.5,120,w,80);
+   ctx.fillStyle = g1;
+   ctx.fill();
+</script>
+</html>

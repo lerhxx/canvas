@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<style type="text.css">
+  body{text-align:center;}
+</style>
+</head>
+<body>
+  状态:<span id="st"></span><br>
+  服务器地址:<input id="host">
+  <input type="button" id="btnConn" value="连接服务器" /><br>  
+</body>
+<script src="js/jquery.js"></script>
+<script>
+var client = null,
+    staMsg = ["正在连接服务器……","建立连接成功!","正在关闭连接……","已经关闭连接!"];
+//初始化
+$(document).ready(function(){
+    //绑定建立连接
+    $("#btnConn").click(function(){
+     connect();
+    });
+})
+//显示socket消息
+function dispStatus()
+{
+  $("#st").text(staMsg[client.readyState]);
+}
+//连接服务器
+function connect()
+{
+   client = new WebSocket("ws://"+$("#host").val()+"/socket");
+   client.onopen = doOpen;
+   client.onmessage = doMsg;
+   client.onclose = doClose;
+   client.onerror = function(err){ alert(err)}
+   dispStatus();
+}
+//处理open事件
+function doOpen()
+{
+   dispStatus();
+}
+//处理messsage事件
+function doMsg(msg)
+{
+  alert("收到消息:"+msg);
+}
+//处理关闭事件
+function doClose()
+{
+  dispStatus();
+}
+</script>
+</html>

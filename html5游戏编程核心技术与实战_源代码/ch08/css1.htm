@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<style type="text/css">
+  body,div{margin:0px;padding:0px;}  
+  .page{width:100%;position:fixed;height:100%;overflow:hidden;background-color:#eee;} 
+  #p1 h1{
+    margin:0px;
+    border:3px solid black;
+	background-color:black;
+	border-radius:10px;
+	color:white;
+	text-align:center;
+	cursor:pointer;
+  }
+  #p1 h2{
+    text-align:center;
+  }
+  #p1 p{
+   text-indent: 30px;
+  }
+  #p1 section{
+    width:100%;	
+	margin:3px auto;
+	overflow: hidden;
+	height:36px;
+	color:#eee;
+	-webkit-transition:all .3s;
+  }
+  #p1 section h1 a{
+    width:100%;
+	display: block;
+	color:inherit;
+	text-decoration: none;
+  }
+  #p1 section:target{
+    height:200px;
+	color:black;
+  }
+  #p1 section article{
+    -webkit-transform:scale(0.1);
+    -webkit-transition:all .8s;
+  }
+  #p1 section:target article{
+	-webkit-transform:scale(1);
+  }
+</style>
+<html>   
+ <body>   
+   <div id="p1" class="page">
+     <section id="s1">
+	    <h1><a href="#s1">第一项</a></h1>
+		<article>
+		  <h2>59分</h2>
+		  <p>
+		    考试结束的铃声响起，老师开始收卷，小明神情慌张地在考卷下塞了1000元，外加一张纸条，上面写着"10元1分"。到了下一次上课，发考卷了，老师给了他一张59分的考卷和410元。
+		  </p>
+		</article>
+	 </section>
+	 <section id="s2">
+	    <h1><a href="#s2">第二项</a></h1>
+		<article>
+          <h2>谁让你不早点睡?</h2>
+		  <p>
+		    儿子问爸爸："爸爸，为什么我没有兄弟姐妹呀？" 正在看报纸的爸爸听后，气不打一处来，咆哮道："谁让你不早点睡？"
+		  </p>
+		</article>
+	 </section>
+	 <section id="s3">
+	    <h1><a href="#s3">第三项</a></h1>
+		<article>
+		  <h2>恐怖故事</h2>
+		  <p>
+		    一个人半夜回家，他的家住在14楼，他走进电梯，过了几秒，发现八楼亮了，他想一定是八楼的人要坐电梯，过了一会儿他猛然按下了345楼，门打开就冲了出去，待在大楼附近的便利店直到第二天。
+		  </p>
+		</article>
+	 </section>
+   </div>
+ </body>
+</html>

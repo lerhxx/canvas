@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+</head>
+<body>  
+  <img src="images/mr.png" id="mr" /><br>  
+  <input type="button" id="btnStart" value="开始" onclick="start()"/>
+  动画<select id="sp" onchange="changeAnimation(this.value);">
+       <option value="run" selected>跑步</option> 
+       <option value="jump">跳跃</option>
+       <option value="crouch" >蹲下</option>
+      </select>
+  速度<select id="sp" onchange="changeSpeed(this.value);">
+    <option value="0.25">X0.25</option> 
+    <option value="0.5">X0.5</option>
+    <option value="1" selected>X1</option>
+	<option value="2">X2</option>
+	<option value="4">X4</option>
+  </select><br>
+  <canvas id="cv" width="64" height="64"></canvas>
+</body>
+<script charset='utf-8' src="xengine/xcore.js"></script>
+<script charset='utf-8' src="xengine/xutil.js"></script>
+<script charset='utf-8' src="xengine/xsys.js"></script>
+<script charset='utf-8' src="xengine/xframes.js"></script>
+<script>
+   //定义动画
+   var anims = new Animations();
+   //帧控制器
+   var fCtrl = null;
+   //时钟句柄
+   var tHand = null;
+   //初始化，创建帧集合和帧控制对象
+   function initAnim()
+   {         
+	  //定义跑的动画
+      var runFrames = new Frames("m_run",document.getElementById("mr"));
+	  //定义蹲下动画
+	  var crouchFrames = new Frames("m_crouch",document.getElementById("mr"));
+	  //定义跳跃动画
+	  var jumpFrames = new Frames("m_jump",document.getElementById("mr"));	  
+	  //添加跑步帧
+	  for(var i=0;i<3;i++)
+	  {
+	    runFrames.add(32*i,0,32,32);
+	  }
+	  //添加跳跃帧   
+	  jumpFrames.add(0,0,32,32);
+	  jumpFrames.add(32*6,0,32,32);
+      //添加蹲下帧
+      crouchFrames.add(0,0,32,32);
+      crouchFrames.add(32*14,0,32,32);
+	  //创建动画集合
+	  anims.add("run",runFrames,true);
+	  anims.add("jump",jumpFrames);
+	  anims.add("crouch",crouchFrames);
+      //定义动画控制对象
+	  fCtrl = new FrameCtrl();
+      fCtrl.setAnims(anims,"run");
+   }
+   //开始动画
+   function start()
+   {
+       var ctx = document.getElementById("cv").getContext("2d");
+	   var btnS = document.getElementById("btnStart");
+	   if(btnS.value=="开始")
+	   {
+	    //开启帧数跟踪
+	    FrameState.start();
+        tHand = setInterval(function(){         
+          //更新帧状态
+          FrameState.update();
+		  //获取动画当前帧
+		  var f = fCtrl.getNextFrame();		  
+		  ctx.clearRect(0,0,64,64);
+		  //绘制帧
+		  ctx.drawImage(f[0],f[1],f[2],f[3],f[4],0,0,64,64);          		  
+	     },20);    
+	     btnS.value="停止";
+	   }
+	   else
+	   {
+	     btnS.value="开始";
+		 clearInterval(tHand);
+	   }      
+   } 
+   //修改动画速度
+   function changeSpeed(val)
+   {
+      fCtrl.speed = val;
+   }
+   //修改当前动画
+   function changeAnimation(val)
+   {
+      fCtrl.setCurrent(val);
+   }
+   initAnim();
+</script>
+</html>

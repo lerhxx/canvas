@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Cube</title>
+	<script src="../js/jquery.js"></script>
+	<!--引入Three.js-->
+	<script src="three.min.js"></script>
+</head>
+<style type="text/css">
+ body,div{margin:0px;padding:0px;text-align:center}
+ #sce{
+   border:2px solid black;
+   border-radius:4px;
+   width:480px;
+   height:320px;
+   margin:10px auto;
+   box-shadow:0px 0px 10px black;
+   -webkit-box-shadow:0px 0px 10px black;
+   -moz-box-shadow:0px 0px 10px black;
+ }
+</style>
+		<body>
+		<div id="sce"></canvas>
+		<script>
+		   $(document).ready(function(){
+		     init();
+		   })
+		   //定义3D场景，摄像机光源等和立方体
+		   var scene,cam,render,cube,light;
+		   //初始化
+		   function init()
+		   {
+		     initScene();		     
+             initCube();
+			 animate();
+		   }
+		   function initScene()
+		   {
+		     scene = new THREE.Scene();
+			 cam = new THREE.PerspectiveCamera(45,$("#sce").width()/$("#sce").height(),0.1,2000);		cam.position.x= cam.position.y = cam.position.z=2;
+			 cam.lookAt(new THREE.Vector3( 0, 0, 0 ));
+			 render = new THREE.WebGLRenderer({antialias:true});
+             render.setSize($("#sce").width(),$("#sce").height());
+             $("#sce").append(render.domElement);
+		   }
+		   function initCube()
+           {
+		     //加载纹理 
+			 var text = THREE.ImageUtils.loadTexture( 'box.gif' );
+		     text.anisotropy = render.getMaxAnisotropy();
+			 //创建几何图形和材质
+             var g = new THREE.CubeGeometry(1,1,1),
+			     m = new THREE.MeshBasicMaterial({ map: text });			
+             cube = new THREE.Mesh(g,m);
+			 scene.add(cube);
+		   }
+		   function animate()
+		   {
+		     requestAnimationFrame(animate);
+			 cube.rotation.y += Math.PI/180;
+			 render.render(scene, cam);
+		   }			
+		</script>
+		</body>
+</html>

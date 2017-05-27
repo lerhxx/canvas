@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<style type="text/css">
+  body{text-align:center;}
+  #can{border:1px dotted black}
+</style>
+<body>
+   <h2>图片显示</h2>
+   <img src="img/t1.png" id="img1" />
+   <input type="button" id="btnCopy" value="拷贝图片" /><br>
+   <canvas id="can" width="400" height="300">
+   </canvas>
+</body>
+<script>
+   function $(id)
+   {
+     return document.getElementById(id);
+   }
+   $("btnCopy").onclick = function()
+   {
+      //获取canvas的上下文
+	  var ctx = $("can").getContext("2d");
+	  //设置canvas的大小
+	  $("can").width = $("img1").width;
+	  $("can").height = $("img1").height;
+	  ctx.drawImage($("img1"),0,0);
+   }
+</script>
+</html>

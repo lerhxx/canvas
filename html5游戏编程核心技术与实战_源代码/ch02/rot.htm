@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8" />
+<style type="text/css">
+  body{text-align:center;}
+  #can{border:1px dotted black}
+</style>
+<body>
+   <h2>图片显示</h2>
+   <img src="img/t1.png" id="img1" /><br>
+   <canvas id="can" width="300" height="200"></canvas>
+</body>
+<script>
+   function $(id)
+   {
+     return document.getElementById(id);
+   }  
+   //定义旋转角度
+   var deg = 0;
+   function draw()
+   {
+     //保存变换矩阵
+     ctx.save()
+	 //清除屏幕
+	 ctx.clearRect(0,0,300,200);
+     ctx.translate(cx,cy);		
+	 ctx.scale(2,2);
+	 ctx.rotate(deg*Math.PI/180);
+	 ctx.drawImage($("img1"),-iw*0.5,-ih*0.5);	 
+	 //恢复变换矩阵
+	 ctx.restore();
+   } 
+   document.body.onload = function()
+   {
+    //获取canvas的上下文
+    ctx = $("can").getContext("2d");
+   //获取canvas中心
+    cx = $("can").width*0.5,
+    cy = $("can").height*0.5;
+   //获取图片的宽高度
+    iw = $("img1").width,
+	ih = $("img1").height;
+    window.setInterval(function(){
+        deg+=2;
+		draw();
+	},30);
+   }   
+</script>
+</html>

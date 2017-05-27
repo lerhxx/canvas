@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+</head>
+<style type="text/css">
+ body,div{margin:0px;padding:0px;text-align:center}
+ #cav{
+   border:1px solid black;
+   border-radius:4px;
+   margin:10px auto;
+ }
+</style>
+<body>
+<canvas id="cav" width="400" height="300"></canvas>
+</body>
+<script charset="utf-8" src="../js/jquery.js"></script>
+<script charset="utf-8" src="aud.js"></script>
+<script charset="utf-8">    
+  var ctx = document.getElementById("cav").getContext("2d");
+  var SampleSize = 1024;
+  $(document).ready(function(){
+	init();
+  }); 
+  function init()
+  {    
+	AudManager.urls=["cat.mp3"];
+    AudManager.init();
+	AudManager.load(function(){	
+      var jNode = AudManager.createNode(2,[SampleSize,1,1]);
+	  var pNode = AudManager.createNode();
+	  ctx.strokeStyle = "red";
+	  jNode.onaudioprocess=function(e)
+	  {
+	    renderWave(e);
+	  }
+	  var sound1 = AudManager.items[0];
+	  sound1.addNode(pNode);
+	  sound1.addNode(jNode,1);
+	  sound1.play(true);
+	});		
+  }      
+  function renderWave(e)
+  {
+     ctx.clearRect(0,0,400,300);
+     var bufData = e.inputBuffer.getChannelData(0);
+	 ctx.beginPath();
+	 ctx.moveTo(0,150);
+	 for(var i=0,len=bufData.length,mix=Math.min(400,len);i<mix;i++)
+	 {
+	   ctx.lineTo(i,bufData[i]*150+150);
+	 }
+	 ctx.stroke();
+	 ctx.closePath();	 
+  }
+  </script>
+</html>

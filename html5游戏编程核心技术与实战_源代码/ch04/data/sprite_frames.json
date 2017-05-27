@@ -1,0 +1,15 @@
+{			           
+	"title":{
+	  "type":0,
+	  "img":"title"
+	},	
+	"mario":{
+	  "type":1,
+	  "img":"mario", 
+	  "rc":[1,15,32,32],
+	  "animations":{
+		"run":[0,2],
+		"jump":[6]
+	  }
+	}
+}
