@@ -1,5 +1,7 @@
 'use strict';
 
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -81,13 +83,129 @@ var FrameState = function () {
     return FrameState;
 }();
 
+var RenderObj = function () {
+    function RenderObj() {
+        var args = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+        _classCallCheck(this, RenderObj);
+
+        this.name = args.name || 'name' + ++RenderObj.id;
+        this.x = args.x || 0;
+        this.y = args.y || 0;
+        this.vx = args.vx || 0;
+        this.vy = args.vy || 0;
+        this.ax = args.ax || 0;
+        this.ay = args.ay || 0;
+        this.deg = args.deg || 0;
+        this.canRemove = false;
+    }
+
+    _createClass(RenderObj, [{
+        key: 'moveTo',
+        value: function moveTo() {
+            var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.x;
+            var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.y;
+
+            this.x = x;
+            this.y = y;
+        }
+    }, {
+        key: 'move',
+        value: function move() {
+            var xOff = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+            var yOff = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+            this.x += xOff;
+            this.y += yOff;
+        }
+    }, {
+        key: 'moveStep',
+        value: function moveStep() {
+            this.vx += this.ax;
+            this.vy += this.ay;
+
+            this.x += this.vx;
+            this.y += this.vy;
+        }
+    }, {
+        key: 'rotate',
+        value: function rotate(deg) {
+            this.deg = deg;
+        }
+    }, {
+        key: 'update',
+        value: function update() {
+            this.moveStep();
+        }
+    }, {
+        key: 'render',
+        value: function render(ctx) {
+            return;
+        }
+    }]);
+
+    return RenderObj;
+}();
+
+RenderObj.id = 0;
+
+var Ball = function (_RenderObj) {
+    _inherits(Ball, _RenderObj);
+
+    function Ball(name) {
+        var r = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+
+        _classCallCheck(this, Ball);
+
+        var _this2 = _possibleConstructorReturn(this, (Ball.__proto__ || Object.getPrototypeOf(Ball)).call(this, { name: name }));
+
+        _this2.r = r;
+        _this2.color = 'white';
+        return _this2;
+    }
+
+    _createClass(Ball, [{
+        key: 'update',
+        value: function update() {
+            var w = this.owner.w,
+                h = this.owner.h;
+            if (this.x < this.r || this.x + this.r > w) {
+                this.vx = -this.vx;
+            }
+
+            if (this.y < this.r || this.y + this.r > h) {
+                this.vy = -this.vy;
+            }
+
+            _get(Ball.prototype.__proto__ || Object.getPrototypeOf(Ball.prototype), 'update', this).call(this);
+        }
+    }, {
+        key: 'render',
+        value: function render(ctx) {
+            ctx.beginPath();
+            ctx.fillStyle = this.color;
+            ctx.arc(this.x, this.y, this.r - 3, 0, Math.PI * 2, false);
+            ctx.fill();
+            ctx.closePath();
+
+            ctx.beginPath();
+            ctx.strokeStyle = 'black';
+            ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
+            ctx.stroke();
+            ctx.closePath();
+        }
+    }]);
+
+    return Ball;
+}(RenderObj);
+
 var Scene = function () {
     function Scene() {
         var args = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
         _classCallCheck(this, Scene);
 
-        this.name = args.name || 'name ' + ++this.sceneID;
+        this.name = args.name || 'name ' + ++Scene.sceneId;
 
         this.x = args.x || 0;
         this.y = args.y || 0;
@@ -98,6 +216,10 @@ var Scene = function () {
         this.holder = this.createHolder();
         this.canvas = this.createCanvas();
         this.ctx = this.canvas.getContext('2d');
+
+        this.renderObj = [];
+        this.renderObjName = {};
+        this.listeners = [];
 
         this.setPos();
         this.setSize();
@@ -116,7 +238,6 @@ var Scene = function () {
         value: function createHolder() {
             var div = document.createElement('div');
             div.style.position = 'absolute';
-            div.style.overflow = 'hidden';
 
             return div;
         }
@@ -129,7 +250,66 @@ var Scene = function () {
             var canvas = document.createElement('canvas');
             canvas.style.position = 'absolute';
             canvas.style.zIndex = -1;
+            canvas.width = this.w;
+            canvas.height = this.h;
             return canvas;
+        }
+    }, {
+        key: 'createRObj',
+        value: function createRObj() {
+            var obj = new Ball();
+            this.addRObj(obj);
+            return obj;
+        }
+    }, {
+        key: 'addRObj',
+        value: function addRObj(obj) {
+            obj.owner = this;
+            this.renderObj.push(obj);
+            this.renderObjName[obj.name] = obj;
+        }
+    }, {
+        key: 'removeRObj',
+        value: function removeRObj(obj) {
+            this.removeRObjByName(obj.name);
+        }
+    }, {
+        key: 'removeRObjByName',
+        value: function removeRObjByName(name) {
+            var obj = this.renderObjName[name];
+            obj && (obj.canRemove = true);
+        }
+    }, {
+        key: 'removeAllCanRemove',
+        value: function removeAllCanRemove() {
+            for (var i = 0, len = this.renderObj.length; i < len; ++i) {
+                var obj = this.renderObj[i].canRemove;
+                if (obj) {
+                    this.renderObj.splice(i, 1);
+                    delete this.renderObjName[obj.name];
+                }
+            }
+        }
+    }, {
+        key: 'clearRObj',
+        value: function clearRObj() {
+            this.renderObj = [];
+            this.renderObjName = {};
+        }
+    }, {
+        key: 'getRObjName',
+        value: function getRObjName(name) {
+            return this.renderObjName[name];
+        }
+    }, {
+        key: 'addListener',
+        value: function addListener(listener) {
+            this.listeners.push(listener);
+        }
+    }, {
+        key: 'clearListener',
+        value: function clearListener() {
+            this.listeners = [];
         }
 
         // 定位
@@ -166,13 +346,38 @@ var Scene = function () {
 
     }, {
         key: 'update',
-        value: function update() {}
+        value: function update() {
+            for (var i = 0, len = this.renderObj.length; i < len; ++i) {
+                this.renderObj[i].update();
+            }
+            this.removeAllCanRemove();
+        }
 
         // 渲染场景
 
     }, {
         key: 'render',
-        value: function render() {}
+        value: function render() {
+            this.clear();
+            for (var i = 0, len = this.listeners.length; i < len; ++i) {
+                this.listeners.enable && this.listeners[i].beforeRender();
+            }
+
+            this.renderRObj();
+
+            for (var _i = 0, _len = this.listeners.length; _i < _len; ++_i) {
+                this.listeners.enable && this.listeners[_i].afterRender();
+            }
+        }
+    }, {
+        key: 'renderRObj',
+        value: function renderRObj() {
+            for (var i = 0, len = this.renderObj.length; i < len; ++i) {
+                this.ctx.save();
+                this.renderObj[i].render(this.ctx);
+                this.ctx.restore();
+            }
+        }
 
         // 清除背景
 
@@ -232,6 +437,7 @@ var Scene = function () {
     }, {
         key: 'clean',
         value: function clean() {
+            this.listeners = null;
             document.body.removeChild(this.holder);
             this.holder = this.canvas = this.ctx = null;
         }
@@ -255,8 +461,8 @@ var SceneManage = function () {
 
     _createClass(SceneManage, [{
         key: 'createScene',
-        value: function createScene() {
-            var scene = new Scene();
+        value: function createScene(args) {
+            var scene = new Scene(args);
             this.pushScene(scene);
             return scene;
         }
@@ -389,6 +595,14 @@ var SceneManage = function () {
             }
         }
 
+        // 获取当前场景
+
+    }, {
+        key: 'getCurScene',
+        value: function getCurScene() {
+            return this.scenes[this.scenes.length - 1];
+        }
+
         // 获取场景索引
 
     }, {
@@ -432,6 +646,8 @@ var Game = function () {
         this.minF = document.getElementById('min');
         this.curF = document.getElementById('cur');
 
+        this.sceneManage = new SceneManage();
+
         this.executeListener = this.executeListener.bind(this);
 
         this.addListener(new AppEventListener({
@@ -450,6 +666,13 @@ var Game = function () {
             this.handle = requestAnimationFrame(this.mainLoop);
             this.frameState.update();
             this.executeListener('beforeRender');
+
+            var scene = this.sceneManage.getCurScene();
+            if (scene) {
+                scene.update();
+                scene.render();
+            }
+
             if (!this.paused) {
                 this.maxF.innerHTML = this.frameState.maxFrame;
                 this.minF.innerHTML = this.frameState.minFrame;
@@ -502,4 +725,39 @@ var Game = function () {
     return Game;
 }();
 
-new Game().run();
+var BallGame = function () {
+    function BallGame() {
+        _classCallCheck(this, BallGame);
+
+        this.game = new Game();
+        this.initGame();
+        this.game.run();
+    }
+
+    _createClass(BallGame, [{
+        key: 'initGame',
+        value: function initGame() {
+            var sc = this.game.sceneManage.createScene({ w: 500, h: 500 });
+            this.initRObj(sc);
+        }
+    }, {
+        key: 'initRObj',
+        value: function initRObj(sc) {
+            for (var i = 0; i < 20; ++i) {
+                var ball = sc.createRObj();
+                ball.moveTo(randomInt(20, sc.w - 20), randomInt(20, sc.h - 20));
+                ball.vx = randomInt(1, 3);
+                ball.vy = randomInt(1, 3);
+                ball.color = 'rgb(' + Math.floor(Math.random() * 256) + ', ' + Math.floor(Math.random() * 256) + ', ' + Math.floor(Math.random() * 256) + ')';
+            }
+        }
+    }]);
+
+    return BallGame;
+}();
+
+new BallGame();
+
+function randomInt(a, b) {
+    return Math.floor(Math.random() * (b - a) + a);
+}

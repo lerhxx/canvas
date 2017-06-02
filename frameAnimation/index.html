@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset='utf-8' />
+        <style>
+            canvas {
+                display: block;
+                margin-top: 10px;
+                border: 1px solid red;
+            }
+        </style>
+    </head>
+    <body>
+        <input id='file' type='file'>
+        <img id='image'/>
+        <div>
+            <lable>每帧图片宽度：</lable>
+            <input id='width' type='text' />
+        </div>
+        <div>
+            <lable>每帧图片高度：</lable>
+            <input id='height' type='text' />
+        </div>
+        <div>
+            <lable>行数：</lable>
+            <input id='row' type='text' />
+        </div>
+        <div>
+            <lable>列数：</lable>
+            <input id='col' type='text' />
+        </div>
+        <button id='create' type='button'>生成动画</button>
+        查看动画帧:
+        <select id='selection' class='perFrame'>
+        </select>
+        <button id='run' type='button'>运行动画</button>
+        <canvas id='canvas'></canvas>
+        <script src='./src/js/index.js'></script>
+    </body>
+</html>

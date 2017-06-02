@@ -52,9 +52,90 @@ class FrameState {
     }
 }
 
+class RenderObj {
+    constructor(args={}) {
+        this.name = args.name || `name${++RenderObj.id}`;
+        this.x = args.x || 0;
+        this.y = args.y || 0;
+        this.vx = args.vx || 0;
+        this.vy = args.vy || 0;
+        this.ax = args.ax || 0;
+        this.ay = args.ay || 0;
+        this.deg = args.deg || 0;
+        this.canRemove = false;
+    }
+
+    moveTo(x=this.x, y=this.y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    move(xOff=0, yOff=0) {
+        this.x += xOff;
+        this.y += yOff;
+    }
+
+    moveStep() {
+        this.vx += this.ax;
+        this.vy += this.ay;
+
+        this.x += this.vx;
+        this.y += this.vy;
+    }
+
+    rotate(deg) {
+        this.deg = deg;
+    }
+
+    update() {
+        this.moveStep();
+    }
+
+    render(ctx) {
+        return;
+    }
+}
+RenderObj.id = 0;
+
+class Ball extends RenderObj{
+    constructor(name, r=10) {
+        super({name});
+        this.r = r;
+        this.color = 'white';
+    }
+
+    update() {
+        let w = this.owner.w,
+            h = this.owner.h;
+        if(this.x < this.r || this.x + this.r > w) {
+            this.vx = -this.vx;
+        }
+
+        if(this.y < this.r || this.y + this.r > h) {
+            this.vy = -this.vy;
+        }
+
+        super.update();
+    }
+
+    render(ctx) {
+        ctx.beginPath();
+        ctx.fillStyle = this.color;
+        ctx.arc(this.x , this.y, this.r - 3, 0, Math.PI * 2, false);
+        ctx.fill();
+        ctx.closePath();
+
+        ctx.beginPath();
+        ctx.strokeStyle = 'black';
+        ctx.arc(this.x , this.y, this.r, 0, Math.PI * 2, false);
+        ctx.stroke();
+        ctx.closePath();
+    }
+}
+
 class Scene {
     constructor(args={}) {
-        this.name = args.name || `name ${++this.sceneID}`;
+        this.name = args.name || `name ${++Scene.sceneId}`;
 
         this.x = args.x || 0;
         this.y = args.y ||0;
@@ -65,6 +146,10 @@ class Scene {
         this.holder = this.createHolder();
         this.canvas = this.createCanvas();
         this.ctx = this.canvas.getContext('2d');
+
+        this.renderObj = [];
+        this.renderObjName = {};
+        this.listeners = [];
 
         this.setPos();
         this.setSize();
@@ -79,7 +164,6 @@ class Scene {
     createHolder() {
         let div = document.createElement('div');
         div.style.position = 'absolute';
-        div.style.overflow = 'hidden';
 
         return div;
     }
@@ -89,7 +173,57 @@ class Scene {
         let canvas = document.createElement('canvas');
         canvas.style.position = 'absolute';
         canvas.style.zIndex = -1;
+        canvas.width = this.w;
+        canvas.height = this.h;
         return canvas;
+    }
+
+    createRObj() {
+        let obj = new Ball();
+        this.addRObj(obj);
+        return obj;
+    }
+
+    addRObj(obj) {
+        obj.owner = this;
+        this.renderObj.push(obj);
+        this.renderObjName[obj.name] = obj;
+    }
+
+    removeRObj(obj) {
+        this.removeRObjByName(obj.name);
+    }
+
+    removeRObjByName(name) {
+        let obj = this.renderObjName[name];
+        obj && (obj.canRemove = true);
+    }
+
+    removeAllCanRemove() {
+        for(let i = 0, len = this.renderObj.length; i < len; ++i) {
+            let obj = this.renderObj[i].canRemove;
+            if(obj) {
+                this.renderObj.splice(i, 1);
+                delete this.renderObjName[obj.name];
+            }
+        }
+    }
+
+    clearRObj() {
+        this.renderObj = [];
+        this.renderObjName = {};
+    }
+
+    getRObjName(name) {
+        return this.renderObjName[name];
+    }
+
+    addListener(listener) {
+        this.listeners.push(listener);
+    }
+
+    clearListener() {
+        this.listeners = [];
     }
 
     // 定位
@@ -114,10 +248,34 @@ class Scene {
     }
 
     //更新场景
-    update() {}
+    update() {
+        for(let i = 0, len = this.renderObj.length; i < len; ++i) {
+            this.renderObj[i].update();
+        }
+        this.removeAllCanRemove();
+    }
 
     // 渲染场景
-    render() {}
+    render() {
+        this.clear();
+        for(let i = 0, len = this.listeners.length; i < len; ++i) {
+            this.listeners.enable && this.listeners[i].beforeRender();
+        }
+
+        this.renderRObj();
+
+        for(let i = 0, len = this.listeners.length; i < len; ++i) {
+            this.listeners.enable && this.listeners[i].afterRender();
+        }
+    }
+
+    renderRObj() {
+        for(let i = 0, len = this.renderObj.length; i < len; ++i) {
+            this.ctx.save();
+            this.renderObj[i].render(this.ctx);
+            this.ctx.restore();
+        }
+    }
 
     // 清除背景
     clear() {
@@ -156,6 +314,7 @@ class Scene {
 
     // 清除场景
     clean() {
+        this.listeners = null;
         document.body.removeChild(this.holder);
         this.holder = this.canvas = this.ctx = null;
         
@@ -170,8 +329,8 @@ class SceneManage {
     }
 
     // 创建场景
-    createScene() {
-        let scene = new Scene();
+    createScene(args) {
+        let scene = new Scene(args);
         this.pushScene(scene);
         return scene;
     }
@@ -275,6 +434,11 @@ class SceneManage {
         }
     }
 
+    // 获取当前场景
+    getCurScene() {
+        return this.scenes[this.scenes.length - 1];
+    }
+
     // 获取场景索引
     getIndex(name) {
         let index = -1;
@@ -308,6 +472,8 @@ class Game {
         this.minF = document.getElementById('min');
         this.curF = document.getElementById('cur');
 
+        this.sceneManage = new SceneManage();
+
         this.executeListener = this.executeListener.bind(this);
 
         this.addListener(new AppEventListener({
@@ -324,6 +490,13 @@ class Game {
         this.handle = requestAnimationFrame(this.mainLoop);
         this.frameState.update();
         this.executeListener('beforeRender');
+
+        let scene = this.sceneManage.getCurScene();
+        if(scene) {
+            scene.update();
+            scene.render();
+        }
+
         if(!this.paused) {
             this.maxF.innerHTML = this.frameState.maxFrame;
             this.minF.innerHTML = this.frameState.minFrame;
@@ -365,4 +538,32 @@ class Game {
         }
     }
 }
-new Game().run()
+
+class BallGame {
+    constructor() {
+        this.game = new Game();
+        this.initGame();
+        this.game.run();
+    }
+
+    initGame() {
+        let sc = this.game.sceneManage.createScene({w: 500, h: 500});
+        this.initRObj(sc);
+    }
+
+    initRObj(sc) {
+        for(let i = 0; i < 20; ++i) {
+            let ball = sc.createRObj();
+            ball.moveTo (randomInt(20, sc.w - 20), randomInt(20, sc.h - 20));
+            ball.vx = randomInt(1, 3);
+            ball.vy = randomInt(1, 3);
+            ball.color = `rgb(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)})`;
+        }
+    }
+}
+
+new BallGame();
+
+function randomInt(a, b) {
+    return Math.floor(Math.random() * (b - a) + a);
+}
