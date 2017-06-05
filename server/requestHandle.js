@@ -7,19 +7,6 @@ let handle = {
         console.log('start')
         let filePath = '/index.html';
         fileExists(filePath, res)
-        // fs.exists(filePath, exists => {
-        //     if(exists) {
-        //         res.writeHead(200, {'Content-Type': 'text/html'});
-        //         let stream = fs.createReadStream(filePath, {flag: 'r', encoding: null});
-        //         stream.on('error', () => {
-        //             res.writeHead(500, {'Content-Type': 'text/html'});
-        //             res.end('<h1>500 Server Error</h1>')
-        //         })
-        //         stream.pipe(res);
-        //     }else {
-        //         handle.notFound(res);
-        //     }
-        // })   
     },
     else: (pathname, res) => {
         fileExists(pathname, res)

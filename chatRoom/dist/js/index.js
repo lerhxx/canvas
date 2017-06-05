@@ -15,15 +15,19 @@ window.onload = function () {
     });
 
     function connect() {
-        socket = io('http://localhost:8888', { reconnect: false });
-        socket.on('connect', function () {
-            regContent.innerHTML = '连接成功';
-            if (firstConnect) {
-                firstConnect = false;
-                regCon();
-            } else {
-                socket.reconnect;
-            }
+        socket = io();
+        // socket = io('http://localhost:8888', {reconnect: false});
+        // socket.on('connect', () => {
+        //     regContent.innerHTML = '连接成功';
+        //     if(firstConnect) {
+        //         firstConnect = false;
+        //         regCon();
+        //     }else {
+        //         socket.reconnect;
+        //     }
+        // })
+        socket.emit('message', function () {
+            msg.value;
         });
     }
 

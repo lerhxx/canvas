@@ -321,4 +321,4 @@ class FindPathGame {
     }
 }
 
-new FindPathGame(5, 5);
+new FindPathGame(10, 10);
