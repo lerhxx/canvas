@@ -25,7 +25,7 @@ var Maze = function () {
             }
             this.initArray();
             this.createCanvas();
-            this.generate();
+            // this.generate();
             this.render();
         }
     }, {

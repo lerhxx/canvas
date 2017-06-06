@@ -15,7 +15,7 @@ class Maze {
         }
         this.initArray();
         this.createCanvas();
-        this.generate();
+        // this.generate();
         this.render();
     }
 
