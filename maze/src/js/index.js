@@ -31,8 +31,8 @@ class Maze {
                 }
             }
         }
-        // this.arr[1][0] = 0;
-        // this.arr[2 * this.r - 1][2 * this.c] = 0;
+        this.arr[1][0] = 0;
+        this.arr[2 * this.r - 1][2 * this.c] = 0;
     }
 
     generate() {
