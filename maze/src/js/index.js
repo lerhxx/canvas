@@ -117,8 +117,6 @@ let MathUtil = {
     }
 }
 
-new Maze(10, 10);
-
 class Point {
     constructor(r, c, flag=1) {
         this.r = r;
@@ -141,27 +139,34 @@ class FindPathGame {
         let maze = new Maze(r, c);
         let oriArr = maze.arr;
         this.ctx = maze.ctx;
+        this.canvas = maze.canvas;
 
         this.openList = [];
         this.closeList = [];
 
+        this.start = null;
+        this.end = null;
+
         this.quickSort = this.quickSort.bind(this);
 
         this.initArr(oriArr);
-        this.findPath(this.pathArr[1][1], this.pathArr[this.r - 2][this.c - 2]);
+        // this.findPath(this.pathArr[1][0], this.pathArr[this.r - 2][this.c - 1]);
+
+        this.findPath = this.findPath.bind(this);
+        this.render = this.render.bind(this);
+        this.removeEvent = this.removeEvent.bind(this);
+        this.addEvent = this.addEvent.bind(this);
         
-        this.render(this.pathArr[this.r - 2][this.c - 2]);
+        // this.render(this.pathArr[this.r - 2][this.c - 1]);
+        this.bindEvent();
     }
 
     initArr(oriArr) {
         oriArr.forEach((row, i) => {
             this.pathArr[i] = [];
-            // let str = '';
             row.forEach((col, n) => {
                 this.pathArr[i][n] = new Point(i, n, col);
-                // str += `${this.pathArr[i][n].flag }`
             })
-            // console.log(str)
         })
     }
 
@@ -192,11 +197,7 @@ class FindPathGame {
             if(finded) {
                 break;
             }
-            // console.log(this.openList)
         }
-            console.log(finded)
-
-            console.log(this.closeList)
     }
 
     distPoint(ori, tar) {
@@ -310,14 +311,56 @@ class FindPathGame {
         this.ctx.fillStyle = 'red';
         this.ctx.fillRect(end.c * 10, end.r * 10, 10, 10);
         let tar = end.parent;
+
         while(tar) {
-        // console.log(`r ${tar.r} c ${tar.c}`)
             this.ctx.fillRect(tar.c * 10, tar.r *10, 10, 10);
             tar = tar.parent;
         }
         this.ctx.stroke();
         this.ctx.restore();
+        this.renderPer(this.start, 'yellow');
+        this.renderPer(this.end, 'blue');
+        console.log(this.pathArr)
     }
+
+    renderPer(point, color='red') {
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.fillStyle = color;
+        this.ctx.fillRect(point.c * 10, point.r * 10, 10, 10);
+        this.ctx.fill();
+        this.ctx.restore();
+    }
+
+    bindEvent() {
+        this.canvas.addEventListener('click', this.addEvent)
+    }
+
+    addEvent(e) {
+        if(this.start && this.end) {
+            this.removeEvent();
+            return;
+        }
+        let c = ~~(e.offsetX / 10),
+            r = ~~(e.offsetY / 10);
+        if(this.pathArr[r][c].flag === 0) {
+            if(!this.start) {
+                this.start = this.pathArr[r][c];
+                this.renderPer(this.start, 'yellow');
+            }else {
+                this.end = this.pathArr[r][c];
+                this.findPath(this.start, this.end);
+                this.render(this.end);
+            }
+        }
+    }
+
+    removeEvent() {
+        console.log('remove');
+        console.log(this)
+        this.canvas.removeEventListener('click', this.addEvent);
+    }
+
 }
 
-// new FindPathGame(10, 10);
+new FindPathGame(10, 10);

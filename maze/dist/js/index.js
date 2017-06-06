@@ -135,8 +135,6 @@ var MathUtil = {
     }
 };
 
-new Maze(10, 10);
-
 var Point = function Point(r, c) {
     var flag = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
 
@@ -163,16 +161,26 @@ var FindPathGame = function () {
         var maze = new Maze(r, c);
         var oriArr = maze.arr;
         this.ctx = maze.ctx;
+        this.canvas = maze.canvas;
 
         this.openList = [];
         this.closeList = [];
 
+        this.start = null;
+        this.end = null;
+
         this.quickSort = this.quickSort.bind(this);
 
         this.initArr(oriArr);
-        this.findPath(this.pathArr[1][1], this.pathArr[this.r - 2][this.c - 2]);
+        // this.findPath(this.pathArr[1][0], this.pathArr[this.r - 2][this.c - 1]);
 
-        this.render(this.pathArr[this.r - 2][this.c - 2]);
+        this.findPath = this.findPath.bind(this);
+        this.render = this.render.bind(this);
+        this.removeEvent = this.removeEvent.bind(this);
+        this.addEvent = this.addEvent.bind(this);
+
+        // this.render(this.pathArr[this.r - 2][this.c - 1]);
+        this.bindEvent();
     }
 
     _createClass(FindPathGame, [{
@@ -182,12 +190,9 @@ var FindPathGame = function () {
 
             oriArr.forEach(function (row, i) {
                 _this2.pathArr[i] = [];
-                // let str = '';
                 row.forEach(function (col, n) {
                     _this2.pathArr[i][n] = new Point(i, n, col);
-                    // str += `${this.pathArr[i][n].flag }`
                 });
-                // console.log(str)
             });
         }
     }, {
@@ -219,11 +224,7 @@ var FindPathGame = function () {
                 if (finded) {
                     break;
                 }
-                // console.log(this.openList)
             }
-            console.log(finded);
-
-            console.log(this.closeList);
         }
     }, {
         key: 'distPoint',
@@ -364,17 +365,64 @@ var FindPathGame = function () {
             this.ctx.fillStyle = 'red';
             this.ctx.fillRect(end.c * 10, end.r * 10, 10, 10);
             var tar = end.parent;
+
             while (tar) {
-                // console.log(`r ${tar.r} c ${tar.c}`)
                 this.ctx.fillRect(tar.c * 10, tar.r * 10, 10, 10);
                 tar = tar.parent;
             }
             this.ctx.stroke();
             this.ctx.restore();
+            this.renderPer(this.start, 'yellow');
+            this.renderPer(this.end, 'blue');
+            console.log(this.pathArr);
+        }
+    }, {
+        key: 'renderPer',
+        value: function renderPer(point) {
+            var color = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'red';
+
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.fillStyle = color;
+            this.ctx.fillRect(point.c * 10, point.r * 10, 10, 10);
+            this.ctx.fill();
+            this.ctx.restore();
+        }
+    }, {
+        key: 'bindEvent',
+        value: function bindEvent() {
+            this.canvas.addEventListener('click', this.addEvent);
+        }
+    }, {
+        key: 'addEvent',
+        value: function addEvent(e) {
+            if (this.start && this.end) {
+                this.removeEvent();
+                return;
+            }
+            var c = ~~(e.offsetX / 10),
+                r = ~~(e.offsetY / 10);
+            if (this.pathArr[r][c].flag === 0) {
+                if (!this.start) {
+                    this.start = this.pathArr[r][c];
+                    this.renderPer(this.start, 'yellow');
+                } else {
+                    this.end = this.pathArr[r][c];
+                    this.findPath(this.start, this.end);
+                    this.render(this.end);
+                }
+            }
+        }
+    }, {
+        key: 'removeEvent',
+        value: function removeEvent() {
+            console.log('remove');
+            console.log(this);
+            this.canvas.removeEventListener('click', this.addEvent);
         }
     }]);
 
     return FindPathGame;
 }();
 
-// new FindPathGame(10, 10);
+new FindPathGame(10, 10);
