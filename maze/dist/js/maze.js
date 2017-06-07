@@ -49,37 +49,39 @@ var Maze = function () {
         key: 'generate',
         value: function generate() {
             var count = this.r * this.c;
-            var pos = MathUtil.randomInt(0, count);
+            var cur = MathUtil.randomInt(0, count);
             var offs = [-this.c, this.c, -1, 1],
                 offr = [-1, 1, 0, 0],
                 offc = [0, 0, -1, 1];
-            this.accessed.push(pos);
+            this.accessed.push(cur);
+            this.notAccessed[cur] = 1;
 
             while (this.accessed.length < count) {
-                var tar = this.notAccessed[pos];
-                var tr = Math.floor(pos / this.c),
-                    tc = pos % this.c;
+                var tr = Math.floor(cur / this.c),
+                    tc = cur % this.c;
                 var num = 0,
                     off = -1;
+
                 while (++num < 5) {
                     var around = MathUtil.randomInt(0, 4),
                         nr = tr + offr[around],
                         nc = tc + offc[around];
-                    if (nr >= 0 && nc >= 0 && nr < this.r && nc < this.c && this.notAccessed[pos + offs[around]] === 0) {
+                    if (nr >= 0 && nc >= 0 && nr < this.r && nc < this.c && this.notAccessed[cur + offs[around]] === 0) {
                         off = around;
                         break;
                     }
+                    // console.log(`count ${this.accessed.length} ${this.notAccessed[cur+offs[around]]}`)
                 }
 
                 if (off < 0) {
-                    pos = this.accessed[MathUtil.randomInt(0, this.accessed.length)];
+                    cur = this.accessed[MathUtil.randomInt(0, this.accessed.length)];
                 } else {
                     tr = 2 * tr + 1;
                     tc = 2 * tc + 1;
                     this.arr[tr + offr[off]][tc + offc[off]] = 0;
-                    pos = pos + offs[off];
-                    this.notAccessed[pos] = 1;
-                    this.accessed.push(pos);
+                    cur = cur + offs[off];
+                    this.notAccessed[cur] = 1;
+                    this.accessed.push(cur);
                 }
             }
         }
@@ -125,5 +127,3 @@ var MathUtil = {
         }
     }
 };
-
-new Maze(10, 10);
