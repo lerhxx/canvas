@@ -295,4 +295,4 @@ var FindPathGame = function () {
     return FindPathGame;
 }();
 
-new FindPathGame(10, 10);
+new FindPathGame(20, 20);
