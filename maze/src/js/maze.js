@@ -1,20 +1,20 @@
 class Maze {
-    constructor(r, c) {
+    constructor(r, c, id) {
         this.r = r;
         this.c = c;
         this.accessed = [];
         this.notAccessed = [];
         this.arr = [];
 
-        this.init()
+        this.init(id);
     }
 
-    init() {
+    init(id) {
         if(this.r === 0 || this.c === 0) {
             return;
         }
         this.initArray();
-        this.createCanvas();
+        this.initCanvas(id);
         this.generate();
         this.render();
     }
@@ -58,7 +58,6 @@ class Maze {
                     off = around;
                     break;
                 }
-                // console.log(`count ${this.accessed.length} ${this.notAccessed[cur+offs[around]]}`)
             }
 
             if(off < 0) {
@@ -73,6 +72,15 @@ class Maze {
             }
         }
     }
+
+    initCanvas(id) {
+        if(typeof id === 'string') {
+            this.canvas = document.getElementById(id);
+            this.ctx = this.canvas.getContext('2d');
+        }else {
+            this.createCanvas();
+        }
+    }
     
     createCanvas() {
         this.canvas = document.createElement('canvas');
@@ -81,17 +89,9 @@ class Maze {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         document.body.appendChild(this.canvas);
-
     }
 
     render() {
-        // this.arr.forEach((value, i) => {
-        //     let str = '';
-        //     value.forEach((item, n) => {
-        //         str += `${item} `;
-        //     })
-        //     console.log(str)
-        // })
         this.arr.forEach((value, i) => {
             value.forEach((item, n) => {
                 this.ctx.save();
@@ -103,16 +103,5 @@ class Maze {
                 this.ctx.restore();
             })
         })
-    }
-}
-
-let MathUtil = {
-    randomInt: (a, b) => {
-        if(b === 'undefined') {
-            a = a || 1;
-            return Math.floor(Math.random() * a);
-        }else {
-            return Math.floor(Math.random() * (b - a) + a);
-        }
     }
 }

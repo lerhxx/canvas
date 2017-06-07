@@ -5,7 +5,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Maze = function () {
-    function Maze(r, c) {
+    function Maze(r, c, id) {
         _classCallCheck(this, Maze);
 
         this.r = r;
@@ -14,17 +14,17 @@ var Maze = function () {
         this.notAccessed = [];
         this.arr = [];
 
-        this.init();
+        this.init(id);
     }
 
     _createClass(Maze, [{
         key: 'init',
-        value: function init() {
+        value: function init(id) {
             if (this.r === 0 || this.c === 0) {
                 return;
             }
             this.initArray();
-            this.createCanvas();
+            this.initCanvas(id);
             this.generate();
             this.render();
         }
@@ -70,7 +70,6 @@ var Maze = function () {
                         off = around;
                         break;
                     }
-                    // console.log(`count ${this.accessed.length} ${this.notAccessed[cur+offs[around]]}`)
                 }
 
                 if (off < 0) {
@@ -83,6 +82,16 @@ var Maze = function () {
                     this.notAccessed[cur] = 1;
                     this.accessed.push(cur);
                 }
+            }
+        }
+    }, {
+        key: 'initCanvas',
+        value: function initCanvas(id) {
+            if (typeof id === 'string') {
+                this.canvas = document.getElementById(id);
+                this.ctx = this.canvas.getContext('2d');
+            } else {
+                this.createCanvas();
             }
         }
     }, {
@@ -100,13 +109,6 @@ var Maze = function () {
         value: function render() {
             var _this = this;
 
-            // this.arr.forEach((value, i) => {
-            //     let str = '';
-            //     value.forEach((item, n) => {
-            //         str += `${item} `;
-            //     })
-            //     console.log(str)
-            // })
             this.arr.forEach(function (value, i) {
                 value.forEach(function (item, n) {
                     _this.ctx.save();
@@ -123,14 +125,3 @@ var Maze = function () {
 
     return Maze;
 }();
-
-var MathUtil = {
-    randomInt: function randomInt(a, b) {
-        if (b === 'undefined') {
-            a = a || 1;
-            return Math.floor(Math.random() * a);
-        } else {
-            return Math.floor(Math.random() * (b - a) + a);
-        }
-    }
-};
