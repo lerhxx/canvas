@@ -47,6 +47,7 @@ var linkGame = function () {
         this.imgRH = 0;
 
         this.match = [];
+        this.matched = 0;
 
         this.bindEvent = this.bindEvent.bind(this);
         this.addEvent = this.addEvent.bind(this);
@@ -163,13 +164,21 @@ var linkGame = function () {
                                 _this2.match[0].isMatch = false;
                                 _this2.match[1].isMatch = false;
                                 _this2.render();
+                            } else {
+                                _this2.matched += 2;
                             }
-                            _this2.match.length = 0;
-                            _this2.bindEvent();
+
+                            if (_this2.matched === _this2.r * _this2.c) {
+                                _this2.isEnd = true;
+                            } else {
+                                _this2.match.length = 0;
+                                _this2.bindEvent();
+                            }
+                            console.log(_this2.matched);
+                            console.log(_this2.isEnd);
                         }, 500);
                     }
                 }
-                console.log(this.match.length);
                 this.render();
             }
         }

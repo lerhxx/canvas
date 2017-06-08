@@ -5,6 +5,7 @@ let argv = require('yargs').argv;
 let babel = require('gulp-babel');
 let browserSync = require('browser-sync').create();
 let nib = require('nib');
+let imgmin = require('gulp-imagemin');
 
 let sourcePath = '/src';
 let distPath = '/dist';
@@ -14,8 +15,8 @@ let filePath = {
         dest: function() {return mod + distPath + '/css'}
     },
     img: {
-        src: function() {return mod + sourcePath + '/imgs/**/*.{png,jpg.jpeg,gif,webp}'},
-        dest: function() {return mod + distPath + '/imgs'}
+        src: function() {return mod + sourcePath + '/img/**/*.{png,jpg.jpeg,gif,webp}'},
+        dest: function() {return mod + distPath + '/img'}
     },
     js: {
         src: function() {return mod + sourcePath + '/js/**/*.js'},
@@ -59,8 +60,14 @@ gulp.task('babel:watch', ['babel'], function() {
     browserSync.reload()
 })
 
+gulp.task('img', function() {
+    mod = argv.m;
+    return gulp.src(filePath.img.src())
+        .pipe(imgmin())
+        .pipe(gulp.dest(filePath.img.dest()));
+})
 
-gulp.task('server', ['stylus', 'babel'],function() {
+gulp.task('server', ['img', 'stylus', 'babel'],function() {
     mod = argv.m;
     browserSync.init({
         server: {
