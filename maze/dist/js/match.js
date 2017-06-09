@@ -4,19 +4,9 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Card = function Card(r, c, pic) {
-    _classCallCheck(this, Card);
-
-    this.r = r;
-    this.c = c;
-    this.flag = 1;
-    this.picIndex = pic;
-    this.isMatch = false;
-};
-
-var linkGame = function () {
-    function linkGame(opt) {
-        _classCallCheck(this, linkGame);
+var Match = function () {
+    function Match(opt) {
+        _classCallCheck(this, Match);
 
         this.r = 5;
         this.c = 4;
@@ -55,12 +45,14 @@ var linkGame = function () {
         this.bindEvent = this.bindEvent.bind(this);
         this.addEvent = this.addEvent.bind(this);
         this.removeEvent = this.removeEvent.bind(this);
+        this.changeMaze = this.changeMaze.bind(this);
 
         this.preLoadImg();
+        // PreLoadImg.preload(this.imgSource, img => this.images.push(img), err => console.log(err), this.changeMaze);
         this.initMaze();
     }
 
-    _createClass(linkGame, [{
+    _createClass(Match, [{
         key: 'getCanvas',
         value: function getCanvas(id) {
             this.canvas = document.getElementById(id);
@@ -85,7 +77,8 @@ var linkGame = function () {
                     source = './dist/img/' + source;
                 }
 
-                var p = _this.loadImage(source).then(function (img) {
+                // 预加载图片
+                var p = PreLoadImg.loadImage(source).then(function (img) {
                     return _this.images.push(img);
                 }).catch(function (err) {
                     return console.log(err);
@@ -95,35 +88,11 @@ var linkGame = function () {
                 return source;
             });
 
-            this.allLoadDone(pr);
-        }
-
-        // 预加载图片
-
-    }, {
-        key: 'loadImage',
-        value: function loadImage(url) {
-            return new Promise(function (resolve, reject) {
-                var img = new Image();
-                img.onload = function () {
-                    return resolve(img);
-                };
-                img.onerror = reject;
-                img.src = url;
-            });
-        }
-
-        // 所有图片加载完成
-
-    }, {
-        key: 'allLoadDone',
-        value: function allLoadDone(p) {
-            var _this2 = this;
-
-            Promise.all(p).then(function () {
-                p = null;
-                _this2.changeMaze();
-                console.log(_this2.images.length);
+            // 图片全部加载完
+            PreLoadImg.allLoadDone(pr).then(function () {
+                pr = null;
+                _this.changeMaze();
+                console.log(_this.images.length);
             });
         }
     }, {
@@ -258,7 +227,7 @@ var linkGame = function () {
         key: 'render',
         value: function render() {
             var imgCount = this.images.length;
-            this.imgRW = ~~((this.canvas.width - 15 * this.c - 15) / this.c), this.imgRH = ~~((this.canvas.height - 10 * this.r - 10) / this.r);
+            this.imgRW = ~~((this.canvas.width - this.imgMC * this.c - this.imgMC) / this.c), this.imgRH = ~~((this.canvas.height - this.imgMR * this.r - this.imgMR) / this.r);
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             for (var i = 0; i < this.r; ++i) {
                 for (var n = 0; n < this.c; ++n) {
@@ -268,36 +237,17 @@ var linkGame = function () {
                     } else {
                         img = this.images[imgCount - 1];
                     }
-                    this.ctx.drawImage(img, 0, 0, this.imgW, this.imgH, n * (this.imgRW + 15) + 15, i * (this.imgRH + 10) + 10, this.imgRW, this.imgRH);
+                    this.ctx.drawImage(img, 0, 0, this.imgW, this.imgH, n * (this.imgRW + this.imgMC) + this.imgMC, i * (this.imgRH + this.imgMR) + this.imgMR, this.imgRW, this.imgRH);
                 }
             }
         }
     }]);
 
-    return linkGame;
+    return Match;
 }();
 
-// new linkGame(5, 4, 'canvas');
-
-
-new linkGame({
+new Match({
     r: 5,
     c: 4,
     id: 'canvas'
 });
-
-// 传入r，c(r * c % 2 === 0)
-// 加载缓存图片
-// 随机生成r*c/2个数字，实例化Card，保存到pathArr
-// 数组removeList保存已消除card
-// 绘制pathArr
-// 添加点击事件
-// 数组arr保存card
-// if(arr.lenght == 2)
-// if(搜索路径)
-// if(图片对比)
-// 对应位置清空
-// if(removeList.length >= r * c)
-// 游戏结束
-// else
-// arr.pop()

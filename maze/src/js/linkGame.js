@@ -5,7 +5,7 @@ class Match {
         this.pathArr = [];
 
         //图片资源
-        this.imgSource = ['card1.jpg', 'card2.jpg', 'card3.jpg', 'card4.jpg', 'card5.jpg', 'card6.jpg', 'card7.jpg', 'card8.jpg', 'card9.jpg', 'back.jpg'];
+        this.imgSource = ['card1.jpg', 'card2.jpg', 'card3.jpg', 'card4.jpg', 'card5.jpg', 'card6.jpg', 'card7.jpg', 'card8.jpg', 'card9.jpg'];
         this.images = [];      // 缓存图片
         this.imgW = 115;        // 图片原宽度
         this.imgH = 115;        // 图片原高度
@@ -37,10 +37,8 @@ class Match {
         this.bindEvent = this.bindEvent.bind(this);
         this.addEvent = this.addEvent.bind(this);
         this.removeEvent = this.removeEvent.bind(this);
-        this.changeMaze = this.changeMaze.bind(this);
 
         this.preLoadImg();
-        // PreLoadImg.preload(this.imgSource, img => this.images.push(img), err => console.log(err), this.changeMaze);
         this.initMaze();
     }
 
@@ -62,8 +60,7 @@ class Match {
                 source = `./dist/img/${source}`;
             }
 
-            // 预加载图片
-            let p = PreLoadImg.loadImage(source)
+            let p = this.loadImage(source)
                         .then(img => this.images.push(img))
                         .catch(err => console.log(err))
 
@@ -71,14 +68,27 @@ class Match {
             return source;
         })
 
-        // 图片全部加载完
-        PreLoadImg.allLoadDone(pr)
-                .then(() => {
-                    pr = null;
-                    this.changeMaze();
-                    console.log(this.images.length);
-                });
+        this.allLoadDone(pr);
 
+    }
+
+    // 预加载图片
+    loadImage(url) {
+        return new Promise((resolve, reject) => {
+            let img = new Image();
+            img.onload = () => resolve(img);
+            img.onerror = reject;
+            img.src = url;
+        })
+    }
+
+    // 所有图片加载完成
+    allLoadDone(p) {
+        Promise.all(p).then(() => {
+            p = null;
+            this.changeMaze();
+            console.log(this.images.length);
+        })
     }
 
     initMaze() {
@@ -197,27 +207,38 @@ class Match {
 
     render() {
         let imgCount = this.images.length;
-        this.imgRW = ~~((this.canvas.width - this.imgMC * this.c -this.imgMC) / this.c),
-        this.imgRH = ~~((this.canvas.height  - this.imgMR * this.r -this.imgMR)/ this.r);
+        this.imgRW = ~~((this.canvas.width - 15 * this.c -15) / this.c),
+        this.imgRH = ~~((this.canvas.height  - 10 * this.r -10)/ this.r);
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for(let i = 0; i < this.r; ++i) {
             for(let n = 0; n < this.c; ++n) {
-                let img = null;
-                if(this.pathArr[i][n].isMatch) {
-                    img = this.images[this.pathArr[i][n].picIndex];
-                }else {
-                    img = this.images[imgCount - 1];
-                }
-                this.ctx.drawImage(img, 0, 0, this.imgW, this.imgH, n * (this.imgRW + this.imgMC) + this.imgMC, i * (this.imgRH + this.imgMR) + this.imgMR, this.imgRW, this.imgRH);
+                let img = this.images[this.pathArr[i][n].picIndex];
+                this.ctx.drawImage(img, 0, 0, this.imgW, this.imgH, n * (this.imgRW + 15) + 15, i * (this.imgRH + 10) + 10, this.imgRW, this.imgRH);
             }
         }
 
     }
 }
 
+// new linkGame(5, 4, 'canvas');
 new Match({
     r: 5,
     c: 4,
     id: 'canvas'
 });
 
+// 传入r，c(r * c % 2 === 0)
+// 加载缓存图片
+// 随机生成r*c/2个数字，实例化Card，保存到pathArr
+// 数组removeList保存已消除card
+// 绘制pathArr
+// 添加点击事件
+// 数组arr保存card
+// if(arr.lenght == 2)
+    // if(搜索路径)
+        // if(图片对比)
+            // 对应位置清空
+            // if(removeList.length >= r * c)
+               // 游戏结束
+        // else
+            // arr.pop()
