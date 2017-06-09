@@ -63,11 +63,15 @@ gulp.task('babel:watch', ['babel'], function() {
 gulp.task('img', function() {
     mod = argv.m;
     return gulp.src(filePath.img.src())
-        .pipe(imgmin())
+        .pipe(imgmin([
+            imgmin.jpegtran({progressize: true}),
+            imgmin.optipng({optimizationLevel: 5})
+        ]))
         .pipe(gulp.dest(filePath.img.dest()));
 })
 
-gulp.task('server', ['img', 'stylus', 'babel'],function() {
+
+gulp.task('server', ['stylus', 'babel'],function() {
     mod = argv.m;
     browserSync.init({
         server: {

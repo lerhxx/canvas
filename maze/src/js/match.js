@@ -9,34 +9,37 @@ class Card {
 }
 
 class linkGame {
-    constructor(r, c, id) {
-        if(typeof id !== 'string') {
-            console.err('There is no id.');
-            return;
-        }
-        if(r * c % 2 === 1) {
-            console.error('Please enter at least one even number.');
-            return;
-        }
-        this.getCanvas(id);
-        if(!this.canvas || !this.ctx) {
-            return;
-        }
-        console.log('start');
-
-        this.r = r;
-        this.c = c;
+    constructor(opt) {
+        this.r = 5;
+        this.c = 4;
         this.pathArr = [];
-        this.isEnd = false;
 
         //图片资源
         this.imgSource = ['card1.jpg', 'card2.jpg', 'card3.jpg', 'card4.jpg', 'card5.jpg', 'card6.jpg', 'card7.jpg', 'card8.jpg', 'card9.jpg', 'back.jpg'];
         this.images = [];      // 缓存图片
-        this.imgCount = 0;     // 已下载图片数量
-        this.imgW = 0;
-        this.imgH = 0;
-        this.imgRW = 0;
-        this.imgRH = 0;
+        this.imgW = 115;        // 图片原宽度
+        this.imgH = 115;        // 图片原高度
+        this.imgRW = 0;         // canvas中图片实际宽度
+        this.imgRH = 0;         // canvas中图片实际高度
+        this.imgMR = 10;         // 图片水平间距
+        this.imgMC = 15;         // 图片垂直间距
+
+        Object.assign(this, opt);
+        console.log(this.imgW)
+
+        if(typeof this.id !== 'string') {
+            console.error('There is no id.');
+            return;
+        }
+        if(this.r * this.c % 2 !== 0) {
+            console.error('Please enter at least one even number.');
+            return;
+        }
+        this.getCanvas(this.id);
+        if(!this.canvas || !this.ctx) {
+            return;
+        }
+        console.log('start');
 
         this.match = [];
         this.matched = 0;
@@ -45,8 +48,8 @@ class linkGame {
         this.addEvent = this.addEvent.bind(this);
         this.removeEvent = this.removeEvent.bind(this);
 
+        this.preLoadImg();
         this.initMaze();
-        this.loadImage();
     }
 
     getCanvas(id) {
@@ -58,20 +61,43 @@ class linkGame {
         this.ctx = this.canvas.getContext('2d');
     }
 
-    // 缓存图片
-    loadImage() {
-        this.imgSource.forEach((src, i) => {
-            this.images[i] = new Image();
-            this.images[i].onload = () => {
-                ++this.imgCount;
-                if(this.imgCount >= this.imgSource.length) {
-                    console.log('ok')
-                    this.imgW = this.images[0].width;
-                    this.imgH = this.images[0].height;
-                    this.changeMaze();
-                }
+    // 预处理图片
+    preLoadImg() {
+        let pr = [];
+        this.imgSource.map(source => {
+            // 处理图片src
+            if(!/^http(s)?:\/\//.test(source)) {
+                source = `./dist/img/${source}`;
             }
-            this.images[i].src = `./dist/img/${src}`;
+
+            let p = this.loadImage(source)
+                        .then(img => this.images.push(img))
+                        .catch(err => console.log(err))
+
+            pr.push(p);
+            return source;
+        })
+
+        this.allLoadDone(pr);
+
+    }
+
+    // 预加载图片
+    loadImage(url) {
+        return new Promise((resolve, reject) => {
+            let img = new Image();
+            img.onload = () => resolve(img);
+            img.onerror = reject;
+            img.src = url;
+        })
+    }
+
+    // 所有图片加载完成
+    allLoadDone(p) {
+        Promise.all(p).then(() => {
+            p = null;
+            this.changeMaze();
+            console.log(this.images.length);
         })
     }
 
@@ -87,11 +113,10 @@ class linkGame {
     changeMaze() {
         if(this.pathArr.length < 0) {
             console.log('There is no pathArr');
-            this.isEnd = true;
             return;
         }
 
-        let sum = this.imgCount - 2;
+        let sum = this.images.length - 2;
 
         for(let i = 0, len = this.r * this.c / 2; i < len; ++i) {
             let index = MathUtil.randomInt(sum),
@@ -119,63 +144,79 @@ class linkGame {
     }
 
     addEvent(e) {
-        let r = ~~((e.offsetY - 10) / (this.imgRH + 10)),
-            c = ~~((e.offsetX - 15) / (this.imgRW + 15)),
-            tr = (e.offsetY - 10 - r * (this.imgRH + 10)) % this.imgRH,
-            tc = (e.offsetX - 15 - c * (this.imgRW + 15)) % this.imgRW;
-
+        let r = ~~((e.offsetY - this.imgMR) / (this.imgRH + this.imgMR)),     // 图片高度+下边间隔区域
+            c = ~~((e.offsetX - this.imgMC) / (this.imgRW + this.imgMC)),     // 图片宽度+右边间隔区域
+            tr = (e.offsetY - this.imgMR - r * (this.imgRH + this.imgMR)) % this.imgRH,     // 鼠标纵坐标实际区域
+            tc = (e.offsetX - this.imgMC - c * (this.imgRW + this.imgMC)) % this.imgRW;     // 鼠标横坐标实际区域
+            
+            // 鼠标是否位于图片区域
             if(tr > 10 && tc > 15) {
                 let len = this.match.length,
                     cur = this.pathArr[r][c];
+                
+                // 已选中两张图片
                 if(len >= 2) {
                     this.removeEvent();
                     return;
                 }
 
-                if(len === 0) {
+                // 已选中0张或1张不同图片
+                if(len === 0 || this.match[0] != cur) {
                     cur.isMatch = true;
                     this.match.push(cur);
-                }else {
-                    if(this.match[0] != cur) {
-                        cur.isMatch = true;
-                        this.match.push(cur);
-                        setTimeout(() => {
-                            if(!this.matchPic(this.match)) {
-                                this.match[0].isMatch = false;
-                                this.match[1].isMatch = false;
-                                this.render();
-                            }else {
-                                this.matched += 2;
-                            }
-
-                            if(this.matched === this.r * this.c) {
-                                this.isEnd = true;
-                            }else {
-                                this.match.length = 0;
-                                this.bindEvent();
-                            }
-                            console.log(this.matched)
-                            console.log(this.isEnd)
-                        }, 500)
-                    }
+                    this.render();
+                    this.compare();
                 }
-                this.render();
             }
-
     }
 
     removeEvent() {
         this.canvas.removeEventListener('click', this.addEvent);
     }
 
-    matchPic(arr) {
+    async compare() {
+        if(this.match.length === 2) {
+            await this.sleep();
+            this.matchPic();
+        }
+    }
+
+    matchPic() {
+        if(!this.isEqualPic(this.match)) {
+            this.match[0].isMatch = false;
+            this.match[1].isMatch = false;
+            this.render();
+        }else {
+            this.matched += 2;
+        }
+
+        // 未结束
+        if(!this.isEnd()) {
+            this.match.length = 0;
+            this.bindEvent();
+        }
+        console.log(this.isEnd())
+    }
+
+    sleep(time=500) {
+        return new Promise(resolve => {
+            setTimeout(resolve, time);
+        })
+    }
+
+    isEqualPic(arr) {
         if(arr.length < 2) {
             return false;
         }
         return arr[0].picIndex === arr[1].picIndex;
     }
 
+    isEnd() {
+        return this.matched === this.r * this.c;
+    }
+
     render() {
+        let imgCount = this.images.length;
         this.imgRW = ~~((this.canvas.width - 15 * this.c -15) / this.c),
         this.imgRH = ~~((this.canvas.height  - 10 * this.r -10)/ this.r);
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -185,7 +226,7 @@ class linkGame {
                 if(this.pathArr[i][n].isMatch) {
                     img = this.images[this.pathArr[i][n].picIndex];
                 }else {
-                    img = this.images[this.imgCount - 1];
+                    img = this.images[imgCount - 1];
                 }
                 this.ctx.drawImage(img, 0, 0, this.imgW, this.imgH, n * (this.imgRW + 15) + 15, i * (this.imgRH + 10) + 10, this.imgRW, this.imgRH);
             }
@@ -194,7 +235,12 @@ class linkGame {
     }
 }
 
-new linkGame(5, 4, 'canvas');
+// new linkGame(5, 4, 'canvas');
+new linkGame({
+    r: 5,
+    c: 4,
+    id: 'canvas'
+});
 
 // 传入r，c(r * c % 2 === 0)
 // 加载缓存图片
