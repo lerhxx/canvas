@@ -9,13 +9,11 @@ class Match {
         this.images = [];      // 缓存图片
         this.imgW = 115;        // 图片原宽度
         this.imgH = 115;        // 图片原高度
-        this.imgRW = 0;         // canvas中图片实际宽度
-        this.imgRH = 0;         // canvas中图片实际高度
-        this.imgMR = 10;         // 图片水平间距
-        this.imgMC = 15;         // 图片垂直间距
+        this.imgMR = 10;         // 图片垂直间距
+        this.imgMC = 15;         // 图片水平间距
 
         Object.assign(this, opt);
-        console.log(this.imgW)
+
 
         if(typeof this.id !== 'string') {
             console.error('There is no id.');
@@ -31,6 +29,9 @@ class Match {
         }
         console.log('start');
 
+        this.imgRW = ~~((this.canvas.width - this.imgMC * this.c -this.imgMC) / this.c);         // canvas中图片实际宽度
+        this.imgRH = ~~((this.canvas.height  - this.imgMR * this.r -this.imgMR)/ this.r);         // canvas中图片实际高度
+        
         this.match = [];
         this.matched = 0;
 
@@ -60,35 +61,23 @@ class Match {
                 source = `./dist/img/${source}`;
             }
 
-            let p = this.loadImage(source)
+            // 预加载图片
+            let p = PreLoadImg.loadImage(source)
                         .then(img => this.images.push(img))
                         .catch(err => console.log(err))
-
             pr.push(p);
+
             return source;
         })
 
-        this.allLoadDone(pr);
+        // 图片全部加载完
+        PreLoadImg.allLoadDone(pr)
+                .then(() => {
+                    pr = null;
+                    this.changeMaze();
+                    console.log(this.images.length);
+                });
 
-    }
-
-    // 预加载图片
-    loadImage(url) {
-        return new Promise((resolve, reject) => {
-            let img = new Image();
-            img.onload = () => resolve(img);
-            img.onerror = reject;
-            img.src = url;
-        })
-    }
-
-    // 所有图片加载完成
-    allLoadDone(p) {
-        Promise.all(p).then(() => {
-            p = null;
-            this.changeMaze();
-            console.log(this.images.length);
-        })
     }
 
     initMaze() {
@@ -151,10 +140,22 @@ class Match {
                 }
 
                 // 已选中0张或1张不同图片
-                if(len === 0 || this.match[0] != cur) {
-                    cur.isMatch = true;
+                if(len === 0) {
                     this.match.push(cur);
-                    this.render();
+
+                    this.ctx.save();
+                    this.ctx.beginPath();
+                    this.ctx.lineWidth = 10;
+                    this.ctx.strokeStyle = 'red';
+                    this.ctx.moveTo(cur.c * (this.imgRW + this.imgMC) + this.imgMR + this.imgW / 2, cur.r * (this.imgRH + this.imgMR) + this.imgMR + this.imgH / 2);
+               
+             }else if(len === 1 && this.match[0] != cur) {
+                    this.match.push(cur);
+
+                    this.ctx.lineTo(cur.c * (this.imgRW + this.imgMC) + this.imgMR + this.imgW / 2, cur.r * (this.imgRH + this.imgMR) + this.imgMR + this.imgH / 2);
+                    this.ctx.stroke();
+                    this.ctx.restore();
+
                     this.compare();
                 }
             }
@@ -173,11 +174,12 @@ class Match {
 
     matchPic() {
         if(!this.isEqualPic(this.match)) {
-            this.match[0].isMatch = false;
-            this.match[1].isMatch = false;
             this.render();
         }else {
+            this.match[0].flag = 0;
+            this.match[1].flag = 0;
             this.matched += 2;
+            this.render()
         }
 
         // 未结束
@@ -206,14 +208,16 @@ class Match {
     }
 
     render() {
-        let imgCount = this.images.length;
-        this.imgRW = ~~((this.canvas.width - 15 * this.c -15) / this.c),
-        this.imgRH = ~~((this.canvas.height  - 10 * this.r -10)/ this.r);
+        // this.imgRW = ~~((this.canvas.width - 15 * this.c -15) / this.c),
+        // this.imgRH = ~~((this.canvas.height  - 10 * this.r -10)/ this.r);
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for(let i = 0; i < this.r; ++i) {
             for(let n = 0; n < this.c; ++n) {
+                if(this.pathArr[i][n].flag === 0) {
+                    continue;
+                }
                 let img = this.images[this.pathArr[i][n].picIndex];
-                this.ctx.drawImage(img, 0, 0, this.imgW, this.imgH, n * (this.imgRW + 15) + 15, i * (this.imgRH + 10) + 10, this.imgRW, this.imgRH);
+                this.ctx.drawImage(img, 0, 0, this.imgW, this.imgH, n * (this.imgRW + this.imgMC) + this.imgMC, i * (this.imgRH + this.imgMR) + this.imgMR, this.imgRW, this.imgRH);
             }
         }
 

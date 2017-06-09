@@ -17,10 +17,8 @@ var Match = function () {
         this.images = []; // 缓存图片
         this.imgW = 115; // 图片原宽度
         this.imgH = 115; // 图片原高度
-        this.imgRW = 0; // canvas中图片实际宽度
-        this.imgRH = 0; // canvas中图片实际高度
-        this.imgMR = 10; // 图片水平间距
-        this.imgMC = 15; // 图片垂直间距
+        this.imgMR = 10; // 图片垂直间距
+        this.imgMC = 15; // 图片水平间距
 
         Object.assign(this, opt);
         console.log(this.imgW);
@@ -38,6 +36,9 @@ var Match = function () {
             return;
         }
         console.log('start');
+
+        this.imgRW = ~~((this.canvas.width - this.imgMC * this.c - this.imgMC) / this.c); // canvas中图片实际宽度
+        this.imgRH = ~~((this.canvas.height - this.imgMR * this.r - this.imgMR) / this.r); // canvas中图片实际高度
 
         this.match = [];
         this.matched = 0;
@@ -83,8 +84,8 @@ var Match = function () {
                 }).catch(function (err) {
                     return console.log(err);
                 });
-
                 pr.push(p);
+
                 return source;
             });
 
@@ -227,7 +228,8 @@ var Match = function () {
         key: 'render',
         value: function render() {
             var imgCount = this.images.length;
-            this.imgRW = ~~((this.canvas.width - this.imgMC * this.c - this.imgMC) / this.c), this.imgRH = ~~((this.canvas.height - this.imgMR * this.r - this.imgMR) / this.r);
+            // this.imgRW = ~~((this.canvas.width - this.imgMC * this.c -this.imgMC) / this.c),
+            // this.imgRH = ~~((this.canvas.height  - this.imgMR * this.r -this.imgMR)/ this.r);
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             for (var i = 0; i < this.r; ++i) {
                 for (var n = 0; n < this.c; ++n) {

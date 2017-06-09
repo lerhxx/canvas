@@ -9,10 +9,8 @@ class Match {
         this.images = [];      // 缓存图片
         this.imgW = 115;        // 图片原宽度
         this.imgH = 115;        // 图片原高度
-        this.imgRW = 0;         // canvas中图片实际宽度
-        this.imgRH = 0;         // canvas中图片实际高度
-        this.imgMR = 10;         // 图片水平间距
-        this.imgMC = 15;         // 图片垂直间距
+        this.imgMR = 10;         // 图片垂直间距
+        this.imgMC = 15;         // 图片水平间距
 
         Object.assign(this, opt);
         console.log(this.imgW)
@@ -30,6 +28,9 @@ class Match {
             return;
         }
         console.log('start');
+
+        this.imgRW = ~~((this.canvas.width - this.imgMC * this.c -this.imgMC) / this.c);         // canvas中图片实际宽度
+        this.imgRH = ~~((this.canvas.height  - this.imgMR * this.r -this.imgMR)/ this.r);         // canvas中图片实际高度
 
         this.match = [];
         this.matched = 0;
@@ -66,8 +67,8 @@ class Match {
             let p = PreLoadImg.loadImage(source)
                         .then(img => this.images.push(img))
                         .catch(err => console.log(err))
-
             pr.push(p);
+
             return source;
         })
 
@@ -197,8 +198,8 @@ class Match {
 
     render() {
         let imgCount = this.images.length;
-        this.imgRW = ~~((this.canvas.width - this.imgMC * this.c -this.imgMC) / this.c),
-        this.imgRH = ~~((this.canvas.height  - this.imgMR * this.r -this.imgMR)/ this.r);
+        // this.imgRW = ~~((this.canvas.width - this.imgMC * this.c -this.imgMC) / this.c),
+        // this.imgRH = ~~((this.canvas.height  - this.imgMR * this.r -this.imgMR)/ this.r);
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for(let i = 0; i < this.r; ++i) {
             for(let n = 0; n < this.c; ++n) {

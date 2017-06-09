@@ -17,13 +17,10 @@ var Match = function () {
         this.images = []; // 缓存图片
         this.imgW = 115; // 图片原宽度
         this.imgH = 115; // 图片原高度
-        this.imgRW = 0; // canvas中图片实际宽度
-        this.imgRH = 0; // canvas中图片实际高度
-        this.imgMR = 10; // 图片水平间距
-        this.imgMC = 15; // 图片垂直间距
+        this.imgMR = 10; // 图片垂直间距
+        this.imgMC = 15; // 图片水平间距
 
         Object.assign(this, opt);
-        console.log(this.imgW);
 
         if (typeof this.id !== 'string') {
             console.error('There is no id.');
@@ -38,6 +35,9 @@ var Match = function () {
             return;
         }
         console.log('start');
+
+        this.imgRW = ~~((this.canvas.width - this.imgMC * this.c - this.imgMC) / this.c); // canvas中图片实际宽度
+        this.imgRH = ~~((this.canvas.height - this.imgMR * this.r - this.imgMR) / this.r); // canvas中图片实际高度
 
         this.match = [];
         this.matched = 0;
@@ -75,45 +75,22 @@ var Match = function () {
                     source = './dist/img/' + source;
                 }
 
-                var p = _this.loadImage(source).then(function (img) {
+                // 预加载图片
+                var p = PreLoadImg.loadImage(source).then(function (img) {
                     return _this.images.push(img);
                 }).catch(function (err) {
                     return console.log(err);
                 });
-
                 pr.push(p);
+
                 return source;
             });
 
-            this.allLoadDone(pr);
-        }
-
-        // 预加载图片
-
-    }, {
-        key: 'loadImage',
-        value: function loadImage(url) {
-            return new Promise(function (resolve, reject) {
-                var img = new Image();
-                img.onload = function () {
-                    return resolve(img);
-                };
-                img.onerror = reject;
-                img.src = url;
-            });
-        }
-
-        // 所有图片加载完成
-
-    }, {
-        key: 'allLoadDone',
-        value: function allLoadDone(p) {
-            var _this2 = this;
-
-            Promise.all(p).then(function () {
-                p = null;
-                _this2.changeMaze();
-                console.log(_this2.images.length);
+            // 图片全部加载完
+            PreLoadImg.allLoadDone(pr).then(function () {
+                pr = null;
+                _this.changeMaze();
+                console.log(_this.images.length);
             });
         }
     }, {
@@ -183,10 +160,21 @@ var Match = function () {
                 }
 
                 // 已选中0张或1张不同图片
-                if (len === 0 || this.match[0] != cur) {
-                    cur.isMatch = true;
+                if (len === 0) {
                     this.match.push(cur);
-                    this.render();
+
+                    this.ctx.save();
+                    this.ctx.beginPath();
+                    this.ctx.lineWidth = 10;
+                    this.ctx.strokeStyle = 'red';
+                    this.ctx.moveTo(cur.c * (this.imgRW + this.imgMC) + this.imgMR + this.imgW / 2, cur.r * (this.imgRH + this.imgMR) + this.imgMR + this.imgH / 2);
+                } else if (len === 1 && this.match[0] != cur) {
+                    this.match.push(cur);
+
+                    this.ctx.lineTo(cur.c * (this.imgRW + this.imgMC) + this.imgMR + this.imgW / 2, cur.r * (this.imgRH + this.imgMR) + this.imgMR + this.imgH / 2);
+                    this.ctx.stroke();
+                    this.ctx.restore();
+
                     this.compare();
                 }
             }
@@ -208,11 +196,12 @@ var Match = function () {
         key: 'matchPic',
         value: function matchPic() {
             if (!this.isEqualPic(this.match)) {
-                this.match[0].isMatch = false;
-                this.match[1].isMatch = false;
                 this.render();
             } else {
+                this.match[0].flag = 0;
+                this.match[1].flag = 0;
                 this.matched += 2;
+                this.render();
             }
 
             // 未结束
@@ -247,13 +236,16 @@ var Match = function () {
     }, {
         key: 'render',
         value: function render() {
-            var imgCount = this.images.length;
-            this.imgRW = ~~((this.canvas.width - 15 * this.c - 15) / this.c), this.imgRH = ~~((this.canvas.height - 10 * this.r - 10) / this.r);
+            // this.imgRW = ~~((this.canvas.width - 15 * this.c -15) / this.c),
+            // this.imgRH = ~~((this.canvas.height  - 10 * this.r -10)/ this.r);
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             for (var i = 0; i < this.r; ++i) {
                 for (var n = 0; n < this.c; ++n) {
+                    if (this.pathArr[i][n].flag === 0) {
+                        continue;
+                    }
                     var img = this.images[this.pathArr[i][n].picIndex];
-                    this.ctx.drawImage(img, 0, 0, this.imgW, this.imgH, n * (this.imgRW + 15) + 15, i * (this.imgRH + 10) + 10, this.imgRW, this.imgRH);
+                    this.ctx.drawImage(img, 0, 0, this.imgW, this.imgH, n * (this.imgRW + this.imgMC) + this.imgMC, i * (this.imgRH + this.imgMR) + this.imgMR, this.imgRW, this.imgRH);
                 }
             }
         }
