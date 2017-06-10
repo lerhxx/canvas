@@ -7,8 +7,6 @@ class Match {
         //图片资源
         this.imgSource = ['card1.jpg', 'card2.jpg', 'card3.jpg', 'card4.jpg', 'card5.jpg', 'card6.jpg', 'card7.jpg', 'card8.jpg', 'card9.jpg', 'back.jpg'];
         this.images = [];      // 缓存图片
-        this.imgW = 115;        // 图片原宽度
-        this.imgH = 115;        // 图片原高度
         this.imgMR = 10;         // 图片垂直间距
         this.imgMC = 15;         // 图片水平间距
 
@@ -29,9 +27,6 @@ class Match {
         }
         console.log('start');
 
-        this.imgRW = ~~((this.canvas.width - this.imgMC * this.c -this.imgMC) / this.c);         // canvas中图片实际宽度
-        this.imgRH = ~~((this.canvas.height  - this.imgMR * this.r -this.imgMR)/ this.r);         // canvas中图片实际高度
-
         this.match = [];
         this.matched = 0;
 
@@ -41,7 +36,6 @@ class Match {
         this.changeMaze = this.changeMaze.bind(this);
 
         this.preLoadImg();
-        // PreLoadImg.preload(this.imgSource, img => this.images.push(img), err => console.log(err), this.changeMaze);
         this.initMaze();
     }
 
@@ -57,18 +51,20 @@ class Match {
     // 预处理图片
     preLoadImg() {
         let pr = [];
-        this.imgSource.map(source => {
+        this.imgSource = this.imgSource.map((source, i) => {
+            // 背面最后处理
             // 处理图片src
             if(!/^http(s)?:\/\//.test(source)) {
                 source = `./dist/img/${source}`;
             }
 
-            // 预加载图片
-            let p = PreLoadImg.loadImage(source)
-                        .then(img => this.images.push(img))
-                        .catch(err => console.log(err))
-            pr.push(p);
-
+            if(i !== this.imgSource.length - 1) {
+                // 预加载图片
+                let p = PreLoadImg.loadImage(source)
+                            .then(img => this.images.push(img))
+                            .catch(err => console.log(err))
+                pr.push(p);
+            }
             return source;
         })
 
@@ -76,17 +72,25 @@ class Match {
         PreLoadImg.allLoadDone(pr)
                 .then(() => {
                     pr = null;
-                    this.changeMaze();
+                    // 加载背面
+                    PreLoadImg.loadImage(this.imgSource[this.imgSource.length - 1])
+                            .then((img) => {
+                                this.images.push(img);
+                                this.changeMaze()
+                            })
                     console.log(this.images.length);
                 });
-
     }
 
     initMaze() {
         for(let i = 0; i < this.r; ++i) {
             this.pathArr[i] = [];
             for(let n = 0; n < this.c; ++n) {
-                this.pathArr[i][n] = new Card(i, n, -1);
+                this.pathArr[i][n] = new Card({
+                    r: i,
+                    c: n,
+                    isMatch: false
+                });
             }
         }
     }
@@ -98,6 +102,9 @@ class Match {
         }
 
         let sum = this.images.length - 2;
+        this.imgRW = ~~((this.canvas.width - this.imgMC * this.c -this.imgMC) / this.c);         // canvas中图片实际宽度
+        this.imgRH = ~~((this.canvas.height  - this.imgMR * this.r -this.imgMR)/ this.r);         // canvas中图片实际高度
+
 
         for(let i = 0, len = this.r * this.c / 2; i < len; ++i) {
             let index = MathUtil.randomInt(sum),
@@ -106,10 +113,17 @@ class Match {
             // 成对修改图片索引
             while(num < 2) {
                 let r = MathUtil.randomInt(this.r),
-                    c = MathUtil.randomInt(this.c);
+                    c = MathUtil.randomInt(this.c),
+                    card = this.pathArr[r][c];
 
-                if(this.pathArr[r][c].picIndex < 0) {
-                    this.pathArr[r][c].picIndex = index;
+                if(card.picIndex < 0) {
+                    card.picIndex = index;
+                    card.w = this.images[index].width;
+                    card.h = this.images[index].height;
+                    card.cw = this.imgRW;
+                    card.ch = this.imgRH;
+                    card.cx = card.c * (card.cw + this.imgMC) + this.imgMC;
+                    card.cy = card.r * (card.ch + this.imgMR) + this.imgMR;
                     ++num;
                 }
             }
@@ -176,7 +190,6 @@ class Match {
             this.match.length = 0;
             this.bindEvent();
         }
-        console.log(this.isEnd())
     }
 
     sleep(time=500) {
@@ -198,21 +211,19 @@ class Match {
 
     render() {
         let imgCount = this.images.length;
-        // this.imgRW = ~~((this.canvas.width - this.imgMC * this.c -this.imgMC) / this.c),
-        // this.imgRH = ~~((this.canvas.height  - this.imgMR * this.r -this.imgMR)/ this.r);
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for(let i = 0; i < this.r; ++i) {
             for(let n = 0; n < this.c; ++n) {
-                let img = null;
-                if(this.pathArr[i][n].isMatch) {
-                    img = this.images[this.pathArr[i][n].picIndex];
+                let imgSrc = null,
+                    card = this.pathArr[i][n];
+                if(card.isMatch) {
+                    imgSrc = this.images[card.picIndex];
                 }else {
-                    img = this.images[imgCount - 1];
+                    imgSrc = this.images[imgCount - 1];
                 }
-                this.ctx.drawImage(img, 0, 0, this.imgW, this.imgH, n * (this.imgRW + this.imgMC) + this.imgMC, i * (this.imgRH + this.imgMR) + this.imgMR, this.imgRW, this.imgRH);
+                this.ctx.drawImage(imgSrc, 0, 0, card.w, card.h, card.cx, card.cy, card.cw, card.ch);
             }
         }
-
     }
 }
 
