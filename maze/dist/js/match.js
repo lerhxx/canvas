@@ -4,6 +4,67 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Mcard = function (_Card) {
+    _inherits(Mcard, _Card);
+
+    function Mcard(obj) {
+        _classCallCheck(this, Mcard);
+
+        var _this = _possibleConstructorReturn(this, (Mcard.__proto__ || Object.getPrototypeOf(Mcard)).call(this, obj));
+
+        _this.deg = 0;
+        _this.rId = null;
+        _this.direction = 1; // 0 从左到右  1 从右到左
+        _this.upImg = 1;
+
+        _this.rotate = _this.rotate.bind(_this);
+        return _this;
+    }
+
+    _createClass(Mcard, [{
+        key: 'rotate',
+        value: function rotate() {
+            this.rId = requestAnimationFrame(this.rotate);
+            if (this.deg >= 180) {
+                cancelAnimationFrame(this.rId);
+                this.deg = 0;
+                this.upImg === 1 ? (this.upImg = 0, this.img) : (this.upImg = 1, this.backImg);
+            }
+            this.deg += 5;
+            this.rotation += this.direction;
+
+            this.render();
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var ctx = this.owner.ctx;
+            ctx.clearRect(this.cx, this.cy, this.cw, this.ch);
+            ctx.save();
+            ctx.beginPath();
+            ctx.rotate = this.rotation;
+            this.rotateImg();
+            ctx.closePath();
+            ctx.restore();
+        }
+    }, {
+        key: 'rotateImg',
+        value: function rotateImg() {
+            var cw = this.cw * Math.cos(this.deg * Math.PI / 180),
+                cx = this.cx + (this.cw - cw) / 2;
+            var img = this.deg > 90 ? this.upImg === 1 ? (this.upImg = 0, this.img) : (this.upImg = 1, this.backImg) : this.upImg === 1 ? (this.upImg = 1, this.backImg) : (this.upImg = 0, this.img);
+
+            this.owner.ctx.drawImage(img, 0, 0, this.w, this.h, cx, this.cy, cw, this.ch);
+        }
+    }]);
+
+    return Mcard;
+}(Card);
+
 var Match = function () {
     function Match(opt) {
         _classCallCheck(this, Match);
@@ -63,7 +124,7 @@ var Match = function () {
     }, {
         key: 'preLoadImg',
         value: function preLoadImg() {
-            var _this = this;
+            var _this2 = this;
 
             var pr = [];
             this.imgSource = this.imgSource.map(function (source, i) {
@@ -73,10 +134,10 @@ var Match = function () {
                     source = './dist/img/' + source;
                 }
 
-                if (i !== _this.imgSource.length - 1) {
+                if (i !== _this2.imgSource.length - 1) {
                     // 预加载图片
                     var p = PreLoadImg.loadImage(source).then(function (img) {
-                        return _this.images.push(img);
+                        return _this2.images.push(img);
                     }).catch(function (err) {
                         return console.log(err);
                     });
@@ -89,11 +150,11 @@ var Match = function () {
             PreLoadImg.allLoadDone(pr).then(function () {
                 pr = null;
                 // 加载背面
-                PreLoadImg.loadImage(_this.imgSource[_this.imgSource.length - 1]).then(function (img) {
-                    _this.images.push(img);
-                    _this.changeMaze();
+                PreLoadImg.loadImage(_this2.imgSource[_this2.imgSource.length - 1]).then(function (img) {
+                    _this2.images.push(img);
+                    _this2.changeMaze();
                 });
-                console.log(_this.images.length);
+                console.log(_this2.images.length);
             });
         }
     }, {
@@ -102,7 +163,7 @@ var Match = function () {
             for (var i = 0; i < this.r; ++i) {
                 this.pathArr[i] = [];
                 for (var n = 0; n < this.c; ++n) {
-                    this.pathArr[i][n] = new Card({
+                    this.pathArr[i][n] = new Mcard({
                         r: i,
                         c: n,
                         isMatch: false
@@ -118,10 +179,10 @@ var Match = function () {
                 return;
             }
 
-            var sum = this.images.length - 2;
+            var sum = this.images.length - 2,
+                backImg = this.images[this.images.length - 1];
             this.imgRW = ~~((this.canvas.width - this.imgMC * this.c - this.imgMC) / this.c); // canvas中图片实际宽度
             this.imgRH = ~~((this.canvas.height - this.imgMR * this.r - this.imgMR) / this.r); // canvas中图片实际高度
-
 
             for (var i = 0, len = this.r * this.c / 2; i < len; ++i) {
                 var index = MathUtil.randomInt(sum),
@@ -131,16 +192,20 @@ var Match = function () {
                 while (num < 2) {
                     var r = MathUtil.randomInt(this.r),
                         c = MathUtil.randomInt(this.c),
-                        card = this.pathArr[r][c];
+                        card = this.pathArr[r][c],
+                        img = this.images[index];
 
                     if (card.picIndex < 0) {
                         card.picIndex = index;
-                        card.w = this.images[index].width;
-                        card.h = this.images[index].height;
+                        card.w = img.width;
+                        card.h = img.height;
                         card.cw = this.imgRW;
                         card.ch = this.imgRH;
                         card.cx = card.c * (card.cw + this.imgMC) + this.imgMC;
                         card.cy = card.r * (card.ch + this.imgMR) + this.imgMR;
+                        card.img = img;
+                        card.backImg = backImg;
+                        card.owner = this;
                         ++num;
                     }
                 }
@@ -180,7 +245,7 @@ var Match = function () {
                 if (len === 0 || this.match[0] != cur) {
                     cur.isMatch = true;
                     this.match.push(cur);
-                    this.render();
+                    cur.rotate();
                     this.compare();
                 }
             }
@@ -204,7 +269,10 @@ var Match = function () {
             if (!this.isEqualPic(this.match)) {
                 this.match[0].isMatch = false;
                 this.match[1].isMatch = false;
-                this.render();
+
+                this.match[0].rotate();
+                this.match[1].rotate();
+                // this.render();
             } else {
                 this.matched += 2;
             }
@@ -244,14 +312,15 @@ var Match = function () {
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             for (var i = 0; i < this.r; ++i) {
                 for (var n = 0; n < this.c; ++n) {
-                    var imgSrc = null,
+                    var img = null,
                         card = this.pathArr[i][n];
                     if (card.isMatch) {
-                        imgSrc = this.images[card.picIndex];
+                        img = card.img;
                     } else {
-                        imgSrc = this.images[imgCount - 1];
+                        img = card.backImg;
                     }
-                    this.ctx.drawImage(imgSrc, 0, 0, card.w, card.h, card.cx, card.cy, card.cw, card.ch);
+
+                    this.ctx.drawImage(img, 0, 0, card.w, card.h, card.cx, card.cy, card.cw, card.ch);
                 }
             }
         }

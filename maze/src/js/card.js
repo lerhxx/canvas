@@ -9,12 +9,16 @@ class Card {
         this.cw = 0;        // 图片在canvas中的宽度
         this.ch = 0;        // 图片在canvas中的高度
         this.picIndex = -1;
-        this.rotate = 0;
+        this.img = null;
+        this.backImg = null;
+        this.rotation = 0;
+        this.owner = null;
 
         Object.assign(this, obj);
     }
 
-    render() {
 
+    render() {
+        return;
     }
 }

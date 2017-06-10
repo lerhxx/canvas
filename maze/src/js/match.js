@@ -1,3 +1,49 @@
+class Mcard extends Card {
+    constructor(obj) {
+        super(obj);
+
+        this.deg = 0;
+        this.rId = null;
+        this.direction = 1;   // 0 从左到右  1 从右到左
+        this.upImg = 1;
+
+        this.rotate = this.rotate.bind(this);
+    }
+
+
+    rotate() {
+        this.rId = requestAnimationFrame(this.rotate);
+        if(this.deg >= 180) {
+            cancelAnimationFrame(this.rId);
+            this.deg = 0;
+            this.upImg === 1 ? (this.upImg = 0, this.img) : (this.upImg = 1, this.backImg)
+        }
+        this.deg += 5;
+        this.rotation += this.direction;
+
+        this.render();
+    }
+
+    render() {
+        let ctx = this.owner.ctx;
+        ctx.clearRect(this.cx, this.cy, this.cw, this.ch);
+        ctx.save();
+        ctx.beginPath();
+        ctx.rotate = this.rotation;
+        this.rotateImg();
+        ctx.closePath();
+        ctx.restore();
+    }
+
+    rotateImg() {
+        let cw = this.cw * Math.cos(this.deg * Math.PI / 180),
+            cx = this.cx + (this.cw - cw) / 2;
+        let img = this.deg > 90 ? (this.upImg === 1 ? (this.upImg = 0, this.img) : (this.upImg = 1, this.backImg)) : (this.upImg === 1 ? (this.upImg = 1, this.backImg) : (this.upImg = 0, this.img));
+        
+        this.owner.ctx.drawImage(img, 0, 0, this.w, this.h, cx, this.cy, cw, this.ch);
+    }
+}
+
 class Match {
     constructor(opt) {
         this.r = 5;
@@ -86,7 +132,7 @@ class Match {
         for(let i = 0; i < this.r; ++i) {
             this.pathArr[i] = [];
             for(let n = 0; n < this.c; ++n) {
-                this.pathArr[i][n] = new Card({
+                this.pathArr[i][n] = new Mcard({
                     r: i,
                     c: n,
                     isMatch: false
@@ -101,10 +147,10 @@ class Match {
             return;
         }
 
-        let sum = this.images.length - 2;
+        let sum = this.images.length - 2,
+            backImg = this.images[this.images.length - 1];
         this.imgRW = ~~((this.canvas.width - this.imgMC * this.c -this.imgMC) / this.c);         // canvas中图片实际宽度
         this.imgRH = ~~((this.canvas.height  - this.imgMR * this.r -this.imgMR)/ this.r);         // canvas中图片实际高度
-
 
         for(let i = 0, len = this.r * this.c / 2; i < len; ++i) {
             let index = MathUtil.randomInt(sum),
@@ -114,17 +160,22 @@ class Match {
             while(num < 2) {
                 let r = MathUtil.randomInt(this.r),
                     c = MathUtil.randomInt(this.c),
-                    card = this.pathArr[r][c];
+                    card = this.pathArr[r][c],
+                    img = this.images[index];
 
                 if(card.picIndex < 0) {
                     card.picIndex = index;
-                    card.w = this.images[index].width;
-                    card.h = this.images[index].height;
+                    card.w = img.width;
+                    card.h = img.height;
                     card.cw = this.imgRW;
                     card.ch = this.imgRH;
                     card.cx = card.c * (card.cw + this.imgMC) + this.imgMC;
                     card.cy = card.r * (card.ch + this.imgMR) + this.imgMR;
+                    card.img = img;
+                    card.backImg = backImg;
+                    card.owner = this;
                     ++num;
+
                 }
             }
 
@@ -159,7 +210,7 @@ class Match {
                 if(len === 0 || this.match[0] != cur) {
                     cur.isMatch = true;
                     this.match.push(cur);
-                    this.render();
+                    cur.rotate();
                     this.compare();
                 }
             }
@@ -180,7 +231,10 @@ class Match {
         if(!this.isEqualPic(this.match)) {
             this.match[0].isMatch = false;
             this.match[1].isMatch = false;
-            this.render();
+            
+            this.match[0].rotate();
+            this.match[1].rotate();
+            // this.render();
         }else {
             this.matched += 2;
         }
@@ -214,14 +268,15 @@ class Match {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for(let i = 0; i < this.r; ++i) {
             for(let n = 0; n < this.c; ++n) {
-                let imgSrc = null,
+                let img = null,
                     card = this.pathArr[i][n];
                 if(card.isMatch) {
-                    imgSrc = this.images[card.picIndex];
+                    img= card.img;
                 }else {
-                    imgSrc = this.images[imgCount - 1];
+                    img = card.backImg;
                 }
-                this.ctx.drawImage(imgSrc, 0, 0, card.w, card.h, card.cx, card.cy, card.cw, card.ch);
+
+                this.ctx.drawImage(img, 0, 0, card.w, card.h, card.cx, card.cy, card.cw, card.ch);
             }
         }
     }
