@@ -5,7 +5,7 @@ class Mcard extends Card {
         this.deg = 0;
         this.rId = null;
         this.direction = 1;   // 0 从左到右  1 从右到左
-        this.upImg = 1;
+        this.isBack = true;
 
         this.rotate = this.rotate.bind(this);
     }
@@ -16,9 +16,9 @@ class Mcard extends Card {
         if(this.deg >= 180) {
             cancelAnimationFrame(this.rId);
             this.deg = 0;
-            this.upImg === 1 ? (this.upImg = 0, this.img) : (this.upImg = 1, this.backImg)
+            this.isBack = !this.isBack;
         }
-        this.deg += 5;
+        this.deg += 10;
         this.rotation += this.direction;
 
         this.render();
@@ -38,8 +38,13 @@ class Mcard extends Card {
     rotateImg() {
         let cw = this.cw * Math.cos(this.deg * Math.PI / 180),
             cx = this.cx + (this.cw - cw) / 2;
-        let img = this.deg > 90 ? (this.upImg === 1 ? (this.upImg = 0, this.img) : (this.upImg = 1, this.backImg)) : (this.upImg === 1 ? (this.upImg = 1, this.backImg) : (this.upImg = 0, this.img));
-        
+        let img = null;
+
+        if(this.deg > 90) {
+            img = this.isBack ? this.img : this.backImg;
+        }else {
+            img = this.isBack ? this.backImg : this.img;
+        }
         this.owner.ctx.drawImage(img, 0, 0, this.w, this.h, cx, this.cy, cw, this.ch);
     }
 }
@@ -98,12 +103,12 @@ class Match {
     preLoadImg() {
         let pr = [];
         this.imgSource = this.imgSource.map((source, i) => {
-            // 背面最后处理
             // 处理图片src
             if(!/^http(s)?:\/\//.test(source)) {
                 source = `./dist/img/${source}`;
             }
 
+            // 背面图片最后处理
             if(i !== this.imgSource.length - 1) {
                 // 预加载图片
                 let p = PreLoadImg.loadImage(source)
@@ -135,7 +140,7 @@ class Match {
                 this.pathArr[i][n] = new Mcard({
                     r: i,
                     c: n,
-                    isMatch: false
+                    // isMatch: false
                 });
             }
         }
@@ -208,7 +213,7 @@ class Match {
 
                 // 已选中0张或1张不同图片
                 if(len === 0 || this.match[0] != cur) {
-                    cur.isMatch = true;
+                    // cur.isMatch = true;
                     this.match.push(cur);
                     cur.rotate();
                     this.compare();
@@ -229,8 +234,8 @@ class Match {
 
     matchPic() {
         if(!this.isEqualPic(this.match)) {
-            this.match[0].isMatch = false;
-            this.match[1].isMatch = false;
+            // this.match[0].isMatch = false;
+            // this.match[1].isMatch = false;
             
             this.match[0].rotate();
             this.match[1].rotate();
@@ -268,15 +273,7 @@ class Match {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for(let i = 0; i < this.r; ++i) {
             for(let n = 0; n < this.c; ++n) {
-                let img = null,
-                    card = this.pathArr[i][n];
-                if(card.isMatch) {
-                    img= card.img;
-                }else {
-                    img = card.backImg;
-                }
-
-                this.ctx.drawImage(img, 0, 0, card.w, card.h, card.cx, card.cy, card.cw, card.ch);
+                this.pathArr[i][n].render();
             }
         }
     }
