@@ -13,33 +13,35 @@ class Point {
 }
 
 class FindPathGame {
-    constructor(r, c) {
-        this.r = 2 * r + 1;
-        this.c = 2 * c + 1;
-        this.pathArr = [];
-        let maze = new Maze(r, c);
-        let oriArr = maze.arr;
-        this.ctx = maze.ctx;
-        this.canvas = maze.canvas;
+    constructor(maze) {
+        if(maze instanceof Maze) {
+            this.r = 2 * maze.r + 1;
+            this.c = 2 * maze.c + 1;
+            this.pathArr = [];
 
-        this.openList = [];
-        this.closeList = [];
+            let oriArr = maze.arr;
+            this.ctx = maze.ctx;
+            this.canvas = maze.canvas;
 
-        this.start = null;
-        this.end = null;
+            this.openList = [];
+            this.closeList = [];
 
-        this.quickSort = this.quickSort.bind(this);
+            this.start = null;
+            this.end = null;
 
-        this.initArr(oriArr);
-        // this.findPath(this.pathArr[1][0], this.pathArr[this.r - 2][this.c - 1]);
+            this.quickSort = this.quickSort.bind(this);
 
-        this.findPath = this.findPath.bind(this);
-        this.render = this.render.bind(this);
-        this.removeEvent = this.removeEvent.bind(this);
-        this.addEvent = this.addEvent.bind(this);
-        
-        // this.render(this.pathArr[this.r - 2][this.c - 1]);
-        this.bindEvent();
+            this.initArr(oriArr);
+
+            this.findPath = this.findPath.bind(this);
+            this.render = this.render.bind(this);
+            this.removeEvent = this.removeEvent.bind(this);
+            this.addEvent = this.addEvent.bind(this);
+
+        }else {
+            console.error('There is no maze!');
+            return;
+        }
     }
 
     initArr(oriArr) {
@@ -173,7 +175,6 @@ class FindPathGame {
     }
 
     sort(arr = [], left = 0, right = arr.length - 1, fun = (a, b) => (a - b)) {
-        console.log(fun)
         let tmp = arr[left];
         while(left < right) {
             while(left < right && fun(arr[right], tmp) > 0) {
@@ -204,7 +205,6 @@ class FindPathGame {
         this.ctx.restore();
         this.renderPer(this.start, 'yellow');
         this.renderPer(this.end, 'blue');
-        console.log(this.pathArr)
     }
 
     renderPer(point, color='red') {
@@ -245,4 +245,4 @@ class FindPathGame {
 
 }
 
-new FindPathGame(20, 20);
+// new FindPathGame(20, 20);

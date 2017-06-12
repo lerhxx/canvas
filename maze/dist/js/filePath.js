@@ -21,35 +21,36 @@ var Point = function Point(r, c) {
 };
 
 var FindPathGame = function () {
-    function FindPathGame(r, c) {
+    function FindPathGame(maze) {
         _classCallCheck(this, FindPathGame);
 
-        this.r = 2 * r + 1;
-        this.c = 2 * c + 1;
-        this.pathArr = [];
-        var maze = new Maze(r, c);
-        var oriArr = maze.arr;
-        this.ctx = maze.ctx;
-        this.canvas = maze.canvas;
+        if (maze instanceof Maze) {
+            this.r = 2 * maze.r + 1;
+            this.c = 2 * maze.c + 1;
+            this.pathArr = [];
 
-        this.openList = [];
-        this.closeList = [];
+            var oriArr = maze.arr;
+            this.ctx = maze.ctx;
+            this.canvas = maze.canvas;
 
-        this.start = null;
-        this.end = null;
+            this.openList = [];
+            this.closeList = [];
 
-        this.quickSort = this.quickSort.bind(this);
+            this.start = null;
+            this.end = null;
 
-        this.initArr(oriArr);
-        // this.findPath(this.pathArr[1][0], this.pathArr[this.r - 2][this.c - 1]);
+            this.quickSort = this.quickSort.bind(this);
 
-        this.findPath = this.findPath.bind(this);
-        this.render = this.render.bind(this);
-        this.removeEvent = this.removeEvent.bind(this);
-        this.addEvent = this.addEvent.bind(this);
+            this.initArr(oriArr);
 
-        // this.render(this.pathArr[this.r - 2][this.c - 1]);
-        this.bindEvent();
+            this.findPath = this.findPath.bind(this);
+            this.render = this.render.bind(this);
+            this.removeEvent = this.removeEvent.bind(this);
+            this.addEvent = this.addEvent.bind(this);
+        } else {
+            console.error('There is no maze!');
+            return;
+        }
     }
 
     _createClass(FindPathGame, [{
@@ -214,7 +215,6 @@ var FindPathGame = function () {
                 return a - b;
             };
 
-            console.log(fun);
             var tmp = arr[left];
             while (left < right) {
                 while (left < right && fun(arr[right], tmp) > 0) {
@@ -246,7 +246,6 @@ var FindPathGame = function () {
             this.ctx.restore();
             this.renderPer(this.start, 'yellow');
             this.renderPer(this.end, 'blue');
-            console.log(this.pathArr);
         }
     }, {
         key: 'renderPer',
@@ -295,4 +294,4 @@ var FindPathGame = function () {
     return FindPathGame;
 }();
 
-new FindPathGame(20, 20);
+// new FindPathGame(20, 20);

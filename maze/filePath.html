@@ -1,11 +1,17 @@
 <!doctype html>
 <html>
 <head>
-	<title>迷宫</title>
+	<title>迷宫搜索路径</title>
 	<meta charset='utf-8' />
 </head>
 <body>
 	<script src='./dist/js/maze.js'></script>
+	<script src='./dist/js/Util.js'></script>
 	<script src='./dist/js/filePath.js'></script>
+	<script>
+        window.onload = function() {
+            new FindPathGame(new Maze(20, 20)).bindEvent();;
+        }
+    </script>
 </body>
 </html>
