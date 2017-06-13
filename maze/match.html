@@ -3,28 +3,32 @@
     <head>
         <meta charset='utf-8' />
         <title>连连看</title>
-        <style>
-            .container {
-                position: relative;
-            }
-            .bg {
-                width: 500px;
-                height: 500px;
-                background-color: #480348;
-            }
-            canvas {
-                position: absolute;
-                top: 0;
-                left: 0;
-                border: 1px solid red;
-            }
-        </style>
+        <link rel='stylesheet' href='./dist/css/match.css' />
     </head>
     <body>
         <div class='container'>
-            <div class='bg'></div>
+            <div class='bg'></div><div class='toolbar'>
+                <div class='score-wrapper'>
+                    <span id='score'>0</span>
+                </div>
+            </div>
             <canvas id='canvas' width=500 height=500></canvas>
-            <div></div>
+            <div class='modal hidden'>
+                <div id='start'></div>
+            </div>
+            <div class='modal ' id='rank-wrapper'>
+                <div id='rank'>
+                    <div>
+                        <span class='label'>分数</span><span class='num' id='rank-score'>0</span>
+                    </div>
+                    <div>
+                        <span class='label'>时长</span><span class='num' id='total-time'>0：0：0</span>
+                    </div>
+                    <span id='restart'></span>
+                    <span id='next'></span>
+                    <span id='more'></span>
+                </div>
+            </div>
         </div>
         <script src='./dist/js/Util.js'></script>
         <script src='./dist/js/preLoadImg.js'></script>
