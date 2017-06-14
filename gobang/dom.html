@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset='utf-8' />
+        <title>五子棋</title>
+        <style>
+            #panel {
+                position: relative;
+            }
+            table {
+                border-collapse: collapse;
+                background-color: #964f0a;
+            }
+            td {
+                min-width: 40px;
+                height: 40px;
+                border: 1px solid #000;
+                -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+            }
+            #panel > div {
+                position: absolute;
+                width: 30px;
+                height: 30px;
+                -webkti-border-radius: 50%;
+                border-radius: 50%;
+            }
+            .toolbar {
+                margin-top: 10px;
+            }
+            #cur {
+                display: inline-block;
+                width: 30px;
+                height: 30px;
+                margin: 0 10px;
+                vertical-align: middle;
+                background-color: #000;
+                -webkit-border-radius: 50%;
+                -moz-border-radius: 50%;
+                border-radius: 50%;
+            }
+            button {
+                margin: 10px 0;
+            }
+            #cur {
+                border: 1px solid #000;
+            }
+        </style>
+    </head>
+    <body>
+        <div id='container'>
+            <div id='panel'>
+            </div>
+        </div>
+        <script src='./dist/js/chess.js'></script>
+        <script src='./dist/js/toolbar.js'></script>
+        <script src='./dist/js/dom.js'></script>
+        <script src='./dist/js/game.js'></script> 
+    </body>
+    <script>
+        window.onload = function() {
+            new Game();
+        }
+    </script>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset='utf-8' />
+        <title>五子棋</title>
+        <style>
+            #cur {
+                display: inline-block;
+                width: 30px;
+                height: 30px;
+                margin: 0 10px;
+                vertical-align: middle;
+                background-color: #000;
+                -webkit-border-radius: 50%;
+                -moz-border-radius: 50%;
+                border-radius: 50%;
+            }
+            button {
+                margin: 10px 0;
+            }
+            #cur {
+                border: 1px solid #000;
+            }
+            canvas {
+                border: 1px solid red;
+            }
+        </style>
+    </head>
+    <body>
+        <div id='container'>
+            <canvas id='canvas' width=500 height=500></canvas>
+        </div>
+        <script src='./dist/js/chess.js'></script>
+        <script src='./dist/js/toolbar.js'></script>
+        <script src='./dist/js/canvas.js'></script>
+        <script src='./dist/js/game.js'></script> 
+    </body>
+    <script>
+        window.onload = function() {
+            new Game();
+        }
+    </script>
+</html>
