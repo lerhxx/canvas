@@ -105,6 +105,9 @@ var GoBang = function () {
         value: function getContext() {
             this.canvas = document.getElementById(this.id);
             this.ctx = this.canvas.getContext('2d');
+
+            this.canvas.width = this.c * this.d + 1;
+            this.canvas.height = this.r * this.d + 1;
         }
     }, {
         key: 'init',
