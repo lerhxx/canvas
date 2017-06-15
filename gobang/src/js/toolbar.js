@@ -24,18 +24,21 @@ class ToolBar {
                 </div>
                 <button id='reget' type='button'>悔棋</button>
                 <button id='cancel-reget' type='button'>撤销悔棋</button>
+                <button id='restart' type='button'>重新开始</button>
             </div>`;
 
         this.parent.innerHTML = this.parent.innerHTML + toolbar;
         this.cur = document.getElementById('cur');
         this.regBtn = document.getElementById('reget');
         this.cancelBtn = document.getElementById('cancel-reget');
+        this.restartBtn = document.getElementById('restart');
         this.bindEvent();
     }
 
     bindEvent() {
         this.regBtn.addEventListener('click', () => this.regretEvent())
         this.cancelBtn.addEventListener('click', () => this.cancelRreget())
+        this.restartBtn.addEventListener('click', () => this.restart())
     }
 
     regretEvent() {
@@ -44,6 +47,11 @@ class ToolBar {
 
     cancelRreget() {
         this.owner.cancelRreget();
+    }
+
+    restart() {
+        console.log(this.owner)
+        this.owner.restart();
     }
 
     changeCur(color) {

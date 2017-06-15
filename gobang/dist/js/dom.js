@@ -58,6 +58,7 @@ var GoBang = function () {
         }
 
         this.parentEvent = this.parentEvent.bind(this);
+        this.win = document.getElementById('win');
 
         this.init();
         this.bindEvent();
@@ -159,10 +160,24 @@ var GoBang = function () {
             this.chessArr[r][c].flag = flag;
         }
     }, {
+        key: 'restart',
+        value: function restart() {
+            this.chessArr.forEach(function (row) {
+                row.forEach(function (col) {
+                    col.flag = 0;
+                    if (col.ele) {
+                        col.draw('transparent');
+                        col.ele = null;
+                    }
+                });
+            });
+            this.win.classList.add('hide');
+            this.bindEvent();
+        }
+    }, {
         key: 'drawLine',
         value: function drawLine(checkResult) {
-            console.log(checkResult);
-            var win = document.getElementById('win'),
+            var win = this.win,
                 list = win.classList;
             var sr = checkResult.sr,
                 sc = checkResult.sc,

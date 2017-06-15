@@ -59,7 +59,7 @@ class GoBang {
         this.getContext();
         if(!this.ctx) {
             console.error("Your broswer doesn't support canvas");
-            return;
+            return null;
         }
 
         this.chessArr = [];
@@ -67,7 +67,6 @@ class GoBang {
         this.canvasEvent = this.canvasEvent.bind(this);
 
         this.init();
-        this.bindEvent();
         console.log('canvas')
     }
 
@@ -82,6 +81,7 @@ class GoBang {
     init() {
         this.initChessBoard();
         this.initChess();
+        this.bindEvent();
     }
 
     bindEvent() {
@@ -177,6 +177,17 @@ class GoBang {
         this.drawChess(x, y, flag, 2);
     }
 
+    restart() {
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.initChessBoard();
+        this.chessArr.forEach(row => {
+            row.forEach(col => {
+                col.flag = 0;
+            })
+        })
+        this.bindEvent();
+    }
+
     drawLine(res) {
         let ctx = this.ctx,
             chessArr = this.chessArr;
@@ -189,6 +200,5 @@ class GoBang {
         ctx.lineTo(chessArr[res.er][res.ec].x, chessArr[res.er][res.ec].y);
         ctx.stroke();
         ctx.restore();
-
     }
 }

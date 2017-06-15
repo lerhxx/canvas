@@ -30,6 +30,7 @@ class GoBang {
         }
 
         this.parentEvent = this.parentEvent.bind(this);
+        this.win = document.getElementById('win');
 
         this.init();
         this.bindEvent();
@@ -122,9 +123,22 @@ class GoBang {
         this.chessArr[r][c].flag = flag;
     }
 
+    restart() {
+        this.chessArr.forEach(row => {
+            row.forEach(col => {
+                col.flag = 0;
+                if(col.ele) {
+                    col.draw('transparent');
+                    col.ele = null;
+                }
+            })
+        })
+        this.win.classList.add('hide');
+        this.bindEvent();
+    }
+
     drawLine(checkResult) {
-        console.log(checkResult);
-        let win = document.getElementById('win'),
+        let win = this.win,
             list = win.classList;
         let sr = checkResult.sr,
             sc = checkResult.sc,

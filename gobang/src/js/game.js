@@ -11,6 +11,10 @@ class Game {
             owner: this
         });
 
+        if(!this.goBang) {
+            return;
+        }
+
         this.steps = [];
         this.regrets = [];
         this.direction = ['checklr', 'checktb', 'checklt', 'checkrt'];
@@ -236,6 +240,12 @@ class Game {
         this.steps.push(chess.chess);
         this.goBang.cancelChess(chess.chess.x, chess.chess.y, chess.oriFlag);
         this.changeCurChess();
+    }
+
+    restart() {
+        this.goBang.restart();
+        this.regrets.length = 0;
+        this.steps.length = 0;
     }
 
     changeCurChess() {

@@ -28,12 +28,13 @@ var ToolBar = function () {
                 console.error('There is no parent of toolbar');
                 return;
             }
-            var toolbar = '<div class=\'toolbar\'>\n                <div>\n                    \u5F53\u524D\u68CB\u5B50<span id=\'cur\'></span>\n                </div>\n                <button id=\'reget\' type=\'button\'>\u6094\u68CB</button>\n                <button id=\'cancel-reget\' type=\'button\'>\u64A4\u9500\u6094\u68CB</button>\n            </div>';
+            var toolbar = '<div class=\'toolbar\'>\n                <div>\n                    \u5F53\u524D\u68CB\u5B50<span id=\'cur\'></span>\n                </div>\n                <button id=\'reget\' type=\'button\'>\u6094\u68CB</button>\n                <button id=\'cancel-reget\' type=\'button\'>\u64A4\u9500\u6094\u68CB</button>\n                <button id=\'restart\' type=\'button\'>\u91CD\u65B0\u5F00\u59CB</button>\n            </div>';
 
             this.parent.innerHTML = this.parent.innerHTML + toolbar;
             this.cur = document.getElementById('cur');
             this.regBtn = document.getElementById('reget');
             this.cancelBtn = document.getElementById('cancel-reget');
+            this.restartBtn = document.getElementById('restart');
             this.bindEvent();
         }
     }, {
@@ -47,6 +48,9 @@ var ToolBar = function () {
             this.cancelBtn.addEventListener('click', function () {
                 return _this.cancelRreget();
             });
+            this.restartBtn.addEventListener('click', function () {
+                return _this.restart();
+            });
         }
     }, {
         key: 'regretEvent',
@@ -57,6 +61,12 @@ var ToolBar = function () {
         key: 'cancelRreget',
         value: function cancelRreget() {
             this.owner.cancelRreget();
+        }
+    }, {
+        key: 'restart',
+        value: function restart() {
+            console.log(this.owner);
+            this.owner.restart();
         }
     }, {
         key: 'changeCur',

@@ -88,7 +88,7 @@ var GoBang = function () {
         this.getContext();
         if (!this.ctx) {
             console.error("Your broswer doesn't support canvas");
-            return;
+            return null;
         }
 
         this.chessArr = [];
@@ -96,7 +96,6 @@ var GoBang = function () {
         this.canvasEvent = this.canvasEvent.bind(this);
 
         this.init();
-        this.bindEvent();
         console.log('canvas');
     }
 
@@ -114,6 +113,7 @@ var GoBang = function () {
         value: function init() {
             this.initChessBoard();
             this.initChess();
+            this.bindEvent();
         }
     }, {
         key: 'bindEvent',
@@ -217,6 +217,18 @@ var GoBang = function () {
         key: 'cancelChess',
         value: function cancelChess(x, y, flag) {
             this.drawChess(x, y, flag, 2);
+        }
+    }, {
+        key: 'restart',
+        value: function restart() {
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            this.initChessBoard();
+            this.chessArr.forEach(function (row) {
+                row.forEach(function (col) {
+                    col.flag = 0;
+                });
+            });
+            this.bindEvent();
         }
     }, {
         key: 'drawLine',

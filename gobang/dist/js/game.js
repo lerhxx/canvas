@@ -19,6 +19,10 @@ var Game = function () {
             owner: this
         });
 
+        if (!this.goBang) {
+            return;
+        }
+
         this.steps = [];
         this.regrets = [];
         this.direction = ['checklr', 'checktb', 'checklt', 'checkrt'];
@@ -252,6 +256,13 @@ var Game = function () {
             this.steps.push(chess.chess);
             this.goBang.cancelChess(chess.chess.x, chess.chess.y, chess.oriFlag);
             this.changeCurChess();
+        }
+    }, {
+        key: 'restart',
+        value: function restart() {
+            this.goBang.restart();
+            this.regrets.length = 0;
+            this.steps.length = 0;
         }
     }, {
         key: 'changeCurChess',
