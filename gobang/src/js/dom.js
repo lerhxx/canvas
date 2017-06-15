@@ -4,6 +4,11 @@ class DomChess extends Chess {
 
         this.r = r;
         this.c = c;
+        this.ele = null;
+    }
+
+    draw(color) {
+        this.ele.style.backgroundColor = color;
     }
 }
 
@@ -94,9 +99,9 @@ class GoBang {
         if(c < 0 || r < 0 || c >= this.c || r >= this.r || this.chessArr[r][c].flag !== 0) {
             return null;
         }
-        tar.style.backgroundColor = flag === 1 ? 'white' : 'black';
         this.chessArr[r][c].flag = flag,
         this.chessArr[r][c].ele = tar;
+        this.chessArr[r][c].draw(flag === 1 ? 'white' : 'black');
 
         this.owner && this.owner.step && this.owner.step(this.chessArr[r][c]);
     }

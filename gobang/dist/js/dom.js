@@ -22,8 +22,16 @@ var DomChess = function (_Chess) {
 
         _this.r = r;
         _this.c = c;
+        _this.ele = null;
         return _this;
     }
+
+    _createClass(DomChess, [{
+        key: 'draw',
+        value: function draw(color) {
+            this.ele.style.backgroundColor = color;
+        }
+    }]);
 
     return DomChess;
 }(Chess);
@@ -127,8 +135,8 @@ var GoBang = function () {
             if (c < 0 || r < 0 || c >= this.c || r >= this.r || this.chessArr[r][c].flag !== 0) {
                 return null;
             }
-            tar.style.backgroundColor = flag === 1 ? 'white' : 'black';
             this.chessArr[r][c].flag = flag, this.chessArr[r][c].ele = tar;
+            this.chessArr[r][c].draw(flag === 1 ? 'white' : 'black');
 
             this.owner && this.owner.step && this.owner.step(this.chessArr[r][c]);
         }
