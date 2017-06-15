@@ -71,26 +71,23 @@ var Game = function () {
                 result = false;
 
             for (var i = c - 1; i >= 0; --i) {
-                if (chessArr[r][i].flag !== flag) {
-                    break;
-                }
-                ++count;
-                sc = i;
-                if (count >= 5) {
-                    result = true;
+                if (chessArr[r][i].flag === flag) {
+                    ++count;
+                    sc = i;
+                } else {
                     break;
                 }
             }
             for (var _i = c + 1; _i < this.goBang.c; ++_i) {
-                if (chessArr[r][_i].flag !== flag) {
+                if (chessArr[r][_i].flag === flag) {
+                    ++count;
+                    ec = _i;
+                } else {
                     break;
                 }
-                ++count;
-                ec = _i;
-                if (count >= 5) {
-                    result = true;
-                    break;
-                }
+            }
+            if (count >= 5) {
+                result = true;
             }
 
             return {
@@ -111,26 +108,23 @@ var Game = function () {
                 result = false;
 
             for (var i = r - 1; i >= 0; --i) {
-                if (chessArr[i][c].flag !== flag) {
-                    break;
-                }
-                ++count;
-                sr = i;
-                if (count >= 5) {
-                    result = true;
+                if (chessArr[i][c].flag === flag) {
+                    ++count;
+                    sr = i;
+                } else {
                     break;
                 }
             }
             for (var _i2 = r + 1; _i2 < this.goBang.r; ++_i2) {
-                if (chessArr[_i2][c].flag !== flag) {
+                if (chessArr[_i2][c].flag === flag) {
+                    ++count;
+                    er = _i2;
+                } else {
                     break;
                 }
-                ++count;
-                er = _i2;
-                if (count >= 5) {
-                    result = true;
-                    break;
-                }
+            }
+            if (count >= 5) {
+                result = true;
             }
 
             return {
@@ -153,28 +147,25 @@ var Game = function () {
                 result = false;
 
             for (var i = r - 1, n = c - 1; i >= 0 && n >= 0; --i, --n) {
-                if (chessArr[i][n].flag !== flag) {
-                    break;
-                }
-                ++count;
-                sr = i;
-                sc = n;
-                if (count >= 5) {
-                    result = true;
+                if (chessArr[i][n].flag === flag) {
+                    ++count;
+                    sr = i;
+                    sc = n;
+                } else {
                     break;
                 }
             }
             for (var _i3 = r + 1, _n = c + 1; _i3 < this.goBang.r && _n < this.goBang.c; ++_i3, ++_n) {
-                if (chessArr[_i3][_n].flag !== flag) {
+                if (chessArr[_i3][_n].flag === flag) {
+                    ++count;
+                    er = _i3;
+                    ec = _n;
+                } else {
                     break;
                 }
-                ++count;
-                er = _i3;
-                ec = _n;
-                if (count >= 5) {
-                    result = true;
-                    break;
-                }
+            }
+            if (count >= 5) {
+                result = true;
             }
 
             return {
@@ -197,28 +188,25 @@ var Game = function () {
                 result = false;
 
             for (var i = r - 1, n = c + 1; i >= 0 && n < this.goBang.c; --i, ++n) {
-                if (chessArr[i][n].flag !== flag) {
-                    break;
-                }
-                ++count;
-                sr = i;
-                sc = n;
-                if (count >= 5) {
-                    result = true;
+                if (chessArr[i][n].flag === flag) {
+                    ++count;
+                    sr = i;
+                    sc = n;
+                } else {
                     break;
                 }
             }
             for (var _i4 = r + 1, _n2 = c - 1; _i4 < this.goBang.r && _n2 >= 0; ++_i4, --_n2) {
-                if (chessArr[_i4][_n2].flag !== flag) {
+                if (chessArr[_i4][_n2].flag === flag) {
+                    ++count;
+                    er = _i4;
+                    ec = _n2;
+                } else {
                     break;
                 }
-                ++count;
-                er = _i4;
-                ec = _n2;
-                if (count >= 5) {
-                    result = true;
-                    break;
-                }
+            }
+            if (count >= 5) {
+                result = true;
             }
 
             return {

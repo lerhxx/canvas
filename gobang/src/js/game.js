@@ -60,26 +60,23 @@ class Game {
             result = false;
 
         for(let i = c - 1; i >= 0; --i) {
-            if(chessArr[r][i].flag !== flag) {
-                break;
-            }
-            ++count;
-            sc = i;
-            if(count >= 5) {
-                result =  true;
+            if(chessArr[r][i].flag === flag) {
+                ++count;
+                sc = i;
+            }else {
                 break;
             }
         }
         for(let i = c + 1; i < this.goBang.c; ++i) {
-            if(chessArr[r][i].flag !== flag) {
+            if(chessArr[r][i].flag === flag) {
+                ++count;
+                ec = i;
+            }else {
                 break;
             }
-            ++count;
-            ec = i;
-            if(count >= 5) {
-                result = true;
-                break;
-            }
+        }
+        if(count >= 5) {
+            result = true;
         }
 
         return {
@@ -99,26 +96,23 @@ class Game {
             result = false;
 
         for(let i = r - 1; i >= 0; --i) {
-            if(chessArr[i][c].flag !== flag) {
-                break;
-            }
-            ++count;
-            sr = i;
-            if(count >= 5) {
-                result = true;
+            if(chessArr[i][c].flag === flag) {
+                ++count;
+                sr = i;
+            }else {
                 break;
             }
         }
         for(let i = r + 1; i < this.goBang.r; ++i) {
-            if(chessArr[i][c].flag !== flag) {
+            if(chessArr[i][c].flag === flag) {
+                ++count;
+                er = i;
+            }else {
                 break;
             }
-            ++count;
-            er = i;
-            if(count >= 5) {
-                result = true;
-                break;
-            }
+        }
+        if(count >= 5) {
+            result = true;
         }
 
         return {
@@ -140,28 +134,25 @@ class Game {
             result = false;
 
         for(let i = r - 1, n = c - 1; i >= 0 && n >= 0; --i, --n) {
-            if(chessArr[i][n].flag !== flag) {
-                break;
-            }
-            ++count;
-            sr = i;
-            sc = n;
-            if(count >= 5) {
-                result = true;
+            if(chessArr[i][n].flag === flag) {
+                ++count;
+                sr = i;
+                sc = n;
+            }else {
                 break;
             }
         }
         for(let i = r + 1, n = c + 1; i < this.goBang.r && n < this.goBang.c; ++i, ++n) {
-            if(chessArr[i][n].flag !== flag) {
+            if(chessArr[i][n].flag === flag) {
+                ++count;
+                er = i;
+                ec = n;
+            }else {
                 break;
             }
-            ++count;
-            er = i;
-            ec = n;
-            if(count >= 5) {
-                result = true;
-                break;
-            }
+        }
+        if(count >= 5) {
+            result = true;
         }
 
         return {
@@ -183,28 +174,25 @@ class Game {
             result = false;
 
         for(let i = r - 1, n = c + 1; i >= 0 && n < this.goBang.c; --i, ++n) {
-            if(chessArr[i][n].flag !== flag) {
-                break;
-            }
-            ++count;
-            sr = i;
-            sc = n;
-            if(count >= 5) {
-                result = true;
+            if(chessArr[i][n].flag === flag) {
+                ++count;
+                sr = i;
+                sc = n;
+            }else {
                 break;
             }
         }
         for(let i = r + 1, n = c - 1; i < this.goBang.r && n >= 0; ++i, --n) {
-            if(chessArr[i][n].flag !== flag) {
+            if(chessArr[i][n].flag === flag) {
+                ++count;
+                er = i;
+                ec = n;
+            }else {
                 break;
             }
-            ++count;
-            er = i;
-            ec = n;
-            if(count >= 5) {
-                result = true;
-                break;
-            }
+        }
+        if(count >= 5) {
+            result = true;
         }
 
         return {
