@@ -4,12 +4,10 @@ class Mcard extends Card {
 
         this.deg = 0;
         this.rId = null;
-        this.direction = 1;   // 0 从左到右  1 从右到左
         this.isBack = true;
 
         this.rotate = this.rotate.bind(this);
     }
-
 
     rotate() {
         this.rId = requestAnimationFrame(this.rotate);
@@ -19,7 +17,6 @@ class Mcard extends Card {
             this.isBack = !this.isBack;
         }
         this.deg += 10;
-        this.rotation += this.direction;
 
         this.render();
     }
@@ -29,7 +26,6 @@ class Mcard extends Card {
         ctx.clearRect(this.cx, this.cy, this.cw, this.ch);
         ctx.save();
         ctx.beginPath();
-        ctx.rotate = this.rotation;
         this.rotateImg();
         ctx.closePath();
         ctx.restore();
@@ -62,7 +58,6 @@ class Match {
         this.imgMC = 15;         // 图片水平间距
 
         Object.assign(this, opt);
-        console.log(this.imgW)
 
         if(typeof this.id !== 'string') {
             console.error('There is no id.');
@@ -80,13 +75,27 @@ class Match {
 
         this.match = [];
         this.matched = 0;
+        this.scoreIn = document.getElementById('score');
+        this.score = 0;
 
         this.bindEvent = this.bindEvent.bind(this);
         this.addEvent = this.addEvent.bind(this);
         this.removeEvent = this.removeEvent.bind(this);
         this.changeMaze = this.changeMaze.bind(this);
+        this.initMaze = this.initMaze.bind(this);
 
         this.preLoadImg();
+        this.initMaze();
+
+        let self = this;
+
+        document.getElementById('start').addEventListener('click', function() {
+            this.parentNode.style.display = 'none';
+            self.startTime = new Date().getTime();
+        })
+    }
+
+    start() {
         this.initMaze();
     }
 
@@ -119,6 +128,11 @@ class Match {
             return source;
         })
 
+        this.preLoadAllImg(pr);
+
+    }
+
+    preLoadAllImg(pr) {
         // 图片全部加载完
         PreLoadImg.allLoadDone(pr)
                 .then(() => {
@@ -127,7 +141,7 @@ class Match {
                     PreLoadImg.loadImage(this.imgSource[this.imgSource.length - 1])
                             .then((img) => {
                                 this.images.push(img);
-                                this.changeMaze()
+                                this.changeMaze();
                             })
                     console.log(this.images.length);
                 });
@@ -139,14 +153,14 @@ class Match {
             for(let n = 0; n < this.c; ++n) {
                 this.pathArr[i][n] = new Mcard({
                     r: i,
-                    c: n,
-                    // isMatch: false
+                    c: n
                 });
             }
         }
     }
 
     changeMaze() {
+        console.log(this)
         if(this.pathArr.length < 0) {
             console.log('There is no pathArr');
             return;
@@ -191,7 +205,7 @@ class Match {
     }
 
     bindEvent() {
-        this.canvas.addEventListener('click', this.addEvent)
+        this.canvas.addEventListener('click', this.addEvent);
     }
 
     addEvent(e) {
@@ -213,7 +227,6 @@ class Match {
 
                 // 已选中0张或1张不同图片
                 if(len === 0 || this.match[0] != cur) {
-                    // cur.isMatch = true;
                     this.match.push(cur);
                     cur.rotate();
                     this.compare();
@@ -234,14 +247,15 @@ class Match {
 
     matchPic() {
         if(!this.isEqualPic(this.match)) {
-            // this.match[0].isMatch = false;
-            // this.match[1].isMatch = false;
-            
             this.match[0].rotate();
             this.match[1].rotate();
-            // this.render();
         }else {
+            let dur = new Date().getTime() - this.startTime;
             this.matched += 2;
+            this.score += 100000 * 1 / dur;
+            console.log(this.startTime)
+            console.log(dur)
+            this.score.value = this.score;
         }
 
         // 未结束

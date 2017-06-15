@@ -6,8 +6,11 @@
         <style>
             .container {
                 position: relative;
+                display: inline-block;
+                min-width: 800px;
             }
             .bg {
+                display: inline-block;
                 width: 500px;
                 height: 500px;
                 background-color: #480348;
@@ -18,13 +21,37 @@
                 left: 0;
                 border: 1px solid red;
             }
+            .modal-wrapper {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background-color: rgba(0, 0, 0, .2);
+            }
+            #start {
+                width: 100px;
+                margin: 230px auto;
+                color: #fff;
+                text-align: center;
+                background-color: #000;
+            }
+            .toolbar {
+                display: inline-block;
+                vertical-align: top
+            }
         </style>
     </head>
     <body>
         <div class='container'>
             <div class='bg'></div>
             <canvas id='canvas' width=500 height=500></canvas>
-            <div></div>
+            <div class='toolbar'>
+                <input id='score' value='0' type='text' readonly="true" />
+            </div>
+            <div class='modal-wrapper'>
+                <div id='start'>开始</div>
+            </div>
         </div>
         <script src='./dist/js/Util.js'></script>
         <script src='./dist/js/preLoadImg.js'></script>

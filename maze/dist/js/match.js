@@ -18,7 +18,6 @@ var Mcard = function (_Card) {
 
         _this.deg = 0;
         _this.rId = null;
-        _this.direction = 1; // 0 从左到右  1 从右到左
         _this.isBack = true;
 
         _this.rotate = _this.rotate.bind(_this);
@@ -35,7 +34,6 @@ var Mcard = function (_Card) {
                 this.isBack = !this.isBack;
             }
             this.deg += 10;
-            this.rotation += this.direction;
 
             this.render();
         }
@@ -46,7 +44,6 @@ var Mcard = function (_Card) {
             ctx.clearRect(this.cx, this.cy, this.cw, this.ch);
             ctx.save();
             ctx.beginPath();
-            ctx.rotate = this.rotation;
             this.rotateImg();
             ctx.closePath();
             ctx.restore();
@@ -85,7 +82,6 @@ var Match = function () {
         this.imgMC = 15; // 图片水平间距
 
         Object.assign(this, opt);
-        console.log(this.imgW);
 
         if (typeof this.id !== 'string') {
             console.error('There is no id.');
@@ -103,17 +99,32 @@ var Match = function () {
 
         this.match = [];
         this.matched = 0;
+        this.scoreIn = document.getElementById('score');
+        this.score = 0;
 
         this.bindEvent = this.bindEvent.bind(this);
         this.addEvent = this.addEvent.bind(this);
         this.removeEvent = this.removeEvent.bind(this);
         this.changeMaze = this.changeMaze.bind(this);
+        this.initMaze = this.initMaze.bind(this);
 
         this.preLoadImg();
         this.initMaze();
+
+        var self = this;
+
+        document.getElementById('start').addEventListener('click', function () {
+            this.parentNode.style.display = 'none';
+            self.startTime = new Date().getTime();
+        });
     }
 
     _createClass(Match, [{
+        key: 'start',
+        value: function start() {
+            this.initMaze();
+        }
+    }, {
         key: 'getCanvas',
         value: function getCanvas(id) {
             this.canvas = document.getElementById(id);
@@ -151,15 +162,22 @@ var Match = function () {
                 return source;
             });
 
+            this.preLoadAllImg(pr);
+        }
+    }, {
+        key: 'preLoadAllImg',
+        value: function preLoadAllImg(pr) {
+            var _this3 = this;
+
             // 图片全部加载完
             PreLoadImg.allLoadDone(pr).then(function () {
                 pr = null;
                 // 加载背面
-                PreLoadImg.loadImage(_this2.imgSource[_this2.imgSource.length - 1]).then(function (img) {
-                    _this2.images.push(img);
-                    _this2.changeMaze();
+                PreLoadImg.loadImage(_this3.imgSource[_this3.imgSource.length - 1]).then(function (img) {
+                    _this3.images.push(img);
+                    _this3.changeMaze();
                 });
-                console.log(_this2.images.length);
+                console.log(_this3.images.length);
             });
         }
     }, {
@@ -178,6 +196,7 @@ var Match = function () {
     }, {
         key: 'changeMaze',
         value: function changeMaze() {
+            console.log(this);
             if (this.pathArr.length < 0) {
                 console.log('There is no pathArr');
                 return;
@@ -247,7 +266,6 @@ var Match = function () {
 
                 // 已选中0张或1张不同图片
                 if (len === 0 || this.match[0] != cur) {
-                    // cur.isMatch = true;
                     this.match.push(cur);
                     cur.rotate();
                     this.compare();
@@ -271,14 +289,15 @@ var Match = function () {
         key: 'matchPic',
         value: function matchPic() {
             if (!this.isEqualPic(this.match)) {
-                // this.match[0].isMatch = false;
-                // this.match[1].isMatch = false;
-
                 this.match[0].rotate();
                 this.match[1].rotate();
-                // this.render();
             } else {
+                var dur = new Date().getTime() - this.startTime;
                 this.matched += 2;
+                this.score += 100000 * 1 / dur;
+                console.log(this.startTime);
+                console.log(dur);
+                this.score.value = this.score;
             }
 
             // 未结束
