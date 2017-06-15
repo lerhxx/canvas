@@ -33,6 +33,7 @@
                 width: 30px;
                 height: 30px;
                 margin: 0 10px;
+                border: 1px solid #000;
                 vertical-align: middle;
                 background-color: #000;
                 -webkit-border-radius: 50%;
@@ -42,8 +43,24 @@
             button {
                 margin: 10px 0;
             }
-            #cur {
-                border: 1px solid #000;
+            #win {
+                position: absolute;
+                width: 180px;
+                height: 5px;
+                background-color: red;
+                transform-origin: 0 50%;
+            }
+            .vertical {
+                transform: rotate(90deg);
+            }
+            .blackslash {
+                transform: rotate(45deg);
+            }
+            .slash {
+                transform: rotate(135deg);
+            }
+            .hide {
+                opacity: 0;
             }
         </style>
     </head>
@@ -51,6 +68,7 @@
         <div id='container'>
             <div id='panel'>
             </div>
+            <div id='win' class='hide'></div>
         </div>
         <script src='./dist/js/chess.js'></script>
         <script src='./dist/js/toolbar.js'></script>

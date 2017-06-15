@@ -119,5 +119,33 @@ class GoBang {
 
     drawLine(checkResult) {
         console.log(checkResult);
+        let win = document.getElementById('win'),
+            list = win.classList;
+        let sr = checkResult.sr,
+            sc = checkResult.sc,
+            er = checkResult.er,
+            ec = checkResult.ec,
+            top = 0,
+            left = 0;
+        if(sr < er && sc === ec) {
+            win.classList.add('vertical');
+            top -= 4;
+            left += 8;
+        }else if(sr < er && sc < ec) {
+            win.classList.add('blackslash');
+            win.style.width = '240px';
+        }else if(sr < er && sc > ec) {
+            win.classList.add('slash');
+            win.style.width = '240px';
+            left += 10;
+        }else if(sr === er && sc < ec){
+            top += 5;
+        }
+        top += (sr + 1) * 40;
+        left += (sc + 1) * 40;
+            console.log(win.classList);
+        win.style.top = `${top}px`;
+        win.style.left = `${left}px`;
+        list.remove('hide');
     }
 }
