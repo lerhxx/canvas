@@ -244,3 +244,5 @@ class FindPathGame {
     }
 
 }
+
+// new FindPathGame(20, 20);

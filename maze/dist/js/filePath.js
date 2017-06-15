@@ -293,3 +293,5 @@ var FindPathGame = function () {
 
     return FindPathGame;
 }();
+
+// new FindPathGame(20, 20);

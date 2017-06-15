@@ -3,54 +3,31 @@
     <head>
         <meta charset='utf-8' />
         <title>连连看</title>
-        <style>
-            .container {
-                position: relative;
-                display: inline-block;
-                min-width: 800px;
-            }
-            .bg {
-                display: inline-block;
-                width: 500px;
-                height: 500px;
-                background-color: #480348;
-            }
-            canvas {
-                position: absolute;
-                top: 0;
-                left: 0;
-                border: 1px solid red;
-            }
-            .modal-wrapper {
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                background-color: rgba(0, 0, 0, .2);
-            }
-            #start {
-                width: 100px;
-                margin: 230px auto;
-                color: #fff;
-                text-align: center;
-                background-color: #000;
-            }
-            .toolbar {
-                display: inline-block;
-                vertical-align: top
-            }
-        </style>
+        <link rel='stylesheet' href='./dist/css/match.css' />
     </head>
     <body>
         <div class='container'>
-            <div class='bg'></div>
-            <canvas id='canvas' width=500 height=500></canvas>
-            <div class='toolbar'>
-                <input id='score' value='0' type='text' readonly="true" />
+            <div class='bg'></div><div class='toolbar'>
+                <div class='score-wrapper'>
+                    <span id='score'>0</span>
+                </div>
             </div>
-            <div class='modal-wrapper'>
-                <div id='start'>开始</div>
+            <canvas id='canvas' width=500 height=500></canvas>
+            <div class='modal '>
+                <div id='start'></div>
+            </div>
+            <div class='modal hidden' id='rank-wrapper'>
+                <div id='rank'>
+                    <div>
+                        <span class='label'>分数</span><span class='num' id='rank-score'>0</span>
+                    </div>
+                    <div>
+                        <span class='label'>时长</span><span class='num' id='total-time'>0：0：0</span>
+                    </div>
+                    <span id='restart'></span>
+                    <span id='next'></span>
+                    <span id='more'></span>
+                </div>
             </div>
         </div>
         <script src='./dist/js/Util.js'></script>
