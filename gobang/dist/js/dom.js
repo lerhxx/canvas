@@ -184,24 +184,27 @@ var GoBang = function () {
                 er = checkResult.er,
                 ec = checkResult.ec,
                 top = 0,
-                left = 0;
+                left = 0,
+                width = Math.abs(sc - ec) * 40 + 20;
             if (sr < er && sc === ec) {
                 win.classList.add('vertical');
+                win.style.width = width + 'px';
                 top -= 4;
                 left += 8;
             } else if (sr < er && sc < ec) {
                 win.classList.add('blackslash');
-                win.style.width = '240px';
+                win.style.width = width * 1.35 + 'px';
             } else if (sr < er && sc > ec) {
                 win.classList.add('slash');
-                win.style.width = '240px';
+                win.style.width = width * 1.35 + 'px';
                 left += 10;
             } else if (sr === er && sc < ec) {
+                win.style.width = width + 'px';
                 top += 5;
             }
             top += (sr + 1) * 40;
             left += (sc + 1) * 40;
-            console.log(win.classList);
+            console.log(win.style.width);
             win.style.top = top + 'px';
             win.style.left = left + 'px';
             list.remove('hide');
