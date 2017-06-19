@@ -8,7 +8,9 @@ class Game {
         this.toolbar.changeCur(this.curChess === 1 ? 'white' : 'black');
 
         this.goBang = new GoBang({
-            owner: this
+            owner: this,
+            r: 6,
+            c: 6
         });
 
         if(!this.goBang) {
@@ -38,7 +40,13 @@ class Game {
             count = 0,
             r = chess.r,
             c = chess.c,
-            flag = chess.flag;
+            flag = chess.flag,
+            sum = (this.goBang.r - 1) * (this.goBang.c - 1);
+
+        if(this.steps.length >= sum) {
+            this.tied();
+            return;
+        }
 
         for(let i = 0, len = this.direction.length; i < len; ++i) {
             let checkResult = this[this.direction[i]](r, c, flag);
@@ -251,6 +259,12 @@ class Game {
         let color = checkResult.flag === 1 ? '白' : '黑';
         setTimeout(() => {
             alert(`${color}棋手胜`);
+        }, 500)
+    }
+
+    tied() {
+        setTimeout(() => {
+            alert('平局');
         }, 500)
     }
 }

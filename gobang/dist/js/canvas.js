@@ -75,8 +75,6 @@ var GoBang = function () {
 
         _classCallCheck(this, GoBang);
 
-        this.r = 10;
-        this.c = 11;
         this.d = 40; //间隔
         this.id = 'canvas';
         this.fillColor = '#964f0a';
@@ -84,6 +82,9 @@ var GoBang = function () {
         this.owner = null;
 
         Object.assign(this, obj);
+
+        this.r = this.r >= 5 ? this.r : 6;
+        this.c = this.c >= 5 ? this.c : 6;
 
         this.getContext();
         if (!this.ctx) {

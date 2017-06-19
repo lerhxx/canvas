@@ -16,7 +16,9 @@ var Game = function () {
         this.toolbar.changeCur(this.curChess === 1 ? 'white' : 'black');
 
         this.goBang = new GoBang({
-            owner: this
+            owner: this,
+            r: 6,
+            c: 6
         });
 
         if (!this.goBang) {
@@ -48,7 +50,13 @@ var Game = function () {
                 count = 0,
                 r = chess.r,
                 c = chess.c,
-                flag = chess.flag;
+                flag = chess.flag,
+                sum = (this.goBang.r - 1) * (this.goBang.c - 1);
+
+            if (this.steps.length >= sum) {
+                this.tied();
+                return;
+            }
 
             for (var i = 0, len = this.direction.length; i < len; ++i) {
                 var checkResult = this[this.direction[i]](r, c, flag);
@@ -271,6 +279,13 @@ var Game = function () {
             var color = checkResult.flag === 1 ? '白' : '黑';
             setTimeout(function () {
                 alert(color + '\u68CB\u624B\u80DC');
+            }, 500);
+        }
+    }, {
+        key: 'tied',
+        value: function tied() {
+            setTimeout(function () {
+                alert('平局');
             }, 500);
         }
     }]);
