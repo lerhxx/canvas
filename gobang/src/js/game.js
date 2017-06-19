@@ -20,6 +20,7 @@ class Game {
         this.steps = [];
         this.regrets = [];
         this.direction = ['checklr', 'checktb', 'checklt', 'checkrt'];
+        this.isEnd = false;
 
         this.regret = this.regret.bind(this);
         this.cancelRreget = this.cancelRreget.bind(this);
@@ -76,7 +77,7 @@ class Game {
                 break;
             }
         }
-        for(let i = c + 1; i < this.goBang.c; ++i) {
+        for(let i = c + 1; i <= this.goBang.c; ++i) {
             if(chessArr[r][i].flag === flag) {
                 ++count;
                 ec = i;
@@ -112,7 +113,7 @@ class Game {
                 break;
             }
         }
-        for(let i = r + 1; i < this.goBang.r; ++i) {
+        for(let i = r + 1; i <= this.goBang.r; ++i) {
             if(chessArr[i][c].flag === flag) {
                 ++count;
                 er = i;
@@ -151,7 +152,7 @@ class Game {
                 break;
             }
         }
-        for(let i = r + 1, n = c + 1; i < this.goBang.r && n < this.goBang.c; ++i, ++n) {
+        for(let i = r + 1, n = c + 1; i <= this.goBang.r && n <= this.goBang.c; ++i, ++n) {
             if(chessArr[i][n].flag === flag) {
                 ++count;
                 er = i;
@@ -182,7 +183,7 @@ class Game {
             ec = c,
             result = false;
 
-        for(let i = r - 1, n = c + 1; i >= 0 && n < this.goBang.c; --i, ++n) {
+        for(let i = r - 1, n = c + 1; i >= 0 && n <= this.goBang.c; --i, ++n) {
             if(chessArr[i][n].flag === flag) {
                 ++count;
                 sr = i;
@@ -191,7 +192,7 @@ class Game {
                 break;
             }
         }
-        for(let i = r + 1, n = c - 1; i < this.goBang.r && n >= 0; ++i, --n) {
+        for(let i = r + 1, n = c - 1; i <= this.goBang.r && n >= 0; ++i, --n) {
             if(chessArr[i][n].flag === flag) {
                 ++count;
                 er = i;
@@ -241,6 +242,7 @@ class Game {
 
     restart() {
         this.goBang.restart();
+        this.isEnd = false;
         this.regrets.length = 0;
         this.steps.length = 0;
     }
@@ -255,7 +257,7 @@ class Game {
     }
 
     end(checkResult) {
-        this.goBang.removeEvent();
+        this.isEnd = true;
         this.drawLine(checkResult);
         let color = checkResult.flag === 1 ? '白' : '黑';
         setTimeout(() => {
@@ -264,6 +266,7 @@ class Game {
     }
 
     tied() {
+        this.isEnd = true;
         setTimeout(() => {
             alert('平局');
         }, 500)

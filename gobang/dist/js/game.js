@@ -28,6 +28,7 @@ var Game = function () {
         this.steps = [];
         this.regrets = [];
         this.direction = ['checklr', 'checktb', 'checklt', 'checkrt'];
+        this.isEnd = false;
 
         this.regret = this.regret.bind(this);
         this.cancelRreget = this.cancelRreget.bind(this);
@@ -87,7 +88,7 @@ var Game = function () {
                     break;
                 }
             }
-            for (var _i = c + 1; _i < this.goBang.c; ++_i) {
+            for (var _i = c + 1; _i <= this.goBang.c; ++_i) {
                 if (chessArr[r][_i].flag === flag) {
                     ++count;
                     ec = _i;
@@ -124,7 +125,7 @@ var Game = function () {
                     break;
                 }
             }
-            for (var _i2 = r + 1; _i2 < this.goBang.r; ++_i2) {
+            for (var _i2 = r + 1; _i2 <= this.goBang.r; ++_i2) {
                 if (chessArr[_i2][c].flag === flag) {
                     ++count;
                     er = _i2;
@@ -164,7 +165,7 @@ var Game = function () {
                     break;
                 }
             }
-            for (var _i3 = r + 1, _n = c + 1; _i3 < this.goBang.r && _n < this.goBang.c; ++_i3, ++_n) {
+            for (var _i3 = r + 1, _n = c + 1; _i3 <= this.goBang.r && _n <= this.goBang.c; ++_i3, ++_n) {
                 if (chessArr[_i3][_n].flag === flag) {
                     ++count;
                     er = _i3;
@@ -196,7 +197,7 @@ var Game = function () {
                 ec = c,
                 result = false;
 
-            for (var i = r - 1, n = c + 1; i >= 0 && n < this.goBang.c; --i, ++n) {
+            for (var i = r - 1, n = c + 1; i >= 0 && n <= this.goBang.c; --i, ++n) {
                 if (chessArr[i][n].flag === flag) {
                     ++count;
                     sr = i;
@@ -205,7 +206,7 @@ var Game = function () {
                     break;
                 }
             }
-            for (var _i4 = r + 1, _n2 = c - 1; _i4 < this.goBang.r && _n2 >= 0; ++_i4, --_n2) {
+            for (var _i4 = r + 1, _n2 = c - 1; _i4 <= this.goBang.r && _n2 >= 0; ++_i4, --_n2) {
                 if (chessArr[_i4][_n2].flag === flag) {
                     ++count;
                     er = _i4;
@@ -258,6 +259,7 @@ var Game = function () {
         key: 'restart',
         value: function restart() {
             this.goBang.restart();
+            this.isEnd = false;
             this.regrets.length = 0;
             this.steps.length = 0;
         }
@@ -275,7 +277,7 @@ var Game = function () {
     }, {
         key: 'end',
         value: function end(checkResult) {
-            this.goBang.removeEvent();
+            this.isEnd = true;
             this.drawLine(checkResult);
             var color = checkResult.flag === 1 ? '白' : '黑';
             setTimeout(function () {
@@ -285,6 +287,7 @@ var Game = function () {
     }, {
         key: 'tied',
         value: function tied() {
+            this.isEnd = true;
             setTimeout(function () {
                 alert('平局');
             }, 500);

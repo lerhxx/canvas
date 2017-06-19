@@ -116,15 +116,10 @@ var GoBang = function () {
     }, {
         key: 'parentEvent',
         value: function parentEvent(e) {
-            if (e.target !== this.parent && e.target.tagName.toLowerCase() === 'div') {
+            if (e.target !== this.parent && e.target.tagName.toLowerCase() === 'div' && !this.owner.isEnd) {
                 var flag = this.owner ? this.owner.curChess : 1;
                 this.drawChess(flag, e.target);
             }
-        }
-    }, {
-        key: 'removeEvent',
-        value: function removeEvent() {
-            this.parent.removeEventListener('click', this.parentEvent);
         }
     }, {
         key: 'drawChess',
@@ -188,24 +183,24 @@ var GoBang = function () {
                 left = 0,
                 width = Math.abs(sc - ec) * 40 + 20;
             if (sr < er && sc === ec) {
+                width = Math.abs(sr - er) * 40 + 20;
                 win.classList.add('vertical');
                 win.style.width = width + 'px';
                 top -= 4;
-                left += 8;
+                left += 10;
             } else if (sr < er && sc < ec) {
                 win.classList.add('blackslash');
                 win.style.width = width * 1.35 + 'px';
+                top -= 5;
             } else if (sr < er && sc > ec) {
                 win.classList.add('slash');
                 win.style.width = width * 1.35 + 'px';
                 left += 10;
             } else if (sr === er && sc < ec) {
                 win.style.width = width + 'px';
-                top += 5;
             }
-            top += (sr + 1) * 40;
-            left += (sc + 1) * 40;
-            console.log(win.style.width);
+            top += sr * 40 + 15;
+            left += sc * 40 + 10;
             win.style.top = top + 'px';
             win.style.left = left + 'px';
             list.remove('hide');

@@ -125,13 +125,10 @@ var GoBang = function () {
     }, {
         key: 'canvasEvent',
         value: function canvasEvent(e) {
-            var flag = this.owner ? this.owner.curChess : 1;
-            this.drawChess(e.offsetX, e.offsetY, flag, 0);
-        }
-    }, {
-        key: 'removeEvent',
-        value: function removeEvent() {
-            this.canvas.removeEventListener('click', this.canvasEvent);
+            if (!this.owner.isEnd) {
+                var flag = this.owner ? this.owner.curChess : 1;
+                this.drawChess(e.offsetX, e.offsetY, flag, 0);
+            }
         }
     }, {
         key: 'initChessBoard',

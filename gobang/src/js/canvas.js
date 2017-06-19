@@ -91,14 +91,12 @@ class GoBang {
     }
 
     canvasEvent(e) {
-        let flag = this.owner ? this.owner.curChess : 1;
-        this.drawChess(e.offsetX, e.offsetY, flag, 0);
+        if(!this.owner.isEnd) {
+            let flag = this.owner ? this.owner.curChess : 1;
+            this.drawChess(e.offsetX, e.offsetY, flag, 0);
+        }
     }
-
-    removeEvent() {
-        this.canvas.removeEventListener('click', this.canvasEvent);
-    }
-
+    
     initChessBoard() {
         let i = 0,
             n = 0,
