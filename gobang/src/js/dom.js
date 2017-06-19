@@ -14,12 +14,13 @@ class DomChess extends Chess {
 
 class GoBang {
     constructor(obj={}) {
-        this.r = 10;
-        this.c = 11;
         this.id = 'panel';
         this.owner = null;
 
         Object.assign(this, obj);
+
+        this.r = this.r >= 4 ? this.r : 4;
+        this.c = this.c >= 4 ? this.c : 4;
 
         this.d = 40;     //间隔
         this.chessArr = [];
@@ -46,13 +47,13 @@ class GoBang {
         let str = '<table><tbody>',
             strdiv = '',
             rd = this.d / 2;
-        for(let i = 0; i < this.r + 1; ++i) {
-            str += '<tr>'
-            for(let n = 0; n < this.c + 1; ++n) {
-                str += '<td></td>';
+        for(let i = 0; i <= this.r; ++i) {
+            str += '<tr>';
+            for(let n = 0; n <= this.c; ++n) {
                 if(n < this.c && i < this.r) {
-                    str += `<div style='top: ${this.d + i * this.d - 15}px;left: ${this.d + n * this.d - 15}px;'></div>`;
+                    str += '<td></td>';
                 }
+                strdiv += `<div style='top: ${i * this.d + 5}px;left: ${n * this.d + 5}px;'></div>`;
             }
             str += '</tr>';
         }
@@ -62,12 +63,12 @@ class GoBang {
     }
 
     initChessArr() {
-        for(let i = 0; i < this.r; ++i) {
+        for(let i = 0; i <= this.r; ++i) {
             this.chessArr[i] = [];
-            for(let n = 0; n < this.c; ++n) {
+            for(let n = 0; n <= this.c; ++n) {
                 this.chessArr[i][n] = new DomChess({
-                    x: this.d * (n + 1), 
-                    y: this.d * (i + 1),
+                    x: this.d * n, 
+                    y: this.d * i,
                     flag: 0,
                     owner: this
                 }, i, n)
@@ -94,10 +95,10 @@ class GoBang {
     drawChess(flag, tar, tx, ty) {
         let y = ty || parseInt(tar.style.top),
             x = tx || parseInt(tar.style.left);
-        let c = ~~((x - this.d / 2) / this.d),
-            r = ~~((y - this.d / 2) / this.d);
+        let c = ~~(x / this.d),
+            r = ~~(y / this.d);
 
-        if(c < 0 || r < 0 || c >= this.c || r >= this.r || this.chessArr[r][c].flag !== 0) {
+        if(c < 0 || r < 0 || c > this.c || r > this.r || this.chessArr[r][c].flag !== 0) {
             return null;
         }
         this.chessArr[r][c].flag = flag,

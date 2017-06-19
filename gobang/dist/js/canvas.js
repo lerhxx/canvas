@@ -83,8 +83,8 @@ var GoBang = function () {
 
         Object.assign(this, obj);
 
-        this.r = this.r >= 5 ? this.r : 6;
-        this.c = this.c >= 5 ? this.c : 6;
+        this.r = this.r >= 4 ? this.r : 4;
+        this.c = this.c >= 4 ? this.c : 4;
 
         this.getContext();
         if (!this.ctx) {
@@ -106,8 +106,8 @@ var GoBang = function () {
             this.canvas = document.getElementById(this.id);
             this.ctx = this.canvas.getContext('2d');
 
-            this.canvas.width = this.c * this.d + 1;
-            this.canvas.height = this.r * this.d + 1;
+            this.canvas.width = (this.c + 1) * this.d;
+            this.canvas.height = (this.r + 1) * this.d;
         }
     }, {
         key: 'init',
@@ -138,29 +138,30 @@ var GoBang = function () {
         value: function initChessBoard() {
             var i = 0,
                 n = 0,
-                w = this.d * this.c + this.d,
-                h = this.d * this.r + this.d;
+                rad = this.d / 2,
+                w = this.d * this.c + this.d - rad,
+                h = this.d * this.r + this.d - rad;
 
             this.ctx.fillStyle = this.fillColor;
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
             this.ctx.strokeStyle = this.strokeColor;
-            for (; i <= this.r + 1 && n <= this.c + 1; ++i, ++n) {
-                this.drawDimen(i, 0, w);
-                this.drawLong(n, 0, h);
+            for (; i <= this.r && n <= this.c; ++i, ++n) {
+                this.drawDimen(i, rad, w);
+                this.drawLong(n, rad, h);
             }
-            while (i <= this.r + 1) {
-                this.drawDimen(i, 0, w);
+            while (i <= this.r) {
+                this.drawDimen(i, rad, w);
                 ++i;
             }
-            while (n <= this.c + 1) {
-                this.drawLong(n, 0, h);
+            while (n <= this.c) {
+                this.drawLong(n, rad, h);
                 ++n;
             }
         }
     }, {
         key: 'drawDimen',
         value: function drawDimen(i, s, e) {
-            var y = this.d * i + .5;
+            var y = this.d * i + .5 + this.d / 2;
             this.ctx.beginPath();
             this.ctx.moveTo(s, y);
             this.ctx.lineTo(e, y);
@@ -169,7 +170,7 @@ var GoBang = function () {
     }, {
         key: 'drawLong',
         value: function drawLong(n, s, e) {
-            var x = this.d * n + .5;
+            var x = this.d * n + .5 + this.d / 2;
             this.ctx.beginPath();
             this.ctx.moveTo(x, s);
             this.ctx.lineTo(x, e);
@@ -178,12 +179,13 @@ var GoBang = function () {
     }, {
         key: 'initChess',
         value: function initChess() {
-            for (var i = 0; i < this.r; ++i) {
+            var rad = this.d / 2;
+            for (var i = 0; i <= this.r; ++i) {
                 this.chessArr[i] = [];
-                for (var n = 0; n < this.c; ++n) {
+                for (var n = 0; n <= this.c; ++n) {
                     this.chessArr[i][n] = new CanvasChess({
-                        x: this.d * (n + 1),
-                        y: this.d * (i + 1),
+                        x: this.d * n + rad,
+                        y: this.d * i + rad,
                         radius: this.d / 2 - 5,
                         flag: 0,
                         owner: this
@@ -195,10 +197,11 @@ var GoBang = function () {
     }, {
         key: 'drawChess',
         value: function drawChess(x, y, flag, type) {
-            var c = ~~((x - this.d / 2) / this.d),
-                r = ~~((y - this.d / 2) / this.d);
+            var c = ~~(x / this.d),
+                r = ~~(y / this.d);
+            // c = c > 0
 
-            if (c < 0 || r < 0 || c >= this.c || r >= this.r || type === 0 && this.chessArr[r][c].flag !== 0) {
+            if (c < 0 || r < 0 || c > this.c || r > this.r || type === 0 && this.chessArr[r][c].flag !== 0) {
                 return null;
             }
 

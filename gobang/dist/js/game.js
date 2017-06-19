@@ -17,8 +17,8 @@ var Game = function () {
 
         this.goBang = new GoBang({
             owner: this,
-            r: 6,
-            c: 6
+            r: 5,
+            c: 5
         });
 
         if (!this.goBang) {
@@ -51,7 +51,9 @@ var Game = function () {
                 r = chess.r,
                 c = chess.c,
                 flag = chess.flag,
-                sum = (this.goBang.r - 1) * (this.goBang.c - 1);
+                sum = chessArr.length * chessArr[0].length;
+
+            this.steps.push(chess);
 
             if (this.steps.length >= sum) {
                 this.tied();
@@ -67,7 +69,6 @@ var Game = function () {
                 }
             }
             this.changeCurChess();
-            this.steps.push(chess);
         }
     }, {
         key: 'checklr',
