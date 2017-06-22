@@ -14,24 +14,28 @@
                 background-color: #964f0a;
                 overflow: hidden;
             }
-            table {
+            .table {
                 margin: 20px;
-                border-collapse: collapse;
                 background-color: #964f0a;
             }
-            td {
-                width: 30px;
-                height: 30px;
-                border: 1px solid #000;
+            .tr:first-child .td {
+                border-top: 1px solid #000;
+            }
+            .td {
+                display: inline-block;
+                border-right: 1px solid #000;
+                border-bottom: 1px solid #000;
                 -webkit-box-sizing: border-box;
                 box-sizing: border-box;
             }
-            #panel > div {
+            .td:first-child {
+                border-left: 1px solid #000;
+            }
+            .chess-box > div {
                 position: absolute;
-                width: 20px;
-                height: 20px;
                 -webkti-border-radius: 50%;
                 border-radius: 50%;
+                /*background-color: pink;*/
             }
             .toolbar {
                 margin-top: 10px;
