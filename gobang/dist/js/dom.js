@@ -50,7 +50,8 @@ var GoBang = function () {
         this.r = this.r >= 4 ? this.r : 4;
         this.c = this.c >= 4 ? this.c : 4;
 
-        this.d = 30; //间隔
+        this.d = this.d > 0 ? this.d : 30; // 棋盘间隔
+        this.ra = this.ra > 0 ? this.ra : 20; // 棋子半径
         this.chessArr = [];
         this.parent = document.getElementById(this.id);
         if (!parent) {
@@ -75,20 +76,24 @@ var GoBang = function () {
     }, {
         key: 'initChessBoard',
         value: function initChessBoard() {
-            var str = '<table><tbody>',
-                strdiv = '',
-                rd = this.d / 2;
-            for (var i = 0; i <= this.r; ++i) {
-                str += '<tr>';
+            var str = '<div class="table">',
+                strdiv = '<div class="chess-box">',
+                rd = this.ra / 2,
+                i = void 0;
+            for (i = 0; i < this.r; ++i) {
+                str += '<div class="tr" style="height: ' + this.d + 'px;">';
                 for (var n = 0; n <= this.c; ++n) {
                     if (n < this.c && i < this.r) {
-                        str += '<td></td>';
+                        str += '<div class="td" style="width:' + this.d + 'px;height:' + this.d + 'px;"></div>';
                     }
-                    strdiv += '<div style=\'top: ' + (i * this.d + 10) + 'px;left: ' + (n * this.d + 10) + 'px;\'></div>';
+                    strdiv += '<div class=\'chess\' style=\'top: ' + (i * this.d + 20 - rd) + 'px;left: ' + (n * this.d + 20 - rd) + 'px;width:' + this.ra + 'px;height:' + this.ra + 'px;\'></div>';
                 }
-                str += '</tr>';
+                str += '</div>';
             }
-            str += '</tbody></table>' + strdiv;
+            for (var _n = 0; _n <= this.c; ++_n) {
+                strdiv += '<div class=\'chess\' style=\'top: ' + (i * this.d + 20 - rd) + 'px;left: ' + (_n * this.d + 20 - rd) + 'px;width:' + this.ra + 'px;height:' + this.ra + 'px;\'></div>';
+            }
+            str += '</div>' + strdiv + '</div>';
 
             this.parent.innerHTML = str;
         }
@@ -116,7 +121,7 @@ var GoBang = function () {
     }, {
         key: 'parentEvent',
         value: function parentEvent(e) {
-            if (e.target !== this.parent && e.target.tagName.toLowerCase() === 'div' && !this.owner.isEnd) {
+            if (e.target !== this.parent && e.target.classList.contains('chess') && !this.owner.isEnd) {
                 var flag = this.owner ? this.owner.curChess : 1;
                 this.drawChess(flag, e.target);
             }
@@ -164,6 +169,7 @@ var GoBang = function () {
             });
             this.win.classList.add('hide');
             this.bindEvent();
+            this.win.className = 'hide';
         }
     }, {
         key: 'drawLine',
@@ -176,26 +182,24 @@ var GoBang = function () {
                 ec = checkResult.ec,
                 top = 0,
                 left = 0,
-                width = Math.abs(sc - ec) * 30 + 20;
+                width = Math.abs(sc - ec) * this.d;
             if (sr < er && sc === ec) {
-                width = Math.abs(sr - er) * 30 + 20;
+                width = Math.abs(sr - er) * this.d;
                 win.classList.add('vertical');
                 win.style.width = width + 'px';
-                top -= 4;
-                left += 10;
+                left += 5;
             } else if (sr < er && sc < ec) {
                 win.classList.add('blackslash');
-                win.style.width = width * 1.35 + 'px';
+                win.style.width = width * 1.45 + 'px';
                 top -= 5;
             } else if (sr < er && sc > ec) {
                 win.classList.add('slash');
-                win.style.width = width * 1.35 + 'px';
-                left += 10;
+                win.style.width = width * 1.45 + 'px';
+                left += 5;
             } else if (sr === er && sc < ec) {
                 win.style.width = width + 'px';
             }
-            top += sr * 30 + 15;
-            left += sc * 30 + 10;
+            top += sr * this.d + this.r;
             win.style.top = top + 'px';
             win.style.left = left + 'px';
             list.remove('hide');

@@ -22,7 +22,8 @@ class GoBang {
         this.r = this.r >= 4 ? this.r : 4;
         this.c = this.c >= 4 ? this.c : 4;
 
-        this.d = 30;     //间隔
+        this.d = this.d > 0 ? this.d : 30;     // 棋盘间隔
+        this.ra = this.ra > 0 ? this.ra : 20;  // 棋子半径
         this.chessArr = [];
         this.parent = document.getElementById(this.id);
         if(!parent) {
@@ -44,20 +45,24 @@ class GoBang {
     }
 
     initChessBoard() {
-        let str = '<table><tbody>',
-            strdiv = '',
-            rd = this.d / 2;
-        for(let i = 0; i <= this.r; ++i) {
-            str += '<tr>';
+        let str = '<div class="table">',
+            strdiv = '<div class="chess-box">',
+            rd = this.ra / 2,
+            i;
+        for(i = 0; i < this.r; ++i) {
+            str += `<div class="tr" style="height: ${this.d}px;">`;
             for(let n = 0; n <= this.c; ++n) {
                 if(n < this.c && i < this.r) {
-                    str += '<td></td>';
+                    str += `<div class="td" style="width:${this.d}px;height:${this.d}px;"></div>`;
                 }
-                strdiv += `<div style='top: ${i * this.d + 10}px;left: ${n * this.d + 10}px;'></div>`;
+                strdiv += `<div class='chess' style='top: ${i * this.d + 20 - rd}px;left: ${n * this.d + 20 - rd}px;width:${this.ra}px;height:${this.ra}px;'></div>`;
             }
-            str += '</tr>';
+            str += '</div>';
         }
-        str += '</tbody></table>' + strdiv;
+        for(let n = 0; n <= this.c; ++n) {
+            strdiv += `<div class='chess' style='top: ${i * this.d + 20 - rd}px;left: ${n * this.d + 20 - rd}px;width:${this.ra}px;height:${this.ra}px;'></div>`;
+        }
+        str += '</div>' + strdiv + '</div>';
 
         this.parent.innerHTML = str;
     }
@@ -82,7 +87,7 @@ class GoBang {
     }
 
     parentEvent(e) {
-        if(e.target !== this.parent && e.target.tagName.toLowerCase() === 'div' && !this.owner.isEnd) {
+        if(e.target !== this.parent && e.target.classList.contains('chess') && !this.owner.isEnd) {
             let flag = this.owner ? this.owner.curChess : 1;
             this.drawChess(flag, e.target);
         }
@@ -127,6 +132,7 @@ class GoBang {
         })
         this.win.classList.add('hide');
         this.bindEvent();
+        this.win.className = 'hide';
     }
 
     drawLine(checkResult) {
@@ -138,26 +144,24 @@ class GoBang {
             ec = checkResult.ec,
             top = 0,
             left = 0,
-            width = Math.abs(sc - ec) * 30 + 20;
+            width = Math.abs(sc - ec) * this.d;
         if(sr < er && sc === ec) {
-            width = Math.abs(sr - er) * 30 + 20;
+            width = Math.abs(sr - er) * this.d;
             win.classList.add('vertical');
             win.style.width = `${width}px`;
-            top -= 4;
-            left += 10;
+            left += 5;
         }else if(sr < er && sc < ec) {
             win.classList.add('blackslash');
-            win.style.width = `${width * 1.35}px`;
+            win.style.width = `${width * 1.45}px`;
             top -= 5;
         }else if(sr < er && sc > ec) {
             win.classList.add('slash');
-            win.style.width = `${width * 1.35}px`;
-            left += 10;
+            win.style.width = `${width * 1.45}px`;
+            left += 5;
         }else if(sr === er && sc < ec){
             win.style.width = `${width}px`;
         }
-        top += sr * 30 + 15;
-        left += sc * 30 + 10;
+        top += sr * this.d + this.r;
         win.style.top = `${top}px`;
         win.style.left = `${left}px`;
         list.remove('hide');
