@@ -231,6 +231,10 @@ var Game = function () {
     }, {
         key: 'regret',
         value: function regret() {
+            if (this.isEnd) {
+                alert('游戏已结束');
+                return;
+            }
             if (this.steps.length === 0) {
                 alert('棋盘上没有可以反悔的棋子了');
                 return;
@@ -247,6 +251,10 @@ var Game = function () {
     }, {
         key: 'cancelRreget',
         value: function cancelRreget() {
+            if (this.isEnd) {
+                alert('游戏已结束');
+                return;
+            }
             if (this.regrets.length === 0) {
                 alert('没有反悔的棋子哦');
                 return;

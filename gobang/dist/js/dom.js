@@ -176,9 +176,9 @@ var GoBang = function () {
                 ec = checkResult.ec,
                 top = 0,
                 left = 0,
-                width = Math.abs(sc - ec) * 40 + 20;
+                width = Math.abs(sc - ec) * 30 + 20;
             if (sr < er && sc === ec) {
-                width = Math.abs(sr - er) * 40 + 20;
+                width = Math.abs(sr - er) * 30 + 20;
                 win.classList.add('vertical');
                 win.style.width = width + 'px';
                 top -= 4;
@@ -194,8 +194,8 @@ var GoBang = function () {
             } else if (sr === er && sc < ec) {
                 win.style.width = width + 'px';
             }
-            top += sr * 40 + 15;
-            left += sc * 40 + 10;
+            top += sr * 30 + 15;
+            left += sc * 30 + 10;
             win.style.top = top + 'px';
             win.style.left = left + 'px';
             list.remove('hide');
