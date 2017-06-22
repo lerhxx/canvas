@@ -170,12 +170,13 @@ class GoBang {
         }
     }
 
-    clearChess(x, y) {
-        this.drawChess(x, y, 0, 1);
+    clearChess(chess) {
+        this.drawChess(chess.x, chess.y, 0, 1);
     }
 
-    cancelChess(x, y, flag) {
-        this.drawChess(x, y, flag, 2);
+    cancelChess(newChess, flag) {
+        let chess = newChess.chess;
+        this.drawChess(chess.x, chess.y, flag, 2);
     }
 
     restart() {

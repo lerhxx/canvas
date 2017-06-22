@@ -212,13 +212,14 @@ var GoBang = function () {
         }
     }, {
         key: 'clearChess',
-        value: function clearChess(x, y) {
-            this.drawChess(x, y, 0, 1);
+        value: function clearChess(chess) {
+            this.drawChess(chess.x, chess.y, 0, 1);
         }
     }, {
         key: 'cancelChess',
-        value: function cancelChess(x, y, flag) {
-            this.drawChess(x, y, flag, 2);
+        value: function cancelChess(newChess, flag) {
+            var chess = newChess.chess;
+            this.drawChess(chess.x, chess.y, flag, 2);
         }
     }, {
         key: 'restart',

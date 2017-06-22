@@ -231,7 +231,7 @@ class Game {
                 oriFlag: chess.flag
             });
 
-            this.goBang.clearChess(chess.x, chess.y);
+            this.goBang.clearChess(chess);
             // this.changeCurChess();
             ++i;
         }
@@ -244,10 +244,9 @@ class Game {
         }
         let i = 0;
         while(i < 2) {
-            let chess = this.regrets.pop();
-            this.steps.push(chess.chess);
-            this.goBang.cancelChess(chess.chess.x, chess.chess.y, chess.oriFlag);
-            // this.changeCurChess();
+            let newChess = this.regrets.pop();
+            this.steps.push(newChess.chess);
+            this.goBang.cancelChess(newChess, newChess.oriFlag);
             ++i;
         }
     }

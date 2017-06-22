@@ -241,7 +241,7 @@ var Game = function () {
                 oriFlag: chess.flag
             });
 
-            this.goBang.clearChess(chess.x, chess.y);
+            this.goBang.clearChess(chess);
             this.changeCurChess();
         }
     }, {
@@ -251,9 +251,9 @@ var Game = function () {
                 alert('没有反悔的棋子哦');
                 return;
             }
-            var chess = this.regrets.pop();
-            this.steps.push(chess.chess);
-            this.goBang.cancelChess(chess.chess.x, chess.chess.y, chess.oriFlag);
+            var newChess = this.regrets.pop();
+            this.steps.push(newChess.chess);
+            this.goBang.cancelChess(newChess, newChess.oriFlag);
             this.changeCurChess();
         }
     }, {

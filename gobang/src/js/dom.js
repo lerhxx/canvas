@@ -22,7 +22,7 @@ class GoBang {
         this.r = this.r >= 4 ? this.r : 4;
         this.c = this.c >= 4 ? this.c : 4;
 
-        this.d = 40;     //间隔
+        this.d = 30;     //间隔
         this.chessArr = [];
         this.parent = document.getElementById(this.id);
         if(!parent) {
@@ -53,7 +53,7 @@ class GoBang {
                 if(n < this.c && i < this.r) {
                     str += '<td></td>';
                 }
-                strdiv += `<div style='top: ${i * this.d + 5}px;left: ${n * this.d + 5}px;'></div>`;
+                strdiv += `<div style='top: ${i * this.d + 10}px;left: ${n * this.d + 10}px;'></div>`;
             }
             str += '</tr>';
         }
@@ -104,20 +104,15 @@ class GoBang {
         this.owner && this.owner.step && this.owner.step(this.chessArr[r][c]);
     }
 
-    clearChess(x, y) {
-        let c = ~~((x - this.d / 2) / this.d),
-            r = ~~((y - this.d / 2) / this.d);
-
-        this.chessArr[r][c].ele.style.backgroundColor = 'transparent';
-        this.chessArr[r][c].flag = 0;
+    clearChess(chess) {
+        this.chessArr[chess.r][chess.c].ele.style.backgroundColor = 'transparent';
+        this.chessArr[chess.r][chess.c].flag = 0;
     }
 
-    cancelChess(x, y, flag) {
-         let c = ~~((x - this.d / 2) / this.d),
-            r = ~~((y - this.d / 2) / this.d);
-
-        this.chessArr[r][c].ele.style.backgroundColor = flag === 1 ? 'white' : 'black';
-        this.chessArr[r][c].flag = flag;
+    cancelChess(newChess, flag) {
+        let chess = newChess.chess;
+        this.chessArr[chess.r][chess.c].ele.style.backgroundColor = flag === 1 ? 'white' : 'black';
+        this.chessArr[chess.r][chess.c].flag = flag;
     }
 
     restart() {
