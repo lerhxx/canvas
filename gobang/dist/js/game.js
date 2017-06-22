@@ -18,12 +18,8 @@ var Game = function () {
         this.goBang = new GoBang({
             owner: this,
             r: 15,
-<<<<<<< HEAD
-            c: 15
-=======
             c: 15,
             d: 30
->>>>>>> test
         });
 
         if (!this.goBang) {

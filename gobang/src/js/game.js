@@ -11,7 +11,7 @@ class Game {
             owner: this,
             r: 15,
             c: 15,
-            d: 20
+            d: 30
         });
 
         if(!this.goBang) {
