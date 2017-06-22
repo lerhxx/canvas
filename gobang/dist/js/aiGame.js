@@ -37,6 +37,7 @@ var Game = function () {
 
         this.regret = this.regret.bind(this);
         this.cancelRreget = this.cancelRreget.bind(this);
+        this.aiPlay = this.aiPlay.bind(this);
     }
 
     _createClass(Game, [{
@@ -283,7 +284,8 @@ var Game = function () {
             this.toolbar.changeCur(this.curChess === 1 ? 'white' : 'black');
             this.isAI = !this.isAI;
             if (this.isAI) {
-                this.aiPlay();
+                setTimeout(this.aiPlay, 500);
+                // this.aiPlay();
             }
         }
     }, {
