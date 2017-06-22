@@ -4,13 +4,14 @@ class Game {
             parent: document.getElementById('container'), 
             owner: this
         });
-        this.curChess = 1;
+        this.curChess = 2;
         this.toolbar.changeCur(this.curChess === 1 ? 'white' : 'black');
 
         this.goBang = new GoBang({
             owner: this,
             r: 15,
-            c: 15
+            c: 15,
+            d: 30
         });
 
         if(!this.goBang) {
@@ -272,4 +273,3 @@ class Game {
         }, 500)
     }
 }
-

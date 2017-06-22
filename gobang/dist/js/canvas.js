@@ -22,6 +22,7 @@ var CanvasChess = function (_Chess) {
 
         _this.r = r;
         _this.c = c;
+
         return _this;
     }
 
@@ -119,13 +120,12 @@ var GoBang = function () {
     }, {
         key: 'bindEvent',
         value: function bindEvent() {
-            console.log(this.canvas);
             this.canvas.addEventListener('click', this.canvasEvent);
         }
     }, {
         key: 'canvasEvent',
         value: function canvasEvent(e) {
-            if (!this.owner.isEnd) {
+            if (!this.owner.isAI && !this.owner.isEnd) {
                 var flag = this.owner ? this.owner.curChess : 1;
                 this.drawChess(e.offsetX, e.offsetY, flag, 0);
             }
@@ -189,14 +189,15 @@ var GoBang = function () {
                     }, i, n);
                 }
             }
-            console.log(this.chessArr);
         }
+
+        // type 0 新下的棋，1 悔棋, 2 撤销悔棋
+
     }, {
         key: 'drawChess',
         value: function drawChess(x, y, flag, type) {
             var c = ~~(x / this.d),
                 r = ~~(y / this.d);
-            // c = c > 0
 
             if (c < 0 || r < 0 || c > this.c || r > this.r || type === 0 && this.chessArr[r][c].flag !== 0) {
                 return null;

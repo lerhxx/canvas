@@ -4,6 +4,7 @@ class CanvasChess extends Chess {
 
         this.r = r;
         this.c = c;
+
     }
     
     draw() {
@@ -86,12 +87,11 @@ class GoBang {
     }
 
     bindEvent() {
-        console.log(this.canvas)
         this.canvas.addEventListener('click', this.canvasEvent);
     }
 
     canvasEvent(e) {
-        if(!this.owner.isEnd) {
+        if(!this.owner.isAI && !this.owner.isEnd) {
             let flag = this.owner ? this.owner.curChess : 1;
             this.drawChess(e.offsetX, e.offsetY, flag, 0);
         }
@@ -151,13 +151,12 @@ class GoBang {
                 }, i, n)
             }
         }
-        console.log(this.chessArr)
     }
 
+    // type 0 新下的棋，1 悔棋, 2 撤销悔棋
     drawChess(x, y, flag, type) {
         let c = ~~(x / this.d),
             r = ~~(y / this.d);
-        // c = c > 0
 
         if(c < 0 || r < 0 || c > this.c || r > this.r || type === 0 && this.chessArr[r][c].flag !== 0) {
             return null;
