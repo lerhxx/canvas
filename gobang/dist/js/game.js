@@ -13,12 +13,15 @@ var Game = function () {
             owner: this
         });
         this.curChess = 1;
+        this.playerChess = 1;
+        this.aiChess = 2;
         this.toolbar.changeCur(this.curChess === 1 ? 'white' : 'black');
 
         this.goBang = new GoBang({
             owner: this,
             r: 15,
-            c: 15
+            c: 15,
+            d: 30
         });
 
         if (!this.goBang) {
@@ -290,16 +293,21 @@ var Game = function () {
             for (var i = 0, len1 = chessArr.length; i < len1; ++i) {
                 for (var n = 0, len2 = chessArr[0].length; n < len2; ++n) {
                     if (chessArr[i][n].flag === 0) {
-                        var weight = 0;
+                        var aiWeight = 0,
+                            playWeight = 0,
+                            weight = 0;
                         for (var j = 0, len = this.weightDirection.length; j < len; ++j) {
-                            var result = this[this.weightDirection[j]](i, n, this.curChess);
-                            weight += this.calcWeight(result);
+                            var aiResult = this[this.weightDirection[j]](i, n, this.aiChess);
+                            var playResult = this[this.weightDirection[j]](i, n, this.playerChess);
+                            aiWeight += this.calcWeight(aiResult);
+                            playWeight += this.calcWeight(playResult);
                         }
+                        console.log('i ' + i + ' n ' + n + ' ai ' + aiWeight + ' play ' + playWeight);
+                        weight = aiWeight > playWeight ? aiWeight : playWeight;
                         if (maxWeight < weight) {
                             maxWeight = weight;
                             chess = chessArr[i][n];
                         }
-                        console.log('i ' + i + ' n ' + n + ' w ' + weight);
                     }
                 }
             }
@@ -452,6 +460,7 @@ var Game = function () {
                 count = obj.count,
                 side1 = obj.side1,
                 side2 = obj.side2;
+            // console.log(`side1 ${side1} side2 ${side2} count ${count}`)
             switch (count) {
                 case 1:
                     if (side1 && side2) {
