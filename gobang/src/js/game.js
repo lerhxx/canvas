@@ -9,8 +9,8 @@ class Game {
 
         this.goBang = new GoBang({
             owner: this,
-            r: 5,
-            c: 5
+            r: 15,
+            c: 15
         });
 
         if(!this.goBang) {
@@ -26,7 +26,6 @@ class Game {
 
         this.regret = this.regret.bind(this);
         this.cancelRreget = this.cancelRreget.bind(this);
-
     }
 
     step(chess) {
@@ -260,6 +259,7 @@ class Game {
 
     aiPlay() {
         let chess = this.maxWeightChess();
+        this.goBang.drawChess(chess.x, chess.y, this.curChess, 0);
     }
 
     maxWeightChess() {
@@ -278,14 +278,14 @@ class Game {
                         maxWeight = weight;
                         chess = chessArr[i][n];
                     }
+                    console.log(`i ${i} n ${n} w ${weight}`)
                 }
             }
         }
-        this.goBang.drawChess(chess.x, chess.y, this.curChess, 0);
+        return chess;
     }
 
     checkWeightlr(r, c, flag) {
-        console.log(flag)
         let chessArr = this.goBang.chessArr,
             count = 1,
             side1 = false,
@@ -454,7 +454,7 @@ class Game {
                 }
                 break;
             case 5:
-                weight = this.isAI ? 10000000 : 10000; 
+                weight = this.isAI ? 1000000 : 10000; 
             default:
                 weight = this.isAI ? 500000 : 250000; 
         }

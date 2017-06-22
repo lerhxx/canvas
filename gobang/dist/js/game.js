@@ -17,8 +17,8 @@ var Game = function () {
 
         this.goBang = new GoBang({
             owner: this,
-            r: 5,
-            c: 5
+            r: 15,
+            c: 15
         });
 
         if (!this.goBang) {
@@ -279,6 +279,7 @@ var Game = function () {
         key: 'aiPlay',
         value: function aiPlay() {
             var chess = this.maxWeightChess();
+            this.goBang.drawChess(chess.x, chess.y, this.curChess, 0);
         }
     }, {
         key: 'maxWeightChess',
@@ -298,15 +299,15 @@ var Game = function () {
                             maxWeight = weight;
                             chess = chessArr[i][n];
                         }
+                        console.log('i ' + i + ' n ' + n + ' w ' + weight);
                     }
                 }
             }
-            this.goBang.drawChess(chess.x, chess.y, this.curChess, 0);
+            return chess;
         }
     }, {
         key: 'checkWeightlr',
         value: function checkWeightlr(r, c, flag) {
-            console.log(flag);
             var chessArr = this.goBang.chessArr,
                 count = 1,
                 side1 = false,
@@ -479,7 +480,7 @@ var Game = function () {
                     }
                     break;
                 case 5:
-                    weight = this.isAI ? 10000000 : 10000;
+                    weight = this.isAI ? 1000000 : 10000;
                 default:
                     weight = this.isAI ? 500000 : 250000;
             }
