@@ -257,6 +257,7 @@ class Game {
         this.isEnd = false;
         this.regrets.length = 0;
         this.steps.length = 0;
+        this.isAI = false;
     }
 
     changeCurChess() {

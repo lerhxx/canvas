@@ -275,6 +275,7 @@ var Game = function () {
             this.isEnd = false;
             this.regrets.length = 0;
             this.steps.length = 0;
+            this.isAI = false;
         }
     }, {
         key: 'changeCurChess',
