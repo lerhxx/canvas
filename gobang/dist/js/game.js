@@ -17,8 +17,8 @@ var Game = function () {
 
         this.goBang = new GoBang({
             owner: this,
-            r: 5,
-            c: 5
+            r: 15,
+            c: 15
         });
 
         if (!this.goBang) {
