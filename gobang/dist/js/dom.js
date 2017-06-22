@@ -187,19 +187,17 @@ var GoBang = function () {
                 width = Math.abs(sr - er) * this.d;
                 win.classList.add('vertical');
                 win.style.width = width + 'px';
-                left += 5;
             } else if (sr < er && sc < ec) {
                 win.classList.add('blackslash');
                 win.style.width = width * 1.45 + 'px';
-                top -= 5;
             } else if (sr < er && sc > ec) {
                 win.classList.add('slash');
                 win.style.width = width * 1.45 + 'px';
-                left += 5;
             } else if (sr === er && sc < ec) {
                 win.style.width = width + 'px';
             }
-            top += sr * this.d + this.r;
+            top += sr * this.d + this.ra;
+            left += sc * this.d + this.ra;
             win.style.top = top + 'px';
             win.style.left = left + 'px';
             list.remove('hide');
