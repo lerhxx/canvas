@@ -305,12 +305,13 @@ var Game = function () {
         }
     }, {
         key: 'changeCurChess',
-        value: function changeCurChess() {
+        value: async function changeCurChess() {
             this.curChess = this.curChess === 1 ? 2 : 1;
             this.toolbar.changeCur(this.curChess === 1 ? 'white' : 'black');
             this.isAI = this.isAIMode ? !this.isAI : false;
             if (this.isAIMode && this.isAI) {
-                setTimeout(this.aiPlay, 500);
+                await this.sleep(500);
+                this.aiPlay();
             }
         }
     }, {
@@ -334,8 +335,8 @@ var Game = function () {
                         for (var j = 0, len = this.weightDirection.length; j < len; ++j) {
                             var aiResult = this[this.weightDirection[j]](i, n, this.aiChess);
                             var playResult = this[this.weightDirection[j]](i, n, this.playerChess);
-                            aiWeight += this.calcWeight(aiResult);
-                            playWeight += this.calcWeight(playResult);
+                            aiWeight += this.calcWeight(aiResult, true);
+                            playWeight += this.calcWeight(playResult, false);
                         }
                         weight = aiWeight > playWeight ? aiWeight : playWeight;
                         if (maxWeight < weight) {
@@ -489,42 +490,44 @@ var Game = function () {
         }
     }, {
         key: 'calcWeight',
-        value: function calcWeight(obj) {
+        value: function calcWeight(obj, isAI) {
             var weight = 0,
                 count = obj.count,
                 side1 = obj.side1,
                 side2 = obj.side2;
+            // console.log(this.isAI)
             switch (count) {
                 case 1:
                     if (side1 && side2) {
-                        weight = this.isAI ? 15 : 10;
+                        // weight = this.isAI ? 15 : 10; 
+                        weight = isAI ? 15 : 10;
                     }
                     break;
                 case 2:
                     if (side1 && side2) {
-                        weight = this.isAI ? 100 : 50;
+                        weight = isAI ? 100 : 50;
                     } else if (side1 || side2) {
                         weight = this.isAI ? 10 : 5;
                     }
                     break;
                 case 3:
                     if (side1 && side2) {
-                        weight = this.isAI ? 500 : 200;
+                        weight = isAI ? 500 : 200;
                     } else if (side1 || side2) {
-                        weight = this.isAI ? 30 : 20;
+                        weight = isAI ? 30 : 20;
                     }
                     break;
                 case 4:
                     if (side1 && side2) {
-                        weight = this.isAI ? 5000 : 2000;
+                        weight = isAI ? 5000 : 2000;
                     } else if (side1 || side2) {
-                        weight = this.isAI ? 400 : 100;
+                        weight = isAI ? 400 : 100;
                     }
                     break;
                 case 5:
-                    weight = this.isAI ? 1000000 : 10000;
+                    weight = isAI ? 1000000 : 10000;
                 default:
-                    weight = this.isAI ? 500000 : 250000;
+                    weight = isAI ? 500000 : 250000;
             }
             return weight;
         }
@@ -534,22 +537,29 @@ var Game = function () {
             this.goBang.drawLine(res);
         }
     }, {
+        key: 'sleep',
+        value: function sleep(time) {
+            return new Promise(function (resolve) {
+                setTimeout(function () {
+                    return resolve();
+                }, time);
+            });
+        }
+    }, {
         key: 'end',
-        value: function end(checkResult) {
+        value: async function end(checkResult) {
             this.isEnd = true;
             this.drawLine(checkResult);
             var color = checkResult.flag === 1 ? '白' : '黑';
-            setTimeout(function () {
-                alert(color + '\u68CB\u624B\u80DC');
-            }, 500);
+            await this.sleep(500);
+            alert(color + '\u68CB\u624B\u80DC');
         }
     }, {
         key: 'tied',
-        value: function tied() {
+        value: async function tied() {
             this.isEnd = true;
-            setTimeout(function () {
-                alert('平局');
-            }, 500);
+            await this.sleep(500);
+            alert('平局');
         }
     }]);
 

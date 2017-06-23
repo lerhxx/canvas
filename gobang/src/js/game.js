@@ -283,12 +283,13 @@ class Game {
         this.toolbar.changeCur('black');
     }
 
-    changeCurChess() {
+    async changeCurChess() {
         this.curChess = this.curChess === 1 ? 2 : 1;
         this.toolbar.changeCur(this.curChess === 1 ? 'white' : 'black');
         this.isAI = this.isAIMode ? !this.isAI : false;
         if(this.isAIMode && this.isAI) {
-            setTimeout(this.aiPlay, 500)
+            await this.sleep(500);
+            this.aiPlay();
         }
     }
 
@@ -310,8 +311,8 @@ class Game {
                     for(let j = 0, len = this.weightDirection.length; j < len; ++j) {
                         let aiResult = this[this.weightDirection[j]](i, n, this.aiChess);
                         let playResult = this[this.weightDirection[j]](i, n, this.playerChess);
-                        aiWeight += this.calcWeight(aiResult);
-                        playWeight += this.calcWeight(playResult);
+                        aiWeight += this.calcWeight(aiResult, true);
+                        playWeight += this.calcWeight(playResult, false);
                     }
                     weight = aiWeight > playWeight ? aiWeight : playWeight;
                     if(maxWeight < weight) {
@@ -460,42 +461,44 @@ class Game {
         };
     }
 
-    calcWeight(obj) {
+    calcWeight(obj, isAI) {
         let weight = 0,
             count = obj.count,
             side1 = obj.side1,
             side2 = obj.side2;
+            // console.log(this.isAI)
         switch(count) {
             case 1:
                 if(side1 && side2) {
-                    weight = this.isAI ? 15 : 10; 
+                    // weight = this.isAI ? 15 : 10; 
+                    weight = isAI ? 15 : 10; 
                 }
                 break;
             case 2:
                 if(side1 && side2) {
-                    weight = this.isAI ? 100 : 50; 
+                    weight =isAI ? 100 : 50; 
                 }else if(side1 || side2) {
                     weight = this.isAI ? 10 : 5; 
                 }
                 break;
             case 3:
                 if(side1 && side2) {
-                    weight = this.isAI ? 500 : 200; 
+                    weight =isAI ? 500 : 200; 
                 }else if(side1 || side2) {
-                    weight = this.isAI ? 30 : 20; 
+                    weight = isAI ? 30 : 20; 
                 }
                 break;
             case 4:
                 if(side1 && side2) {
-                    weight = this.isAI ? 5000 : 2000; 
+                    weight = isAI ? 5000 : 2000; 
                 }else if(side1 || side2) {
-                    weight = this.isAI ? 400 : 100; 
+                    weight = isAI ? 400 : 100; 
                 }
                 break;
             case 5:
-                weight = this.isAI ? 1000000 : 10000; 
+                weight = isAI ? 1000000 : 10000; 
             default:
-                weight = this.isAI ? 500000 : 250000; 
+                weight = isAI ? 500000 : 250000; 
         }
         return weight;
     }
@@ -504,20 +507,24 @@ class Game {
         this.goBang.drawLine(res)
     }
 
-    end(checkResult) {
+    sleep(time) {
+        return new Promise(resolve => {
+            setTimeout(() => resolve(), time);
+        })
+    }
+
+    async end(checkResult) {
         this.isEnd = true;
         this.drawLine(checkResult);
         let color = checkResult.flag === 1 ? '白' : '黑';
-        setTimeout(() => {
-            alert(`${color}棋手胜`);
-        }, 500)
+        await this.sleep(500);
+        alert(`${color}棋手胜`);
     }
 
-    tied() {
+    async tied() {
         this.isEnd = true;
-        setTimeout(() => {
-            alert('平局');
-        }, 500)
+        await this.sleep(500);
+        alert('平局');
     }
 }
 
