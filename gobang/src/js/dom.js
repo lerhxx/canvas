@@ -157,6 +157,7 @@ class GoBang {
             win.style.width = `${width * 1.45}px`;
         }else if(sr === er && sc < ec){
             win.style.width = `${width}px`;
+            top -= 2.5;
         }
         top += sr * this.d + this.ra;
         left += sc * this.d + this.ra;

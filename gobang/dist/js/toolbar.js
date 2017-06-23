@@ -19,6 +19,7 @@ var ToolBar = function () {
         this.regretEvent = this.regretEvent.bind(this);
         this.cancelRreget = this.cancelRreget.bind(this);
         this.bindEvent = this.bindEvent.bind(this);
+        this.changeMode = this.changeMode.bind(this);
     }
 
     _createClass(ToolBar, [{
@@ -28,13 +29,20 @@ var ToolBar = function () {
                 console.error('There is no parent of toolbar');
                 return;
             }
-            var toolbar = '<div class=\'toolbar\'>\n                <div>\n                    \u5F53\u524D\u68CB\u5B50<span id=\'cur\'></span>\n                </div>\n                <button id=\'reget\' type=\'button\'>\u6094\u68CB</button>\n                <button id=\'cancel-reget\' type=\'button\'>\u64A4\u9500\u6094\u68CB</button>\n                <button id=\'restart\' type=\'button\'>\u91CD\u65B0\u5F00\u59CB</button>\n            </div>';
+            var toolbar = '';
+            if (this.aiTool) {
+                toolbar = '<div class=\'toolbar\'>\n                    <div>\n                        \u5F53\u524D\u68CB\u5B50<span id=\'cur\'></span>\n                    </div>\n                    <button id=\'reget\' type=\'button\'>\u6094\u68CB</button>\n                    <button id=\'cancel-reget\' type=\'button\'>\u64A4\u9500\u6094\u68CB</button>\n                    <button id=\'restart\' type=\'button\'>\u91CD\u65B0\u5F00\u59CB</button>\n                    <button id=\'aiMode\' type=\'button\'>\u4EBA\u673A\u6A21\u5F0F</button>\n                    <button id=\'selfMode\' type=\'button\'>\u5355\u72EC\u6A21\u5F0F</button>\n                </div>';
+            } else {
+                toolbar = '<div class=\'toolbar\'>\n                    <div>\n                        \u5F53\u524D\u68CB\u5B50<span id=\'cur\'></span>\n                    </div>\n                    <button id=\'reget\' type=\'button\'>\u6094\u68CB</button>\n                    <button id=\'cancel-reget\' type=\'button\'>\u64A4\u9500\u6094\u68CB</button>\n                    <button id=\'restart\' type=\'button\'>\u91CD\u65B0\u5F00\u59CB</button>\n                </div>';
+            }
 
             this.parent.innerHTML = this.parent.innerHTML + toolbar;
             this.cur = document.getElementById('cur');
             this.regBtn = document.getElementById('reget');
             this.cancelBtn = document.getElementById('cancel-reget');
             this.restartBtn = document.getElementById('restart');
+            this.aiBtn = document.getElementById('aiMode');
+            this.selfBtn = document.getElementById('selfMode');
             this.bindEvent();
         }
     }, {
@@ -51,6 +59,16 @@ var ToolBar = function () {
             this.restartBtn.addEventListener('click', function () {
                 return _this.restart();
             });
+            if (this.aiTool) {
+                this.aiBtn.addEventListener('click', function () {
+                    _this.restart();
+                    _this.changeMode(1);
+                });
+                this.selfBtn.addEventListener('click', function () {
+                    _this.restart();
+                    _this.changeMode(2);
+                });
+            }
         }
     }, {
         key: 'regretEvent',
@@ -65,13 +83,29 @@ var ToolBar = function () {
     }, {
         key: 'restart',
         value: function restart() {
-            console.log(this.owner);
             this.owner.restart();
         }
     }, {
         key: 'changeCur',
         value: function changeCur(color) {
             this.cur.style.backgroundColor = color;
+        }
+
+        /*
+         * mode 1: aiMode 2: selfMode
+         */
+
+    }, {
+        key: 'changeMode',
+        value: function changeMode(mode) {
+            this.owner.changeMode(mode);
+            if (mode === 1) {
+                this.aiBtn.disabled = true;
+                this.selfBtn.disabled = false;
+            } else if (mode === 2) {
+                this.aiBtn.disabled = false;
+                this.selfBtn.disabled = true;
+            }
         }
     }]);
 

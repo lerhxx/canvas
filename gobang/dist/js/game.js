@@ -5,14 +5,20 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Game = function () {
-    function Game() {
+    function Game(aiModeTool) {
         _classCallCheck(this, Game);
 
         this.toolbar = new ToolBar({
             parent: document.getElementById('container'),
-            owner: this
+            owner: this,
+            aiTool: aiModeTool
         });
-        this.curChess = 2;
+        this.isAIMode = false;
+        aiModeTool && this.toolbar.changeMode(1);
+
+        this.playerChess = 2;
+        this.aiChess = 1;
+        this.curChess = this.playerChess;
         this.toolbar.changeCur(this.curChess === 1 ? 'white' : 'black');
 
         this.goBang = new GoBang({
@@ -29,13 +35,26 @@ var Game = function () {
         this.steps = [];
         this.regrets = [];
         this.direction = ['checklr', 'checktb', 'checklt', 'checkrt'];
+        this.weightDirection = ['checkWeightlr', 'checkWeighttb', 'checkWeightlt', 'checkWeightrt'];
         this.isEnd = false;
+        this.isAI = false;
 
         this.regret = this.regret.bind(this);
         this.cancelRreget = this.cancelRreget.bind(this);
+        this.aiPlay = this.aiPlay.bind(this);
     }
 
+    /*
+     * mode 1: aiMode 2: selfMode
+     */
+
+
     _createClass(Game, [{
+        key: 'changeMode',
+        value: function changeMode(mode) {
+            this.isAIMode = mode === 1 ? true : false;
+        }
+    }, {
         key: 'step',
         value: function step(chess) {
             if (chess) {
@@ -239,14 +258,18 @@ var Game = function () {
                 alert('棋盘上没有可以反悔的棋子了');
                 return;
             }
-            var chess = this.steps.pop();
-            this.regrets.push({
-                chess: chess,
-                oriFlag: chess.flag
-            });
+            var i = 0,
+                loop = this.isAIMode ? 2 : 1;
+            while (i < loop) {
+                var chess = this.steps.pop();
+                this.regrets.push({
+                    chess: chess,
+                    oriFlag: chess.flag
+                });
 
-            this.goBang.clearChess(chess);
-            this.changeCurChess();
+                this.goBang.clearChess(chess);
+                ++i;
+            }
         }
     }, {
         key: 'cancelRreget',
@@ -259,24 +282,251 @@ var Game = function () {
                 alert('没有反悔的棋子哦');
                 return;
             }
-            var newChess = this.regrets.pop();
-            this.steps.push(newChess.chess);
-            this.goBang.cancelChess(newChess, newChess.oriFlag);
-            this.changeCurChess();
+            var i = 0,
+                loop = this.isAIMode ? 2 : 1;
+            while (i < loop) {
+                var newChess = this.regrets.pop();
+                this.steps.push(newChess.chess);
+                this.goBang.cancelChess(newChess, newChess.oriFlag);
+                ++i;
+            }
         }
     }, {
         key: 'restart',
         value: function restart() {
+            console.log(this);
             this.goBang.restart();
             this.isEnd = false;
             this.regrets.length = 0;
             this.steps.length = 0;
+            this.isAI = false;
+            this.curChess = this.playerChess;
+            this.toolbar.changeCur('black');
         }
     }, {
         key: 'changeCurChess',
         value: function changeCurChess() {
             this.curChess = this.curChess === 1 ? 2 : 1;
             this.toolbar.changeCur(this.curChess === 1 ? 'white' : 'black');
+            this.isAI = this.isAIMode ? !this.isAI : false;
+            if (this.isAIMode && this.isAI) {
+                setTimeout(this.aiPlay, 500);
+            }
+        }
+    }, {
+        key: 'aiPlay',
+        value: function aiPlay() {
+            var chess = this.maxWeightChess();
+            this.goBang.drawChess(chess.x, chess.y, this.curChess, 0);
+        }
+    }, {
+        key: 'maxWeightChess',
+        value: function maxWeightChess() {
+            var chessArr = this.goBang.chessArr,
+                chess = null,
+                maxWeight = 0;
+            for (var i = 0, len1 = chessArr.length; i < len1; ++i) {
+                for (var n = 0, len2 = chessArr[0].length; n < len2; ++n) {
+                    if (chessArr[i][n].flag === 0) {
+                        var aiWeight = 0,
+                            playWeight = 0,
+                            weight = 0;
+                        for (var j = 0, len = this.weightDirection.length; j < len; ++j) {
+                            var aiResult = this[this.weightDirection[j]](i, n, this.aiChess);
+                            var playResult = this[this.weightDirection[j]](i, n, this.playerChess);
+                            aiWeight += this.calcWeight(aiResult);
+                            playWeight += this.calcWeight(playResult);
+                        }
+                        weight = aiWeight > playWeight ? aiWeight : playWeight;
+                        if (maxWeight < weight) {
+                            maxWeight = weight;
+                            chess = chessArr[i][n];
+                        }
+                    }
+                }
+            }
+            return chess;
+        }
+    }, {
+        key: 'checkWeightlr',
+        value: function checkWeightlr(r, c, flag) {
+            var chessArr = this.goBang.chessArr,
+                count = 1,
+                side1 = false,
+                side2 = false;
+
+            for (var i = c - 1; i >= 0; --i) {
+                if (chessArr[r][i].flag === flag) {
+                    ++count;
+                } else {
+                    if (chessArr[r][i].flag === 0) {
+                        side1 = true;
+                    }
+                    break;
+                }
+            }
+            for (var _i5 = c + 1; _i5 <= this.goBang.c; ++_i5) {
+                if (chessArr[r][_i5].flag === flag) {
+                    ++count;
+                } else {
+                    if (chessArr[r][_i5].flag === 0) {
+                        side2 = true;
+                    }
+                    break;
+                }
+            }
+
+            return {
+                side1: side1,
+                side2: side2,
+                count: count
+            };
+        }
+    }, {
+        key: 'checkWeighttb',
+        value: function checkWeighttb(r, c, flag) {
+            var chessArr = this.goBang.chessArr,
+                count = 1,
+                side1 = false,
+                side2 = false;
+
+            for (var i = r - 1; i >= 0; --i) {
+                if (chessArr[i][c].flag === flag) {
+                    ++count;
+                } else {
+                    if (chessArr[i][c].flag === 0) {
+                        side1 = true;
+                    }
+                    break;
+                }
+            }
+            for (var _i6 = r + 1; _i6 <= this.goBang.r; ++_i6) {
+                if (chessArr[_i6][c].flag === flag) {
+                    ++count;
+                } else {
+                    if (chessArr[_i6][c].flag === 0) {
+                        side2 = true;
+                    }
+                    break;
+                }
+            }
+
+            return {
+                side1: side1,
+                side2: side2,
+                count: count
+            };
+        }
+    }, {
+        key: 'checkWeightlt',
+        value: function checkWeightlt(r, c, flag) {
+            var chessArr = this.goBang.chessArr,
+                count = 1,
+                side1 = false,
+                side2 = false;
+
+            for (var i = r - 1, n = c - 1; i >= 0 && n >= 0; --i, --n) {
+                if (chessArr[i][n].flag === flag) {
+                    ++count;
+                } else {
+                    if (chessArr[i][n].flag === 0) {
+                        side1 = true;
+                    }
+                    break;
+                }
+            }
+            for (var _i7 = r + 1, _n3 = c + 1; _i7 <= this.goBang.r && _n3 <= this.goBang.c; ++_i7, ++_n3) {
+                if (chessArr[_i7][_n3].flag === flag) {
+                    ++count;
+                } else {
+                    if (chessArr[_i7][_n3].flag === 0) {
+                        side2 = true;
+                    }
+                    break;
+                }
+            }
+
+            return {
+                side1: side1,
+                side2: side2,
+                count: count
+            };
+        }
+    }, {
+        key: 'checkWeightrt',
+        value: function checkWeightrt(r, c, flag) {
+            var chessArr = this.goBang.chessArr,
+                count = 1,
+                side1 = false,
+                side2 = false;
+
+            for (var i = r - 1, n = c + 1; i >= 0 && n <= this.goBang.c; --i, ++n) {
+                if (chessArr[i][n].flag === flag) {
+                    ++count;
+                } else {
+                    if (chessArr[i][n].flag === 0) {
+                        side1 = true;
+                    }
+                    break;
+                }
+            }
+            for (var _i8 = r + 1, _n4 = c - 1; _i8 <= this.goBang.r && _n4 >= 0; ++_i8, --_n4) {
+                if (chessArr[_i8][_n4].flag === flag) {
+                    ++count;
+                } else {
+                    if (chessArr[_i8][_n4].flag === 0) {
+                        side2 = true;
+                    }
+                    break;
+                }
+            }
+
+            return {
+                side1: side1,
+                side2: side2,
+                count: count
+            };
+        }
+    }, {
+        key: 'calcWeight',
+        value: function calcWeight(obj) {
+            var weight = 0,
+                count = obj.count,
+                side1 = obj.side1,
+                side2 = obj.side2;
+            switch (count) {
+                case 1:
+                    if (side1 && side2) {
+                        weight = this.isAI ? 15 : 10;
+                    }
+                    break;
+                case 2:
+                    if (side1 && side2) {
+                        weight = this.isAI ? 100 : 50;
+                    } else if (side1 || side2) {
+                        weight = this.isAI ? 10 : 5;
+                    }
+                    break;
+                case 3:
+                    if (side1 && side2) {
+                        weight = this.isAI ? 500 : 200;
+                    } else if (side1 || side2) {
+                        weight = this.isAI ? 30 : 20;
+                    }
+                    break;
+                case 4:
+                    if (side1 && side2) {
+                        weight = this.isAI ? 5000 : 2000;
+                    } else if (side1 || side2) {
+                        weight = this.isAI ? 400 : 100;
+                    }
+                    break;
+                case 5:
+                    weight = this.isAI ? 1000000 : 10000;
+                default:
+                    weight = this.isAI ? 500000 : 250000;
+            }
+            return weight;
         }
     }, {
         key: 'drawLine',

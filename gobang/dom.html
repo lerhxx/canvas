@@ -61,6 +61,8 @@
                 height: 5px;
                 background-color: red;
                 transform-origin: 0 50%;
+                -webkit-border-radius: 5px;
+                border-radius: 5px;
             }
             .vertical {
                 transform: rotate(90deg);
@@ -89,7 +91,7 @@
     </body>
     <script>
         window.onload = function() {
-            new Game();
+            new Game(false);
         }
     </script>
 </html>

@@ -12,9 +12,9 @@ var Game = function () {
             parent: document.getElementById('container'),
             owner: this
         });
-        this.curChess = 2;
         this.playerChess = 2;
         this.aiChess = 1;
+        this.curChess = this.playerChess;
         this.toolbar.changeCur(this.curChess === 1 ? 'white' : 'black');
 
         this.goBang = new GoBang({
@@ -253,7 +253,6 @@ var Game = function () {
                 });
 
                 this.goBang.clearChess(chess);
-                // this.changeCurChess();
                 ++i;
             }
         }
@@ -284,6 +283,8 @@ var Game = function () {
             this.regrets.length = 0;
             this.steps.length = 0;
             this.isAI = false;
+            this.curChess = this.playerChess;
+            this.toolbar.changeCur('black');
         }
     }, {
         key: 'changeCurChess',
@@ -293,7 +294,6 @@ var Game = function () {
             this.isAI = !this.isAI;
             if (this.isAI) {
                 setTimeout(this.aiPlay, 500);
-                // this.aiPlay();
             }
         }
     }, {

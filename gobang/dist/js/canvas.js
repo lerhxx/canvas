@@ -241,6 +241,7 @@ var GoBang = function () {
 
             ctx.beginPath();
             ctx.save();
+            ctx.lineCap = 'round';
             ctx.strokeStyle = 'red';
             ctx.lineWidth = 5;
             ctx.moveTo(chessArr[res.sr][res.sc].x, chessArr[res.sr][res.sc].y);
