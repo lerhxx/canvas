@@ -287,6 +287,7 @@ var Game = function () {
             while (i < loop) {
                 var newChess = this.regrets.pop();
                 this.steps.push(newChess.chess);
+                console.log(newChess);
                 this.goBang.cancelChess(newChess, newChess.oriFlag);
                 ++i;
             }
@@ -318,14 +319,15 @@ var Game = function () {
         key: 'aiPlay',
         value: function aiPlay() {
             var chess = this.maxWeightChess();
-            this.goBang.drawChess(chess.x, chess.y, this.curChess, 0);
+            console.log(chess);
+            this.goBang.drawChess(chess.r, chess.c, this.curChess, 0);
         }
     }, {
         key: 'maxWeightChess',
         value: function maxWeightChess() {
             var chessArr = this.goBang.chessArr,
                 chess = null,
-                maxWeight = 0;
+                maxWeight = -1;
             for (var i = 0, len1 = chessArr.length; i < len1; ++i) {
                 for (var n = 0, len2 = chessArr[0].length; n < len2; ++n) {
                     if (chessArr[i][n].flag === 0) {

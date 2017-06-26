@@ -15,6 +15,7 @@ var DomChess = function (_Chess) {
         var obj = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
         var r = arguments[1];
         var c = arguments[2];
+        var ele = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
         _classCallCheck(this, DomChess);
 
@@ -22,7 +23,7 @@ var DomChess = function (_Chess) {
 
         _this.r = r;
         _this.c = c;
-        _this.ele = null;
+        _this.ele = ele;
         return _this;
     }
 
@@ -100,6 +101,7 @@ var GoBang = function () {
     }, {
         key: 'initChessArr',
         value: function initChessArr() {
+            var chesses = [].slice.call(document.getElementsByClassName('chess'));
             for (var i = 0; i <= this.r; ++i) {
                 this.chessArr[i] = [];
                 for (var n = 0; n <= this.c; ++n) {
@@ -108,7 +110,7 @@ var GoBang = function () {
                         y: this.d * i,
                         flag: 0,
                         owner: this
-                    }, i, n);
+                    }, i, n, chesses.shift());
                 }
             }
             console.log(this.chessArr);
@@ -121,24 +123,24 @@ var GoBang = function () {
     }, {
         key: 'parentEvent',
         value: function parentEvent(e) {
-            if (e.target !== this.parent && e.target.classList.contains('chess') && !this.owner.isEnd) {
+            if (!this.owner.isAI && e.target !== this.parent && e.target.classList.contains('chess') && !this.owner.isEnd) {
                 var flag = this.owner ? this.owner.curChess : 1;
-                this.drawChess(flag, e.target);
+
+                var y = parseInt(e.target.style.top),
+                    x = parseInt(e.target.style.left);
+                var c = ~~(x / this.d),
+                    r = ~~(y / this.d);
+                this.drawChess(r, c, flag);
             }
         }
     }, {
         key: 'drawChess',
-        value: function drawChess(flag, tar, tx, ty) {
-            var y = ty || parseInt(tar.style.top),
-                x = tx || parseInt(tar.style.left);
-            var c = ~~(x / this.d),
-                r = ~~(y / this.d);
+        value: function drawChess(r, c, flag) {
 
             if (c < 0 || r < 0 || c > this.c || r > this.r || this.chessArr[r][c].flag !== 0) {
                 return null;
             }
-            this.chessArr[r][c].flag = flag, this.chessArr[r][c].ele = tar;
-            this.chessArr[r][c].draw(flag === 1 ? 'white' : 'black');
+            this.chessArr[r][c].flag = flag, this.chessArr[r][c].draw(flag === 1 ? 'white' : 'black');
 
             this.owner && this.owner.step && this.owner.step(this.chessArr[r][c]);
         }
@@ -163,7 +165,6 @@ var GoBang = function () {
                     col.flag = 0;
                     if (col.ele) {
                         col.draw('transparent');
-                        col.ele = null;
                     }
                 });
             });

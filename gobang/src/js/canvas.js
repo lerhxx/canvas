@@ -93,7 +93,9 @@ class GoBang {
     canvasEvent(e) {
         if(!this.owner.isAI && !this.owner.isEnd) {
             let flag = this.owner ? this.owner.curChess : 1;
-            this.drawChess(e.offsetX, e.offsetY, flag, 0);
+            let c = ~~(e.offsetX / this.d),
+                r = ~~(e.offsetY / this.d);
+            this.drawChess(r, c, flag, 0);
         }
     }
     
@@ -154,9 +156,9 @@ class GoBang {
     }
 
     // type 0 新下的棋，1 悔棋, 2 撤销悔棋
-    drawChess(x, y, flag, type) {
-        let c = ~~(x / this.d),
-            r = ~~(y / this.d);
+    drawChess(r, c, flag, type) {
+        // let c = ~~(x / this.d),
+        //     r = ~~(y / this.d);
 
         if(c < 0 || r < 0 || c > this.c || r > this.r || type === 0 && this.chessArr[r][c].flag !== 0) {
             return null;
@@ -171,12 +173,12 @@ class GoBang {
     }
 
     clearChess(chess) {
-        this.drawChess(chess.x, chess.y, 0, 1);
+        this.drawChess(chess.r, chess.c, 0, 1);
     }
 
     cancelChess(newChess, flag) {
         let chess = newChess.chess;
-        this.drawChess(chess.x, chess.y, flag, 2);
+        this.drawChess(chess.r, chess.c, flag, 2);
     }
 
     restart() {

@@ -267,6 +267,7 @@ class Game {
         while(i < loop) {
             let newChess = this.regrets.pop();
             this.steps.push(newChess.chess);
+            console.log(newChess)
             this.goBang.cancelChess(newChess, newChess.oriFlag);
             ++i;
         }
@@ -295,13 +296,14 @@ class Game {
 
     aiPlay() {
         let chess = this.maxWeightChess();
-        this.goBang.drawChess(chess.x, chess.y, this.curChess, 0);
+        console.log(chess)
+        this.goBang.drawChess(chess.r, chess.c, this.curChess, 0);
     }
 
     maxWeightChess() {
         let chessArr = this.goBang.chessArr,
             chess = null,
-            maxWeight = 0;
+            maxWeight = -1;
         for(let i = 0, len1 = chessArr.length; i < len1; ++i) {
             for(let n = 0, len2 = chessArr[0].length; n < len2; ++n) {
                 if(chessArr[i][n].flag === 0) {

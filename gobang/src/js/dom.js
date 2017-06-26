@@ -1,10 +1,10 @@
 class DomChess extends Chess {
-    constructor(obj={}, r, c) {
+    constructor(obj={}, r, c, ele=null) {
         super(obj);
 
         this.r = r;
         this.c = c;
-        this.ele = null;
+        this.ele = ele;
     }
 
     draw(color) {
@@ -68,6 +68,7 @@ class GoBang {
     }
 
     initChessArr() {
+        let chesses = [].slice.call(document.getElementsByClassName('chess'));
         for(let i = 0; i <= this.r; ++i) {
             this.chessArr[i] = [];
             for(let n = 0; n <= this.c; ++n) {
@@ -76,7 +77,7 @@ class GoBang {
                     y: this.d * i,
                     flag: 0,
                     owner: this
-                }, i, n)
+                }, i, n, chesses.shift())
             }
         }
         console.log(this.chessArr)
@@ -87,23 +88,23 @@ class GoBang {
     }
 
     parentEvent(e) {
-        if(e.target !== this.parent && e.target.classList.contains('chess') && !this.owner.isEnd) {
+        if(!this.owner.isAI && e.target !== this.parent && e.target.classList.contains('chess') && !this.owner.isEnd) {
             let flag = this.owner ? this.owner.curChess : 1;
-            this.drawChess(flag, e.target);
+
+            let y = parseInt(e.target.style.top),
+                x = parseInt(e.target.style.left);
+            let c = ~~(x / this.d),
+                r = ~~(y / this.d);
+            this.drawChess(r, c, flag);
         }
     }
 
-    drawChess(flag, tar, tx, ty) {
-        let y = ty || parseInt(tar.style.top),
-            x = tx || parseInt(tar.style.left);
-        let c = ~~(x / this.d),
-            r = ~~(y / this.d);
+    drawChess(r, c, flag) {
 
         if(c < 0 || r < 0 || c > this.c || r > this.r || this.chessArr[r][c].flag !== 0) {
             return null;
         }
         this.chessArr[r][c].flag = flag,
-        this.chessArr[r][c].ele = tar;
         this.chessArr[r][c].draw(flag === 1 ? 'white' : 'black');
 
         this.owner && this.owner.step && this.owner.step(this.chessArr[r][c]);
@@ -126,7 +127,6 @@ class GoBang {
                 col.flag = 0;
                 if(col.ele) {
                     col.draw('transparent');
-                    col.ele = null;
                 }
             })
         })

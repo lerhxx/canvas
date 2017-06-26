@@ -127,7 +127,9 @@ var GoBang = function () {
         value: function canvasEvent(e) {
             if (!this.owner.isAI && !this.owner.isEnd) {
                 var flag = this.owner ? this.owner.curChess : 1;
-                this.drawChess(e.offsetX, e.offsetY, flag, 0);
+                var c = ~~(e.offsetX / this.d),
+                    r = ~~(e.offsetY / this.d);
+                this.drawChess(r, c, flag, 0);
             }
         }
     }, {
@@ -195,9 +197,9 @@ var GoBang = function () {
 
     }, {
         key: 'drawChess',
-        value: function drawChess(x, y, flag, type) {
-            var c = ~~(x / this.d),
-                r = ~~(y / this.d);
+        value: function drawChess(r, c, flag, type) {
+            // let c = ~~(x / this.d),
+            //     r = ~~(y / this.d);
 
             if (c < 0 || r < 0 || c > this.c || r > this.r || type === 0 && this.chessArr[r][c].flag !== 0) {
                 return null;
@@ -213,13 +215,13 @@ var GoBang = function () {
     }, {
         key: 'clearChess',
         value: function clearChess(chess) {
-            this.drawChess(chess.x, chess.y, 0, 1);
+            this.drawChess(chess.r, chess.c, 0, 1);
         }
     }, {
         key: 'cancelChess',
         value: function cancelChess(newChess, flag) {
             var chess = newChess.chess;
-            this.drawChess(chess.x, chess.y, flag, 2);
+            this.drawChess(chess.r, chess.c, flag, 2);
         }
     }, {
         key: 'restart',
